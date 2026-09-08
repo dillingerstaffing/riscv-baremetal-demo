@@ -28,6 +28,15 @@ round-robin scheduler with real assembly context switches.
   Measured on QEMU: interrupt latency min 13.6 us, context-switch cost
   min 17.3 us (see `src/preempt/PROOF.md` for the build log, the raw run
   output, and how each number was measured).
+- **virtio-blk block driver** (`virtio-blk.elf`, see `src/virtio-blk/`):
+  discovers the virtio-mmio block device on the bus, runs the spec's
+  device status sequence, negotiates the interface (1.x via
+  `VIRTIO_F_VERSION_1` when offered, legacy `QueuePFN`/`QueueAlign`
+  otherwise), lays out a 128-entry split virtqueue in RAM, and issues a
+  real sector write followed by a sector read. Measured on QEMU: 512/512
+  bytes round-tripped through sector 0 with 0 mismatches, device status
+  OK on both requests (see `src/virtio-blk/PROOF.md` for the build log,
+  the raw run output, and a host-side check of the backing image).
 - **SMP bring-up** (`smp.elf`, see `src/smp/`): two-hart startup on
   `-smp 2`. Every hart reads `mhartid`, installs a private stack from a
   static array, and hart 1 spins on a release flag until hart 0 starts
@@ -67,6 +76,12 @@ riscv-baremetal-demo/
       hart1.c     hart 1: entry stamp, hart-id/stack print, done signal
       smp.h       shared definitions
       PROOF.md    build log, QEMU run output, measurement analysis
+    virtio-blk/   virtio-blk block driver module (built as virtio-blk.elf)
+      virtio.h/.c virtio-mmio transport: discovery, init sequence,
+                  feature negotiation, split-virtqueue management
+      blk.h/.c    sector read/write via 3-descriptor request chains
+      bmain.c     bring-up, sector write/read/verify, results report
+      PROOF.md    build log, QEMU run output, measurement analysis
 ```
 
 ## How to build and run
@@ -96,6 +111,14 @@ Build and run the SMP bring-up module (two harts):
 ```sh
 make smp.elf
 make run-smp
+```
+
+Build and run the virtio-blk module (needs the raw disk image, created
+by the `disk.img` make target):
+
+```sh
+make virtio-blk.elf
+make run-virtio
 ```
 
 `make run` launches:

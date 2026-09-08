@@ -14,7 +14,7 @@ SRCS := src/boot.S src/switch.S src/uart.c src/sched.c src/tasks.c src/main.c
 OBJS := $(SRCS:.c=.o)
 OBJS := $(OBJS:.S=.o)
 
-all: demo.elf preempt.elf smp.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -29,6 +29,17 @@ PREEMPT_OBJS := $(PREEMPT_OBJS:.S=.o)
 
 preempt.elf: $(PREEMPT_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(PREEMPT_OBJS)
+
+# virtio-blk module: its own binary sharing only boot.S and the
+# UART driver with the other demos. Needs a raw disk image at run time
+# (see the disk.img rule and run-virtio below).
+VIRTIO_SRCS := src/boot.S src/uart.c \
+               src/virtio-blk/virtio.c src/virtio-blk/blk.c src/virtio-blk/bmain.c
+VIRTIO_OBJS := $(VIRTIO_SRCS:.c=.o)
+VIRTIO_OBJS := $(VIRTIO_OBJS:.S=.o)
+
+virtio-blk.elf: $(VIRTIO_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(VIRTIO_OBJS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -47,6 +58,17 @@ run: demo.elf
 run-preempt: preempt.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel preempt.elf
 
+# 16 MiB raw disk image backing the virtio-blk device (not committed).
+disk.img:
+	dd if=/dev/zero of=$@ bs=1M count=16
+
+# Run the virtio-blk module under QEMU, with the raw image attached as a
+# virtio-blk-device (QEMU maps it to the next free virtio-mmio slot).
+run-virtio: virtio-blk.elf disk.img
+	$(QEMU) -machine virt -nographic -bios none -kernel virtio-blk.elf \
+		-drive file=disk.img,if=none,format=raw,id=hd0 \
+		-device virtio-blk-device,drive=hd0
+
 # SMP bring-up module: its own binary sharing only the UART driver with
 # the other demos. Boots two harts (-smp 2).
 SMP_SRCS := src/smp/smp_boot.S src/uart.c \
@@ -63,6 +85,6 @@ run-smp: smp.elf
 	$(QEMU) -machine virt -nographic -bios none -smp 2 -kernel smp.elf
 
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(SMP_OBJS) demo.elf preempt.elf smp.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf
 
 .PHONY: all run clean
