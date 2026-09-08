@@ -30,4 +30,13 @@ SECTIONS
     /* 16 KiB stack for the boot hart, 16-byte aligned. */
     . = ALIGN(16);
     _stack_top = . + 0x4000;
+
+    /* Toolchain metadata (build-id notes, unwinding tables, attributes)
+       must not occupy the entry point or the image. */
+    /DISCARD/ : {
+        *(.note .note.*)
+        *(.eh_frame .eh_frame_hdr)
+        *(.riscv.attributes)
+        *(.comment)
+    }
 }

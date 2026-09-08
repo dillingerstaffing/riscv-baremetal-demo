@@ -21,12 +21,20 @@ round-robin scheduler with real assembly context switches.
   the task body.
 - **Clean, freestanding C**: `-ffreestanding -nostdlib -nostartfiles`,
   no libc, no syscalls, warnings enabled (`-Wall -Wextra`).
+- **Preemptive scheduling** (`preempt.elf`, see `src/preempt/`): the CLINT
+  machine timer (`mtime`/`mtimecmp`) fires every 1 ms; an assembly trap
+  handler saves the full register context (x1-x31 plus `mepc`) and
+  switches tasks, so three tasks that never yield still interleave.
+  Measured on QEMU: interrupt latency min 13.6 us, context-switch cost
+  min 17.3 us (see `src/preempt/PROOF.md` for the build log, the raw run
+  output, and how each number was measured).
 
 ## Project layout
 
 ```
 riscv-baremetal-demo/
-  Makefile        build and run (CROSS=riscv64-unknown-elf- by default)
+  Makefile        build and run (CROSS=riscv64-unknown-elf- by default;
+                  QEMU=qemu-system-riscv64 is overridable)
   link.ld         places .text/.rodata/.data/.bss at 0x80000000, 16 KiB boot stack
   src/
     boot.S        _start: stack init, BSS clear, call main, halt on return
@@ -35,6 +43,13 @@ riscv-baremetal-demo/
     sched.h/.c    task table, task_create, sched_yield, sched_run
     tasks.h/.c    three demo workloads (heartbeat, fibonacci, spinner)
     main.c        UART init, banner, task registration, scheduler start
+    preempt/      preemptive-scheduler module (built as preempt.elf)
+      trap.S      machine-timer trap entry/exit, full context save/restore
+      clint.h/.c  CLINT mtime/mtimecmp driver
+      psched.h/.c task table, C trap handler, cycle/latency measurements
+      ptasks.h/.c three tasks that never yield
+      pmain.c     bring-up, wait loop, results report
+      PROOF.md    build log, QEMU run output, measurement analysis
 ```
 
 ## How to build and run
@@ -50,6 +65,13 @@ Build and run:
 ```sh
 make
 make run
+```
+
+Build and run the preemptive-scheduler module:
+
+```sh
+make preempt.elf
+make run-preempt
 ```
 
 `make run` launches:
@@ -105,6 +127,5 @@ which only works because every task runs on its own stack.
 
 ## Possible extensions
 
-- Preemptive scheduling via the CLINT timer interrupt (`mtime`/`mtimecmp`)
 - UART receive with interrupt-driven input and a tiny shell
 - `sbrk`-style heap and dynamic task creation

@@ -6,17 +6,29 @@ CROSS   ?= riscv64-unknown-elf-
 CC      := $(CROSS)gcc
 
 CFLAGS  := -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles \
-           -march=rv64imac -mabi=lp64 -mcmodel=medany
+           -no-pie -fno-pie -fno-pic \
+           -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany
 LDFLAGS := -T link.ld
 
 SRCS := src/boot.S src/switch.S src/uart.c src/sched.c src/tasks.c src/main.c
 OBJS := $(SRCS:.c=.o)
 OBJS := $(OBJS:.S=.o)
 
-all: demo.elf
+all: demo.elf preempt.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
+
+# Preemptive-scheduler module: its own binary sharing only boot.S and the
+# UART driver with the cooperative demo.
+PREEMPT_SRCS := src/boot.S src/uart.c \
+                src/preempt/trap.S src/preempt/clint.c src/preempt/psched.c \
+                src/preempt/ptasks.c src/preempt/pmain.c
+PREEMPT_OBJS := $(PREEMPT_SRCS:.c=.o)
+PREEMPT_OBJS := $(PREEMPT_OBJS:.S=.o)
+
+preempt.elf: $(PREEMPT_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(PREEMPT_OBJS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -26,10 +38,16 @@ demo.elf: $(OBJS) link.ld
 
 # Run under QEMU. -bios none skips firmware so we boot straight into _start
 # in M-mode; -nographic wires the virt UART to the terminal.
+# QEMU is overridable: make run QEMU=path/to/qemu-system-riscv64
+QEMU ?= qemu-system-riscv64
 run: demo.elf
-	qemu-system-riscv64 -machine virt -nographic -bios none -kernel demo.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel demo.elf
+
+# Run the preemptive-scheduler module under QEMU.
+run-preempt: preempt.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel preempt.elf
 
 clean:
-	rm -f $(OBJS) demo.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) demo.elf preempt.elf
 
 .PHONY: all run clean
