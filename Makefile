@@ -14,7 +14,7 @@ SRCS := src/boot.S src/switch.S src/uart.c src/sched.c src/tasks.c src/main.c
 OBJS := $(SRCS:.c=.o)
 OBJS := $(OBJS:.S=.o)
 
-all: demo.elf preempt.elf
+all: demo.elf preempt.elf smp.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -47,7 +47,22 @@ run: demo.elf
 run-preempt: preempt.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel preempt.elf
 
+# SMP bring-up module: its own binary sharing only the UART driver with
+# the other demos. Boots two harts (-smp 2).
+SMP_SRCS := src/smp/smp_boot.S src/uart.c \
+            src/smp/spinlock.c src/smp/smp_print.c \
+            src/smp/smp_main.c src/smp/hart1.c
+SMP_OBJS := $(SMP_SRCS:.c=.o)
+SMP_OBJS := $(SMP_OBJS:.S=.o)
+
+smp.elf: $(SMP_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SMP_OBJS)
+
+# Run the SMP bring-up module under QEMU with two harts.
+run-smp: smp.elf
+	$(QEMU) -machine virt -nographic -bios none -smp 2 -kernel smp.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) demo.elf preempt.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(SMP_OBJS) demo.elf preempt.elf smp.elf
 
 .PHONY: all run clean

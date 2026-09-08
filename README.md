@@ -28,6 +28,15 @@ round-robin scheduler with real assembly context switches.
   Measured on QEMU: interrupt latency min 13.6 us, context-switch cost
   min 17.3 us (see `src/preempt/PROOF.md` for the build log, the raw run
   output, and how each number was measured).
+- **SMP bring-up** (`smp.elf`, see `src/smp/`): two-hart startup on
+  `-smp 2`. Every hart reads `mhartid`, installs a private stack from a
+  static array, and hart 1 spins on a release flag until hart 0 starts
+  it. UART output from both harts is serialized with an `amoswap`
+  spinlock. Measured on QEMU: bring-up latency 1,595,175 cycles (run 1)
+  and 3,554,055 cycles (run 2), release stamp to hart 1's first stamp;
+  both harts reported `mhartid` 0 and 1 with disjoint stack slices
+  (see `src/smp/PROOF.md` for the build log, the raw run output, and
+  how each number was measured).
 
 ## Project layout
 
@@ -49,6 +58,14 @@ riscv-baremetal-demo/
       psched.h/.c task table, C trap handler, cycle/latency measurements
       ptasks.h/.c three tasks that never yield
       pmain.c     bring-up, wait loop, results report
+      PROOF.md    build log, QEMU run output, measurement analysis
+    smp/          two-hart SMP bring-up module (built as smp.elf)
+      smp_boot.S  per-hart entry: mhartid read, private stacks, release-flag wait
+      spinlock.h/.c  amoswap-based spinlock serializing UART output
+      smp_print.c locked UART output helpers
+      smp_main.c  hart 0: bring-up, release, verification report
+      hart1.c     hart 1: entry stamp, hart-id/stack print, done signal
+      smp.h       shared definitions
       PROOF.md    build log, QEMU run output, measurement analysis
 ```
 
@@ -72,6 +89,13 @@ Build and run the preemptive-scheduler module:
 ```sh
 make preempt.elf
 make run-preempt
+```
+
+Build and run the SMP bring-up module (two harts):
+
+```sh
+make smp.elf
+make run-smp
 ```
 
 `make run` launches:
