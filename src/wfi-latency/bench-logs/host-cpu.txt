@@ -1,0 +1,2 @@
+model name	: AMD EPYC 9D25 126-Core Processor
+cpu MHz		: 1497.751

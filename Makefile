@@ -14,7 +14,7 @@ SRCS := src/boot.S src/switch.S src/uart.c src/sched.c src/tasks.c src/main.c
 OBJS := $(SRCS:.c=.o)
 OBJS := $(OBJS:.S=.o)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -164,7 +164,23 @@ pmp.elf: $(PMP_OBJS) link.ld
 run-pmp: pmp.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel pmp.elf
 
+# WFI wakeup-latency module: its own binary sharing boot.S, the UART
+# driver, and the preempt CLINT driver with the other demos. Measures
+# the latency from the CLINT timer interrupt to the first task
+# instruction, with a spin baseline for comparison.
+WFI_SRCS := src/boot.S src/uart.c src/preempt/clint.c \
+            src/wfi-latency/wfi_trap.S src/wfi-latency/wfi_main.c
+WFI_OBJS := $(WFI_SRCS:.c=.o)
+WFI_OBJS := $(WFI_OBJS:.S=.o)
+
+wfi-latency.elf: $(WFI_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(WFI_OBJS)
+
+# Run the WFI wakeup-latency module under QEMU.
+run-wfi-latency: wfi-latency.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel wfi-latency.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf
 
 .PHONY: all run clean
