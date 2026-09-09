@@ -151,6 +151,11 @@ riscv-baremetal-demo/
                   timed claim/complete, in-program PASS/FAIL checks
       PROOF.md    build log, three QEMU run logs, QEMU PLIC model notes,
                   results and limits
+    mtimecmp/     mtimecmp delivery-offset measurement (built as mtimecmp.elf)
+      mt_main.c   CLINT arming 5000 ticks ahead, 1000 timed trials,
+                  calibration, statistics, in-program PASS/FAIL checks
+      mt_trap.S   M-mode trap entry stamping rdtime/rdcycle on entry
+      PROOF.md    build log, three QEMU run logs, results and limits
 ```
 
 ## How to build and run
@@ -253,3 +258,4 @@ which only works because every task runs on its own stack.
 - lab 13: PMP no-access denial test, locked NAPOT region over 4 KiB scratch, load traps mcause=5 mepc=0x80000416, store traps mcause=7 mepc=0x800004be, mtval=0x80002000 both, verified on QEMU
 - lab 14: Misaligned load/store experiment, M-mode trap handler recording mcause/mepc/mtval, QEMU 8.2.2 virt completes misaligned lw/sw transparently (no traps): lw loaded 0xffffffffd5a1b2c3 matching the sign-extended byte-wise reference, sw round-tripped 0x12345678 exactly with the neighboring byte untouched, identical across 3 runs
 - lab 15: PLIC claim/complete round-trip, source 10 (UART0) enabled via priority/enable/threshold, asserted with a looped-back UART byte: claim returns id 10 (29655-32310 rdcycle units across 3 runs), complete 29730-40230 units (host-time MMIO costs, mtime-calibrated), post-complete claim returns 0, RESULT: PASS on all 3 runs
+- lab 16: mtimecmp delivery-offset measurement (mtimecmp.elf), mtimecmp armed 5000 ticks ahead of mtime, 1000 trials per run x 3 runs on QEMU 8.2.2: delivery offset 102-115 min, 152-198 median, 814-881 p99, 992-998 max ticks; rdcycle/mtime calibration 149 on every run; every trial delivered exactly one timer interrupt, zero spurious traps, offset never negative; RESULT: PASS on all 3 runs
