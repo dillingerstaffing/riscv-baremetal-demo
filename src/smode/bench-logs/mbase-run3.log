@@ -1,0 +1,28 @@
+
+========================================
+riscv-baremetal-demo: M-mode baseline
+same scheduler on the machine timer interrupt
+========================================
+
+quantum 10000 ticks (1 ms), 200 ticks total
+
+timer armed, entering wfi wait...
+
+smode: done. 200 timer ticks, 200 measured context switches
+
+task progress (task bodies never yield):
+  spin-a: 13896449 iterations
+  spin-b: 13838631 iterations
+  spin-c: 14271227 iterations
+
+interrupt latency (mtime tick = 100 ns):
+  min 120 / median 144 / max 61182 ticks  (12000 / 14400 / 6118200 ns)
+
+context-switch cost, entry stamp to exit stamp:
+  min 19965 / median 21607 / max 2625930 cycles
+  cross-check via mtime: min 137 / median 148 / max 18086 ticks (13700 / 14800 / 1808600 ns)
+
+rdcycle/rdtime ratio at median switch cost: 145 cycles per 100 ns tick
+
+halting.
+qemu-system-riscv64: terminating on signal 15 from pid 4888 (timeout)

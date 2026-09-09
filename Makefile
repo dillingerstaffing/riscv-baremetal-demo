@@ -14,7 +14,7 @@ SRCS := src/boot.S src/switch.S src/uart.c src/sched.c src/tasks.c src/main.c
 OBJS := $(SRCS:.c=.o)
 OBJS := $(OBJS:.S=.o)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -112,7 +112,44 @@ uart-baud.elf: $(UARTBAUD_OBJS) link.ld
 run-uart-baud: uart-baud.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel uart-baud.elf
 
+# S-mode trap delegation module: two binaries sharing the scheduler core,
+# compiled once per privilege mode via -DTRAP_SMODE.
+#   smode.elf: M-mode boot programs medeleg/mideleg, installs stvec, drops
+#     to S-mode with sret; the scheduler runs on the delegated supervisor
+#     timer interrupt (stimecmp when Sstc is present, M-mode ecall rearm
+#     otherwise).
+#   smode-mbase.elf: the identical workload in M-mode on the machine timer
+#     interrupt; the baseline the delegation overhead is measured against.
+SMODE_S_OBJS := src/smode/sboot_s.o src/smode/msetup_s.o src/smode/strap_s.o \
+                src/smode/ssched_s.o src/smode/stimer_s.o src/smode/smain_s.o \
+                src/smode/stasks_s.o src/uart.o
+SMODE_M_OBJS := src/smode/sboot_m.o src/smode/msetup_m.o src/smode/strap_m.o \
+                src/smode/ssched_m.o src/smode/stimer_m.o src/smode/smain_m.o \
+                src/smode/stasks_m.o src/uart.o
+
+src/smode/%_s.o: src/smode/%.c
+	$(CC) $(CFLAGS) -DTRAP_SMODE=1 -c $< -o $@
+src/smode/%_s.o: src/smode/%.S
+	$(CC) $(CFLAGS) -DTRAP_SMODE=1 -c $< -o $@
+src/smode/%_m.o: src/smode/%.c
+	$(CC) $(CFLAGS) -DTRAP_SMODE=0 -c $< -o $@
+src/smode/%_m.o: src/smode/%.S
+	$(CC) $(CFLAGS) -DTRAP_SMODE=0 -c $< -o $@
+
+smode.elf: $(SMODE_S_OBJS) link.ld
+	$(CC) $(CFLAGS) -DTRAP_SMODE=1 $(LDFLAGS) -o $@ $(SMODE_S_OBJS)
+
+smode-mbase.elf: $(SMODE_M_OBJS) link.ld
+	$(CC) $(CFLAGS) -DTRAP_SMODE=0 $(LDFLAGS) -o $@ $(SMODE_M_OBJS)
+
+# Run the S-mode delegation module and the M-mode baseline under QEMU.
+run-smode: smode.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel smode.elf
+
+run-smode-mbase: smode-mbase.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel smode-mbase.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf
 
 .PHONY: all run clean

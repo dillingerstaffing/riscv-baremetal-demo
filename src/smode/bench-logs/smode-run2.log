@@ -1,0 +1,29 @@
+
+========================================
+riscv-baremetal-demo: S-mode trap delegation
+scheduler on the delegated supervisor timer interrupt
+========================================
+
+Sstc (stimecmp): present, pure S-mode timer
+quantum 10000 ticks (1 ms), 200 ticks total
+
+timer armed, entering wfi wait...
+
+smode: done. 200 timer ticks, 200 measured context switches
+
+task progress (task bodies never yield):
+  spin-a: 14565436 iterations
+  spin-b: 14758009 iterations
+  spin-c: 14554273 iterations
+
+interrupt latency (mtime tick = 100 ns):
+  min 121 / median 238 / max 37500 ticks  (12100 / 23800 / 3750000 ns)
+
+context-switch cost, entry stamp to exit stamp:
+  min 4350 / median 7897 / max 352455 cycles
+  cross-check via mtime: min 31 / median 55 / max 2540 ticks (3100 / 5500 / 254000 ns)
+
+rdcycle/rdtime ratio at median switch cost: 143 cycles per 100 ns tick
+
+halting.
+qemu-system-riscv64: terminating on signal 15 from pid 5006 (timeout)
