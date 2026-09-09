@@ -14,7 +14,7 @@ SRCS := src/boot.S src/switch.S src/uart.c src/sched.c src/tasks.c src/main.c
 OBJS := $(SRCS:.c=.o)
 OBJS := $(OBJS:.S=.o)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -98,7 +98,21 @@ shell.elf: $(SHELL_OBJS) link.ld
 run-shell: shell.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel shell.elf
 
+# UART baud-timing module: its own binary sharing only boot.S and the
+# UART driver with the other demos. Programs the divisor latch and
+# measures the resulting bit timing via the FIFO receive timeout.
+UARTBAUD_SRCS := src/boot.S src/uart.c src/uart-baud/baud_main.c
+UARTBAUD_OBJS := $(UARTBAUD_SRCS:.c=.o)
+UARTBAUD_OBJS := $(UARTBAUD_OBJS:.S=.o)
+
+uart-baud.elf: $(UARTBAUD_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(UARTBAUD_OBJS)
+
+# Run the UART baud-timing module under QEMU.
+run-uart-baud: uart-baud.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel uart-baud.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf
 
 .PHONY: all run clean

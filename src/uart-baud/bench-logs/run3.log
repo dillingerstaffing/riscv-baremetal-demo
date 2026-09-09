@@ -1,0 +1,73 @@
+
+========================================
+riscv-baremetal-demo: uart baud timing
+divisor latch vs measured bit time
+========================================
+
+cal: mtime ticks=4000785 rdcycle ticks=599480685
+cal: rdcycle units per second=1498407649 (mtime is 10 MHz per virt device tree)
+cal: mtime=4034404 rdtime=4034489 mtime=4034670
+cal: one LSR read min=1335 mean=2561 cycles
+
+nominal: bit_time = divisor / 399193 s (virt board baudbase)
+method: one FIFO rx timeout (40 bit times) per run
+
+divisor 1: sync-xmit LSR=0x61 (sampled 92265 cyc after THR write)
+divisor 1: THR write min=5205 mean=9794 cyc
+divisor 1: nominal bit 2505053 ps, 12 runs
+  run 0: bit 3669145 ps, ppm 464697
+  run 1: bit 3765747 ps, ppm 503260
+  run 2: bit 2981164 ps, ppm 190060
+  run 3: bit 3006191 ps, ppm 200050
+  run 4: bit 3047735 ps, ppm 216634
+  run 5: bit 2979162 ps, ppm 189261
+  run 6: bit 2969902 ps, ppm 185564
+  run 7: bit 2979663 ps, ppm 189461
+  run 8: bit 2990174 ps, ppm 193656
+  run 9: bit 2975158 ps, ppm 187662
+  run 10: bit 3021958 ps, ppm 206344
+  run 11: bit 2957889 ps, ppm 180769
+  bit ps min 2957889 max 3765747 mean 3111990
+  bit/divisor 3111990 ps (2505053 matches baudbase 399193)
+  ppm min 180769 max 503260 mean 242284 (one-off costs inside each run: one THR write + one poll iteration, see above)
+
+divisor 12: sync-xmit LSR=0x61 (sampled 16515 cyc after THR write)
+divisor 12: THR write min=5520 mean=11109 cyc
+divisor 12: nominal bit 30060647 ps, 12 runs
+  run 0: bit 30803950 ps, ppm 24726
+  run 1: bit 30959365 ps, ppm 29896
+  run 2: bit 30946351 ps, ppm 29463
+  run 3: bit 30885787 ps, ppm 27449
+  run 4: bit 30827725 ps, ppm 25517
+  run 5: bit 31262937 ps, ppm 39995
+  run 6: bit 30778923 ps, ppm 23894
+  run 7: bit 30874775 ps, ppm 27082
+  run 8: bit 30801948 ps, ppm 24660
+  run 9: bit 30744887 ps, ppm 22761
+  run 10: bit 30796692 ps, ppm 24485
+  run 11: bit 30779424 ps, ppm 23910
+  bit ps min 30744887 max 31262937 mean 30871897
+  bit/divisor 2572658 ps (2505053 matches baudbase 399193)
+  ppm min 22761 max 39995 mean 26986 (one-off costs inside each run: one THR write + one poll iteration, see above)
+
+divisor 96: sync-xmit LSR=0x61 (sampled 17895 cyc after THR write)
+divisor 96: THR write min=5460 mean=11145 cyc
+divisor 96: nominal bit 240485178 ps, 12 runs
+  run 0: bit 242633821 ps, ppm 8934
+  run 1: bit 241565938 ps, ppm 4494
+  run 2: bit 241623499 ps, ppm 4733
+  run 3: bit 241898291 ps, ppm 5876
+  run 4: bit 241608984 ps, ppm 4673
+  run 5: bit 241893035 ps, ppm 5854
+  run 6: bit 241538409 ps, ppm 4379
+  run 7: bit 242539221 ps, ppm 8541
+  run 8: bit 245752132 ps, ppm 21901
+  run 9: bit 242124531 ps, ppm 6816
+  run 10: bit 241489857 ps, ppm 4177
+  run 11: bit 241531401 ps, ppm 4350
+  bit ps min 241489857 max 245752132 mean 242183259
+  bit/divisor 2522742 ps (2505053 matches baudbase 399193)
+  ppm min 4177 max 21901 mean 7060 (one-off costs inside each run: one THR write + one poll iteration, see above)
+
+done
+qemu-system-riscv64: terminating on signal 15 from pid 13493 (timeout)
