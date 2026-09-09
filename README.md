@@ -176,3 +176,7 @@ which only works because every task runs on its own stack.
 
 - UART receive with interrupt-driven input and a tiny shell
 - `sbrk`-style heap and dynamic task creation
+
+## Labs
+- lab 10: Preempt benchmarks, code size -O2 3831 vs -O0 4761 bytes, switch cost measured and mtime cross-checked (commit 3971bb4)
+- lab 11: Bare-metal UART shell, help/echo/regs/uptime, verified on QEMU (commit 06c817b)
