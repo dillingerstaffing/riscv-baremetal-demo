@@ -68,6 +68,17 @@ round-robin scheduler with real assembly context switches.
   a correct 1/D baud law, not a baud error (see `src/uart-baud/PROOF.md`
   for the build log, the raw run output, and the limits of
   verification).
+- **WFI wakeup latency** (`wfi-latency.elf`, see `src/wfi-latency/`):
+  arms the CLINT timer 20000 mtime ticks (2 ms) ahead, then either
+  executes `wfi` or spins on a flag, and measures the latency from the
+  programmed wakeup to the first instruction after `mret`, with 400
+  interleaved trials of each kind per run (first 8 discarded). Measured
+  on QEMU: waking a halted vcpu costs about 1.5 to 1.9x the
+  timer-interrupt latency of a spinning hart, roughly 130 to 230 ticks
+  (13 to 23 us) of extra vcpu-wakeup latency in the quieter runs; the
+  trap path itself is identical either way (see
+  `src/wfi-latency/PROOF.md` for the build log, three raw QEMU run
+  logs, the clock calibration, and the limits of verification).
 
 ## Project layout
 
@@ -113,6 +124,13 @@ riscv-baremetal-demo/
                   with mcause/mepc/mtval verification
       pmp_trap.S  minimal M-mode trap entry recording the fault state
       PROOF.md    build log, three QEMU run logs, config and limits
+    wfi-latency/  WFI wakeup latency (built as wfi-latency.elf)
+      wfi_main.c  CLINT arming, wfi vs spin trial blocks, interleaved
+                  trials, statistics, in-program PASS/FAIL checks
+      wfi_trap.S  M-mode trap entry stamping rdtime/rdcycle on entry
+      wfi.h       trap save-area layout and per-trial record
+      PROOF.md    build log, three QEMU run logs, clock calibration,
+                  method, results, and limits
 ```
 
 ## How to build and run
