@@ -72,8 +72,9 @@ static void check(int cond, const char *msg) {
 // compressible registers), and the resume label follows immediately.
 // Therefore mepc of the faulting lw must equal resume_pc - 4, checked
 // below. (An earlier version took the resume address with &&label, but
-// this toolchain's -O2 miscompiles that into a wrong address; the
-// in-asm local label avoids the issue entirely.)
+// &&label only pins a label's position when a computed goto can reach
+// it; with no such goto, -O2 may move the label. The in-asm local label
+// is the correct construction, resolved exactly by the assembler.)
 static void test_load(void) {
     unsigned long saddr = (unsigned long)scratch;
 

@@ -85,13 +85,21 @@ Both are recorded here because they changed what was verified.
    which restores t0 and reinstalls `&pmp_save` in one swap. Caught by
    QEMU `-d int` tracing showing a fetch-fault loop at pc=0.
 
-2. Toolchain quirk (not mine): the distro `riscv64-unknown-elf-gcc`
-   13.2.0 miscompiles C `&&label` (labels-as-values) at -O2, producing a
-   wrong resume address (verified with a minimal reproducer: at -O0 the
-   address is correct, at -O2 it points at the function entry / the
-   auipc itself). Workaround: the resume address is taken inside the
-   asm block with `la t0, 1f` against a numeric local label, which the
-   assembler resolves exactly. No `&&label` remains in the module.
+2. `&&label` cannot pin a resume address (my earlier framing was
+   wrong, corrected 2026-09-09): an earlier version took the resume
+   address with C `&&label` (labels-as-values), and at -O2 the address
+   came out wrong (pointing at the function entry; verified with a
+   minimal reproducer on gcc 13.3 and 14.2). Investigation showed this
+   is not a toolchain-version bug: per the GCC maintainers (bugs 44298,
+   123600), `&&label` only guarantees the label's position when a
+   computed `goto *` can reach it. With no computed goto, the optimizer
+   may merge blocks and move the label, and the address follows the
+   label wherever it goes. Our trap handler resumes via `mepc`,
+   invisible to the compiler, so there was no such goto. The in-asm
+   approach is the correct construction, not a workaround: the resume
+   address is taken inside the asm block with `la t0, 1f` against a
+   numeric local label, which the assembler resolves exactly. No
+   `&&label` remains in the module.
 
 ## Limits of verification (read before citing numbers)
 
