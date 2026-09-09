@@ -26,7 +26,7 @@ MIS_OBJS := $(MIS_OBJS:.S=.o)
 mal.elf: $(MIS_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MIS_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -262,7 +262,24 @@ sv39.elf: $(SV39_OBJS) link.ld
 run-sv39: sv39.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel sv39.elf
 
+# ecall ABI round-trip module: its own binary sharing only boot.S and
+# the UART driver with the other demos. Drops to S-mode, loads known
+# constants into a0-a7/t0-t6, issues an ecall per argument set, and
+# verifies the M-mode handler returns the XOR of a0-a5 in a0 while
+# every other register comes back bit-identical.
+ECALL_SRCS := src/boot.S src/uart.c \
+              src/ecall/ecall_trap.S src/ecall/ecall_main.c
+ECALL_OBJS := $(ECALL_SRCS:.c=.o)
+ECALL_OBJS := $(ECALL_OBJS:.S=.o)
+
+ecall.elf: $(ECALL_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ECALL_OBJS)
+
+# Run the ecall ABI round-trip module under QEMU.
+run-ecall: ecall.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel ecall.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf
 
 .PHONY: all run clean

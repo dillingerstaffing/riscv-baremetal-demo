@@ -1,0 +1,25 @@
+ecall ABI round-trip: S-mode payload, M-mode handler
+dropping to S-mode for the payload...
+
+--- ecall ABI round-trip report (M-mode) ---
+call 0: mcause=0x9 mepc=0x8000031c insn=0x73 svc(a7)=0x1
+  handler received a0-a5: 0x1 0x2 0x3 0x4 0x5 0x6
+  handler returned a0=0x7 resume=0x80000320
+call 1: mcause=0x9 mepc=0x8000031c insn=0x73 svc(a7)=0x1
+  handler received a0-a5: 0x0 0xffffffffffffffff 0xaaaaaaaaaaaaaaaa 0x5555555555555555 0x8000000000000000 0x1
+  handler returned a0=0x8000000000000001 resume=0x80000320
+call 2: mcause=0x9 mepc=0x8000031c insn=0x73 svc(a7)=0x1
+  handler received a0-a5: 0x123456789abcdef 0xfedcba9876543210 0xaaaaaaaaaaaaaaaa 0x5555555555555555 0xdeadbeefcafebabe 0xf0f0f0f0f0f0f0f
+  handler returned a0=0xd1a2b1e0c5f1b5b1 resume=0x80000320
+payload view (S-mode, after each ecall):
+  set 0: a0 after=0x7 expected=0x7 a1-a5,a6,a7,t0-t6 intact: yes
+    after a1-a7: 0x2 0x3 0x4 0x5 0x6 0xa6a6a6a6a6a6a6a6 0x1
+    after t0-t6: 0x1111111111111111 0x2222222222222222 0x3333333333333333 0x4444444444444444 0x5555555555555555 0x6666666666666666 0x7777777777777777
+  set 1: a0 after=0x8000000000000001 expected=0x8000000000000001 a1-a5,a6,a7,t0-t6 intact: yes
+    after a1-a7: 0xffffffffffffffff 0xaaaaaaaaaaaaaaaa 0x5555555555555555 0x8000000000000000 0x1 0x6a6a6a6a6a6a6a6a 0x1
+    after t0-t6: 0x8888888888888888 0x9999999999999999 0xaaaaaaaaaaaaaaaa 0xbbbbbbbbbbbbbbbb 0xcccccccccccccccc 0xdddddddddddddddd 0xeeeeeeeeeeeeeeee
+  set 2: a0 after=0xd1a2b1e0c5f1b5b1 expected=0xd1a2b1e0c5f1b5b1 a1-a5,a6,a7,t0-t6 intact: yes
+    after a1-a7: 0xfedcba9876543210 0xaaaaaaaaaaaaaaaa 0x5555555555555555 0xdeadbeefcafebabe 0xf0f0f0f0f0f0f0f 0x1234567890abcdef 0x1
+    after t0-t6: 0xffffffffffffffff 0x0 0xaaaaaaaaaaaaaaaa 0x5555555555555555 0xf0f0f0f0f0f0f0f 0xf0f0f0f0f0f0f0f0 0x8000000000000000
+RESULT: PASS
+qemu-system-riscv64: terminating on signal 15 from pid 11490 (timeout)
