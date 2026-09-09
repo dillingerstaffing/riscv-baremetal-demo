@@ -14,7 +14,7 @@ SRCS := src/boot.S src/switch.S src/uart.c src/sched.c src/tasks.c src/main.c
 OBJS := $(SRCS:.c=.o)
 OBJS := $(OBJS:.S=.o)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -84,7 +84,21 @@ smp.elf: $(SMP_OBJS) link.ld
 run-smp: smp.elf
 	$(QEMU) -machine virt -nographic -bios none -smp 2 -kernel smp.elf
 
+# UART shell module: its own binary sharing only the UART driver with
+# the other demos. Interactive over the virt serial port (use
+# run-shell-piped to feed it scripted input).
+SHELL_SRCS := src/boot.S src/uart.c \
+              src/shell/trap.S src/shell/sh_main.c src/shell/cmds.c
+SHELL_OBJS := $(SHELL_SRCS:.c=.o)
+SHELL_OBJS := $(SHELL_OBJS:.S=.o)
+
+shell.elf: $(SHELL_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SHELL_OBJS)
+
+run-shell: shell.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel shell.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf
 
 .PHONY: all run clean

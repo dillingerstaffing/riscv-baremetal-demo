@@ -7,5 +7,6 @@ void uart_putc(char c);
 void uart_puts(const char *s);
 void uart_put_hex(unsigned long v);
 void uart_put_dec(unsigned long v);
+char uart_getc(void);
 
 #endif  // UART_H
