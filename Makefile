@@ -53,7 +53,7 @@ UMODE_OBJS := $(UMODE_OBJS:.S=.o)
 umode.elf: $(UMODE_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(UMODE_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -330,7 +330,24 @@ counter-alias.elf: $(CA_OBJS) link.ld
 run-counter-alias: counter-alias.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel counter-alias.elf
 
+# CLINT msip software-interrupt delivery module: its own binary sharing
+# only boot.S and the UART driver with the other demos. Installs an
+# M-mode trap handler, sets the CLINT msip bit for hart 0, verifies
+# mcause is a machine software interrupt, clears msip in the handler,
+# and verifies no re-delivery, over two set/clear cycles.
+MSIP_SRCS := src/boot.S src/uart.c \
+             src/msip/msip_trap.S src/msip/msip_main.c
+MSIP_OBJS := $(MSIP_SRCS:.c=.o)
+MSIP_OBJS := $(MSIP_OBJS:.S=.o)
+
+msip.elf: $(MSIP_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MSIP_OBJS)
+
+# Run the CLINT msip delivery module under QEMU.
+run-msip: msip.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel msip.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf
 
 .PHONY: all run clean
