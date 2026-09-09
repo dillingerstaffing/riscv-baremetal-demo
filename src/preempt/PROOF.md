@@ -138,6 +138,73 @@ per the README.)
   corrupt otherwise, since each iteration depends on the previous
   register-held state spilled through volatile globals).
 
+## Appendix: -O0 vs -O2 benchmarks (2026-09-08)
+
+Same module, same flags as the main build, differing only in the
+optimization level. Built with Ubuntu `riscv64-unknown-elf-gcc` 13.2.0
+(`-march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany`, all other flags
+identical to the Makefile defaults), each level compiled to its own
+object directory and linked against `link.ld`. Zero compile errors,
+zero warnings; the only linker note is the benign RWX-segment warning
+from the minimal linker script, present at both levels.
+
+### Code size (`riscv64-unknown-elf-size -B`)
+
+```
+   text      data       bss       dec       hex   filename
+   4761        56     30016     34833      8811   preempt-O0.elf
+   3831        56     30024     33911      8477   preempt-O2.elf
+```
+
+-O2 shrinks `.text` from 4761 to 3831 bytes (19.5% smaller). `.data`
+is unchanged (56 bytes); `.bss` differs by 8 bytes (30016 vs 30024,
+task trapframe alignment padding landing differently). Total binary
+`dec` goes 34833 -> 33911, 2.6% smaller.
+
+### Measured cycle counts, four QEMU runs
+
+`qemu-system-riscv64` 8.2.2, `-machine virt -nographic -bios none`,
+200 ticks each run, same recipe as the main run. Full logs are in
+`src/preempt/bench-logs/` (O0-run1.log, O0-run2.log, O2-run1.log,
+O2-run2.log). 200 ticks produced exactly 200 switches on every run.
+
+| run | latency min/avg (100 ns ticks) | switch cost min/avg (cycles) | switch cost min/avg (mtime ticks) |
+|-----|-------------------------------|------------------------------|----------------------------------|
+| -O0 run 1 | 124 / 995 | 17850 / 37739 | 125 / 257 |
+| -O0 run 2 | 123 / 808 | 9360 / 33799 | 66 / 231 |
+| -O2 run 1 | 129 / 414 | 11790 / 33712 | 81 / 229 |
+| -O2 run 2 | 125 / 3600 | 24255 / 39647 | 165 / 269 |
+
+cycle/tick ratios from the two counters: 17850/125 = 142.8,
+9360/66 = 141.8, 11790/81 = 145.6, 24255/165 = 147.0. The counters
+agree within about 5% on every run, so the measurement apparatus is
+coherent; the remaining spread is the platform path itself, not the
+instruments.
+
+### Reading the numbers (what they support, and what they do not)
+
+- Code size claim stands: -O2 text is 19.5% smaller, measured by the
+  section table above.
+- Interrupt latency min is 123-129 ticks at both levels: best-case
+  hardware-to-handler delay is independent of optimization level on
+  this platform. Max and avg are host scheduling jitter (the vCPU
+  thread waiting on the host while the virtual clock advances), so
+  only min and the ordering of runs carry information.
+- No reliable cycle-count win can be claimed. Best-case switch cost
+  spans 9360 to 24255 cycles across the four runs (6.6 us to 16.5 us
+  at 150 cycles per 100 ns), and the -O0 and -O2 bands overlap
+  completely. The run-to-run spread inside one optimization level is
+  larger than any difference between levels, so the honest statement
+  is: the trap path's best case on this emulator is not stable enough
+  to rank -O0 against -O2 from 200-switch samples. A finer claim would
+  need hardware, or the same measurement repeated until the
+  distributions separate.
+- Sanity note: task iteration counts differ strongly between levels
+  (-O0 runs: ~8.1M / 8.1M / 11.4M per task; -O2 runs: ~28k per task),
+  which is the expected codegen effect on the spin loops, not a
+  scheduling defect: 200 ticks / 200 switches and balanced progress
+  hold at both levels.
+
 ## Bug found by measurement, then fixed
 
 The first build measured 399 switches for 200 ticks. Tracing showed the

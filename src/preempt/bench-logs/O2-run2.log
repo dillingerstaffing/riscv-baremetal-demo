@@ -1,0 +1,27 @@
+
+========================================
+riscv-baremetal-demo: preemptive scheduler
+CLINT timer interrupt + full-context switch
+========================================
+
+clint: mtime@0x200bff8 mtimecmp@0x2004000 timebase 10000000 Hz (100 ns/tick)
+quantum 10000 ticks (1 ms), 200 ticks total
+
+timer armed, entering wfi wait...
+
+preempt: done. 200 timer ticks, 200 measured context switches
+
+task progress (task bodies never yield):
+  spin-a: 28296 iterations
+  spin-b: 27765 iterations
+  spin-c: 27995 iterations
+
+interrupt latency (mtime tick = 100 ns):
+  min 125 / max 231233 / avg 3600 ticks  (12500 / 23123300 / 360000 ns)
+
+context-switch cost, entry stamp to exit stamp:
+  min 24255 / max 508815 / avg 39647 cycles
+  cross-check via mtime: min 165 / max 3568 / avg 269 ticks (16500 / 356800 / 26900 ns)
+
+preempt: halting.
+qemu-system-riscv64: terminating on signal 15 from pid 8536 (timeout)
