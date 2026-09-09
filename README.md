@@ -108,6 +108,11 @@ riscv-baremetal-demo/
       baud_main.c divisor latch programming, loopback receive-timeout
                   measurement, rdcycle vs mtime clock calibration
       PROOF.md    measurement definition, three QEMU run logs, limits
+    pmp/          PMP no-access denial test (built as pmp.elf)
+      pmp_main.c  locked NAPOT no-access region, load/store fault tests
+                  with mcause/mepc/mtval verification
+      pmp_trap.S  minimal M-mode trap entry recording the fault state
+      PROOF.md    build log, three QEMU run logs, config and limits
 ```
 
 ## How to build and run
@@ -207,3 +212,4 @@ which only works because every task runs on its own stack.
 - lab 10: Preempt benchmarks, code size -O2 3831 vs -O0 4761 bytes, switch cost measured and mtime cross-checked (commit 3971bb4)
 - lab 11: Bare-metal UART shell, help/echo/regs/uptime, verified on QEMU (commit 06c817b)
 - lab 12: S-mode trap delegation, scheduler in S-mode via medeleg/mideleg, exact 200/200 tick and switch counts, no delegation penalty above noise (commit 19ed2a7)
+- lab 13: PMP no-access denial test, locked NAPOT region over 4 KiB scratch, load traps mcause=5 mepc=0x80000416, store traps mcause=7 mepc=0x800004be, mtval=0x80002000 both, verified on QEMU

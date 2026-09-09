@@ -1,0 +1,12 @@
+pmp-denial: PMP no-access region test
+hart mhartid=0
+control: scratch readable/writable before PMP: ok
+config: pmpaddr0=0x200009ff (NAPOT 4 KiB at 0x80002000) pmpcfg0=0x98 (entry0: L=1 A=NAPOT R=W=X=0)
+config: pmpcfg0 readback=0x98
+config: pmpcfg0 after clear attempt=0x98 (lock holds)
+control: address outside region still accessible: ok
+load:  seen=1 mcause=0x5 mepc=0x80000416 mtval=0x80002000 resume-4=0x80000416
+store: seen=1 mcause=0x7 mepc=0x800004be mtval=0x80002000 resume-4=0x800004be
+RESULT: PASS (load mcause=5, store mcause=7)
+done
+qemu-system-riscv64: terminating on signal 15 from pid 8321 (timeout)

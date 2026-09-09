@@ -14,7 +14,7 @@ SRCS := src/boot.S src/switch.S src/uart.c src/sched.c src/tasks.c src/main.c
 OBJS := $(SRCS:.c=.o)
 OBJS := $(OBJS:.S=.o)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -149,7 +149,22 @@ run-smode: smode.elf
 run-smode-mbase: smode-mbase.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel smode-mbase.elf
 
+# PMP denial-test module: its own binary sharing only boot.S and the
+# UART driver with the other demos. Programs a locked no-access PMP
+# region and verifies the load/store access-fault trap codes.
+PMP_SRCS := src/boot.S src/uart.c \
+            src/pmp/pmp_trap.S src/pmp/pmp_main.c
+PMP_OBJS := $(PMP_SRCS:.c=.o)
+PMP_OBJS := $(PMP_OBJS:.S=.o)
+
+pmp.elf: $(PMP_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(PMP_OBJS)
+
+# Run the PMP denial-test module under QEMU.
+run-pmp: pmp.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel pmp.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf
 
 .PHONY: all run clean
