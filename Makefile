@@ -53,7 +53,7 @@ UMODE_OBJS := $(UMODE_OBJS:.S=.o)
 umode.elf: $(UMODE_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(UMODE_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -365,7 +365,26 @@ mtvec-vectored.elf: $(MTV_OBJS) link.ld
 run-mtvec-vectored: mtvec-vectored.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mtvec-vectored.elf
 
+# rdcycle monotonicity module: its own binary sharing only boot.S and
+# the UART driver with the other demos. Reads rdcycle around a fixed
+# 100-nop window 1000 times, checks every delta is strictly positive
+# and the reads never go backward, and reports min/median/max deltas.
+# On PASS it shuts the machine down via the virt test-device finisher
+# so the QEMU process exit code (0) reflects the verdict; on FAIL it
+# parks the hart instead.
+CYCMON_SRCS := src/boot.S src/uart.c \
+              src/cycmon/cyc_main.c
+CYCMON_OBJS := $(CYCMON_SRCS:.c=.o)
+CYCMON_OBJS := $(CYCMON_OBJS:.S=.o)
+
+cycmon.elf: $(CYCMON_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(CYCMON_OBJS)
+
+# Run the rdcycle monotonicity module under QEMU.
+run-cycmon: cycmon.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel cycmon.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf
 
 .PHONY: all run clean

@@ -1,0 +1,7 @@
+cycmon: rdcycle monotonicity over 100-nop window
+samples: 1000
+run window: 69358 mtime ticks
+delta (after - before): min=135 median=150 max=48060 outliers(>2^20)=0
+backward reads across samples: 0
+RESULT: PASS
+[harness] qemu exit status: 0
