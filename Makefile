@@ -26,7 +26,7 @@ MIS_OBJS := $(MIS_OBJS:.S=.o)
 mal.elf: $(MIS_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MIS_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -175,6 +175,23 @@ pmp.elf: $(PMP_OBJS) link.ld
 # Run the PMP denial-test module under QEMU.
 run-pmp: pmp.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel pmp.elf
+
+# CSR readback / ISA probe module: its own binary sharing only boot.S
+# and the UART driver with the other demos. Reads misa/marchid/mimpid
+# with csrr, decodes the extension bitmap, and executes one
+# hand-written instruction per reported extension under a trap handler
+# that records mcause/mepc on any trap.
+CSR_SRCS := src/boot.S src/uart.c \
+            src/csr/csr_trap.S src/csr/csr_main.c
+CSR_OBJS := $(CSR_SRCS:.c=.o)
+CSR_OBJS := $(CSR_OBJS:.S=.o)
+
+csr.elf: $(CSR_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(CSR_OBJS)
+
+# Run the CSR readback / ISA probe module under QEMU.
+run-csr: csr.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel csr.elf
 
 # WFI wakeup-latency module: its own binary sharing boot.S, the UART
 # driver, and the preempt CLINT driver with the other demos. Measures

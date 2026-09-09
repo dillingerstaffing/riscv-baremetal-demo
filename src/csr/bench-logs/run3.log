@@ -1,0 +1,19 @@
+csr: misa readback and per-extension instruction probes
+hart mhartid=0
+misa    read1=0x80000000001411ad read2=0x80000000001411ad
+marchid read1=0x0 read2=0x0
+mimpid  read1=0x0 read2=0x0
+misa MXL=2 (2 = RV64) bitmap=0x1411ad
+misa extensions reported: ACDFHIMSU
+probe A (amoswap.w): seen=0 PASS
+probe C (c.addi): seen=0 PASS
+probe D (fadd.d): seen=0 PASS
+probe F (fadd.s): seen=0 PASS
+probe H (hfence.gvma): seen=0 PASS
+probe I (add): seen=0 PASS
+probe M (mul): seen=0 PASS
+letter S: privilege mode, no instruction probe
+letter U: privilege mode, no instruction probe
+RESULT: PASS
+done
+qemu-system-riscv64: terminating on signal 15 from pid 7471 (timeout)
