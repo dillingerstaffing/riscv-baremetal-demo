@@ -131,6 +131,11 @@ riscv-baremetal-demo/
       wfi.h       trap save-area layout and per-trial record
       PROOF.md    build log, three QEMU run logs, clock calibration,
                   method, results, and limits
+    misaligned/   misaligned load/store experiment (built as mal.elf)
+      mis_main.c  M-mode trap vector, aligned control, misaligned lw
+                  and sw tests with exact instruction layout
+      mis_trap.S  minimal M-mode trap entry recording mcause/mepc/mtval
+      PROOF.md    build log, three QEMU run logs, results and limits
 ```
 
 ## How to build and run
@@ -231,3 +236,4 @@ which only works because every task runs on its own stack.
 - lab 11: Bare-metal UART shell, help/echo/regs/uptime, verified on QEMU (commit 06c817b)
 - lab 12: S-mode trap delegation, scheduler in S-mode via medeleg/mideleg, exact 200/200 tick and switch counts, no delegation penalty above noise (commit 19ed2a7)
 - lab 13: PMP no-access denial test, locked NAPOT region over 4 KiB scratch, load traps mcause=5 mepc=0x80000416, store traps mcause=7 mepc=0x800004be, mtval=0x80002000 both, verified on QEMU
+- lab 14: Misaligned load/store experiment, M-mode trap handler recording mcause/mepc/mtval, QEMU 8.2.2 virt completes misaligned lw/sw transparently (no traps): lw loaded 0xffffffffd5a1b2c3 matching the sign-extended byte-wise reference, sw round-tripped 0x12345678 exactly with the neighboring byte untouched, identical across 3 runs
