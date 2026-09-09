@@ -46,6 +46,16 @@ round-robin scheduler with real assembly context switches.
   both harts reported `mhartid` 0 and 1 with disjoint stack slices
   (see `src/smp/PROOF.md` for the build log, the raw run output, and
   how each number was measured).
+- **Cycle-accurate UART baud check** (`uart-baud.elf`, see
+  `src/uart-baud/`): programs the ns16550a divisor latch for divisors
+  1, 12, and 96, and measures the bit timing the UART model actually
+  produces, using the receive FIFO's character timeout in internal
+  loopback, stamped with `rdcycle` calibrated against the 10 MHz
+  `mtime`. Measured on QEMU: ppm error shrinks with longer timeouts
+  (about 0.3% at divisor 96), the signature of additive host latency on
+  a correct 1/D baud law, not a baud error (see `src/uart-baud/PROOF.md`
+  for the build log, the raw run output, and the limits of
+  verification).
 
 ## Project layout
 
@@ -82,6 +92,10 @@ riscv-baremetal-demo/
       blk.h/.c    sector read/write via 3-descriptor request chains
       bmain.c     bring-up, sector write/read/verify, results report
       PROOF.md    build log, QEMU run output, measurement analysis
+    uart-baud/    cycle-accurate UART baud check (built as uart-baud.elf)
+      baud_main.c divisor latch programming, loopback receive-timeout
+                  measurement, rdcycle vs mtime clock calibration
+      PROOF.md    measurement definition, three QEMU run logs, limits
 ```
 
 ## How to build and run
