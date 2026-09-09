@@ -1,0 +1,10 @@
+counter-alias: mcycle vs rdcycle lockstep check
+calibration over 1000000 mtime ticks:
+  mcycle rate  = 119 units/tick
+  rdcycle rate = 119 units/tick
+samples: 1000
+back-to-back (rdcycle - mcycle): min=108 median=120 max=6612 outliers(>1024)=1
+run window: mtime ticks=2611 mcycle rate=102 rdcycle rate=100 rate diff=1%
+mcycle units per mtime tick: 102 (historical band 140..160: OUT OF BAND; vs calibration 14% diff)
+median back-to-back gap ~= one emulated CSR read: 120 host-tick units
+RESULT: PASS

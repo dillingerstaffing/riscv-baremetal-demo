@@ -26,7 +26,7 @@ MIS_OBJS := $(MIS_OBJS:.S=.o)
 mal.elf: $(MIS_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MIS_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -279,7 +279,23 @@ ecall.elf: $(ECALL_OBJS) link.ld
 run-ecall: ecall.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel ecall.elf
 
+# Counter-alias module: its own binary sharing only boot.S and the
+# UART driver with the other demos. Reads mcycle and rdcycle back to
+# back 1000 times and checks the shadow counter advances in lockstep,
+# cross-checked against the CLINT mtime.
+CA_SRCS := src/boot.S src/uart.c \
+           src/counter-alias/ca_main.c
+CA_OBJS := $(CA_SRCS:.c=.o)
+CA_OBJS := $(CA_OBJS:.S=.o)
+
+counter-alias.elf: $(CA_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(CA_OBJS)
+
+# Run the counter-alias module under QEMU.
+run-counter-alias: counter-alias.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel counter-alias.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf
 
 .PHONY: all run clean
