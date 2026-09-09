@@ -28,6 +28,18 @@ round-robin scheduler with real assembly context switches.
   Measured on QEMU: interrupt latency min 13.6 us, context-switch cost
   min 17.3 us (see `src/preempt/PROOF.md` for the build log, the raw run
   output, and how each number was measured).
+- **S-mode trap delegation** (`smode.elf`, see `src/smode/`): the M-mode
+  boot stub delegates supervisor interrupts and S-mode exceptions via
+  `medeleg`/`mideleg`, installs `stvec`, opens S-mode memory with a PMP
+  NAPOT entry, enables counters with `mcounteren`, probes
+  `menvcfg.STCE` for Sstc, then `sret` drops to S-mode. The scheduler
+  runs entirely in S-mode on the delegated supervisor timer interrupt
+  (`stimecmp`), with no M-mode involvement after boot. A matching
+  M-mode baseline shares the scheduler core via `-DTRAP_SMODE`. Measured
+  on QEMU 8.2.2, five trials per binary, 200 ticks each: exact 200/200
+  tick and switch counts every trial, latency and switch cost in the
+  same band as the M-mode baseline with no systematic delegation
+  penalty above host noise (see `src/smode/PROOF.md`).
 - **virtio-blk block driver** (`virtio-blk.elf`, see `src/virtio-blk/`):
   discovers the virtio-mmio block device on the bus, runs the spec's
   device status sequence, negotiates the interface (1.x via
@@ -194,3 +206,4 @@ which only works because every task runs on its own stack.
 ## Labs
 - lab 10: Preempt benchmarks, code size -O2 3831 vs -O0 4761 bytes, switch cost measured and mtime cross-checked (commit 3971bb4)
 - lab 11: Bare-metal UART shell, help/echo/regs/uptime, verified on QEMU (commit 06c817b)
+- lab 12: S-mode trap delegation, scheduler in S-mode via medeleg/mideleg, exact 200/200 tick and switch counts, no delegation penalty above noise (commit 19ed2a7)
