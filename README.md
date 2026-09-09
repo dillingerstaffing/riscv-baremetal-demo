@@ -182,6 +182,11 @@ riscv-baremetal-demo/
       sv39_trap.S M-mode trap entry recording mcause/mepc/mtval/stval
       PROOF.md    build log, three QEMU run logs, PTE layout, results
                   and limits
+    umode/        M-mode to U-mode trap transition (built as umode.elf)
+      umode_main.c  mtvec handler, one PMP NAPOT entry, MPP=0 drop,
+                    mret into a one-instruction U-mode ecall payload
+      umode_trap.S  minimal M-mode trap entry recording mcause/mepc/mtval
+      PROOF.md    build log, three QEMU run logs, results and limits
 ```
 
 ## How to build and run
@@ -289,3 +294,4 @@ which only works because every task runs on its own stack.
 - ecall ABI round-trip (ecall.elf), bare-metal M-mode to S-mode drop with environment calls: M-mode trap handler saves and restores every register x1-x31 around the C dispatcher, per-call ground truth mcause=9 and the instruction word at mepc=0x00000073 (the ecall encoding), handler-received a0-a5 compared word for word against the payload's loaded constants and returned a0 checked against an independently computed XOR, program output byte-identical across 3 QEMU 8.2.2 runs, RESULT: PASS each
 - counter-alias check (counter-alias.elf), bare-metal M-mode mcycle vs rdcycle lockstep read back-to-back over 1000 samples cross-checked against mtime: calibration 119/119 (exact agreement) on all 3 QEMU 8.2.2 runs, back-to-back delta min=108 median=120, counter rate diff 1-2%, no backward counter and no borrow, RESULT: PASS on all 3 runs
 - lab 19: Misaligned LR/SC experiment (amo.elf), M-mode trap handler recording mcause/mepc/mtval: misaligned lr.w at base+2 traps every run (mcause=4, mepc exactly the faulting lr, mtval the faulting address), misaligned sc.w after an aligned lr does not trap but returns 1 (reservation dropped, memory unchanged), misaligned lr/sc pair unreachable since the lr traps, identical across 3 runs, RESULT: PASS
+- M-mode to U-mode trap transition (umode.elf), M-mode trap handler recording mcause/mepc/mtval, one PMP NAPOT R/W/X entry, mret with mstatus.MPP=0 into a one-instruction U-mode ecall payload: mcause=0x8 (ecall from U-mode; a failed drop would have raised 11), mepc=0x80000440 exactly the payload ecall, mtval=0x0, trap-entry mstatus MPP bits = 0 (U-mode), exactly 1 trap per run, byte-identical across 3 QEMU 8.2.2 runs, RESULT: PASS
