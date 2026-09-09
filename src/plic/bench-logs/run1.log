@@ -1,0 +1,13 @@
+plic-claim: PLIC claim/complete round-trip test
+hart mhartid=0
+clock: 1000000 mtime ticks -> rdcycle delta 152337945 (ratio 149 rdcycle units per tick)
+control: claim before programming=0 (expect 0)
+config: priority[10]=1 enable10=1 thresh=0
+assert: pending bit 10 after TX byte=1 (spins=0)
+claim: id=10 cycles=32310 pending-after=0
+uart: looped-back byte=0x51 (expect 0x51) pending-after-deassert=0
+complete: cycles=34260
+reclaim: id=0 (expect 0)
+RESULT: PASS (claim=10, claim_cycles=32310, complete_cycles=34260)
+done
+qemu-system-riscv64: terminating on signal 15 from pid 14708 (timeout)

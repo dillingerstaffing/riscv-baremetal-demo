@@ -79,6 +79,16 @@ round-robin scheduler with real assembly context switches.
   trap path itself is identical either way (see
   `src/wfi-latency/PROOF.md` for the build log, three raw QEMU run
   logs, the clock calibration, and the limits of verification).
+- **PLIC claim/complete** (`plic.elf`, see `src/plic/`): drives the
+  platform-level interrupt controller directly through its
+  memory-mapped registers. Enables the UART interrupt (source 10) via
+  priority/enable/threshold, asserts it with a looped-back UART byte,
+  claims it, and completes it. Measured on QEMU: claim returns id 10,
+  claim step about 29655-32310 `rdcycle` units, complete step about
+  29730-40230 units (host-time MMIO costs, calibrated per run against
+  the 10 MHz `mtime`), post-complete claim returns 0, identical PASS
+  on 3 runs (see `src/plic/PROOF.md` for the build log, the raw run
+  output, and the QEMU PLIC model behavior this depends on).
 
 ## Project layout
 
@@ -136,6 +146,11 @@ riscv-baremetal-demo/
                   and sw tests with exact instruction layout
       mis_trap.S  minimal M-mode trap entry recording mcause/mepc/mtval
       PROOF.md    build log, three QEMU run logs, results and limits
+    plic/         PLIC claim/complete round-trip (built as plic.elf)
+      plic_main.c PLIC programming, UART-loopback interrupt assertion,
+                  timed claim/complete, in-program PASS/FAIL checks
+      PROOF.md    build log, three QEMU run logs, QEMU PLIC model notes,
+                  results and limits
 ```
 
 ## How to build and run
@@ -237,3 +252,4 @@ which only works because every task runs on its own stack.
 - lab 12: S-mode trap delegation, scheduler in S-mode via medeleg/mideleg, exact 200/200 tick and switch counts, no delegation penalty above noise (commit 19ed2a7)
 - lab 13: PMP no-access denial test, locked NAPOT region over 4 KiB scratch, load traps mcause=5 mepc=0x80000416, store traps mcause=7 mepc=0x800004be, mtval=0x80002000 both, verified on QEMU
 - lab 14: Misaligned load/store experiment, M-mode trap handler recording mcause/mepc/mtval, QEMU 8.2.2 virt completes misaligned lw/sw transparently (no traps): lw loaded 0xffffffffd5a1b2c3 matching the sign-extended byte-wise reference, sw round-tripped 0x12345678 exactly with the neighboring byte untouched, identical across 3 runs
+- lab 15: PLIC claim/complete round-trip, source 10 (UART0) enabled via priority/enable/threshold, asserted with a looped-back UART byte: claim returns id 10 (29655-32310 rdcycle units across 3 runs), complete 29730-40230 units (host-time MMIO costs, mtime-calibrated), post-complete claim returns 0, RESULT: PASS on all 3 runs

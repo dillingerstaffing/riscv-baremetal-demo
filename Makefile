@@ -26,7 +26,7 @@ MIS_OBJS := $(MIS_OBJS:.S=.o)
 mal.elf: $(MIS_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MIS_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -196,7 +196,24 @@ run-wfi-latency: wfi-latency.elf
 run-mal: mal.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mal.elf
 
+# PLIC claim/complete module: its own binary sharing only boot.S and the
+# UART driver with the other demos. Drives the PLIC directly on the virt
+# machine: enables the UART interrupt (source 10), asserts it with a
+# looped-back UART byte, claims it, times claim and complete with
+# rdcycle, and verifies complete clears the pending state.
+PLIC_SRCS := src/boot.S src/uart.c \
+             src/plic/plic_main.c
+PLIC_OBJS := $(PLIC_SRCS:.c=.o)
+PLIC_OBJS := $(PLIC_OBJS:.S=.o)
+
+plic.elf: $(PLIC_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(PLIC_OBJS)
+
+# Run the PLIC claim/complete module under QEMU.
+run-plic: plic.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel plic.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf
 
 .PHONY: all run clean
