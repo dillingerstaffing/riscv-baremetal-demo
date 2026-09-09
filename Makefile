@@ -39,7 +39,21 @@ AMO_OBJS := $(AMO_OBJS:.S=.o)
 amo.elf: $(AMO_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(AMO_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf
+# M-mode to U-mode trap transition module: its own binary sharing only
+# boot.S and the UART driver with the other demos. Drops to U-mode with
+# mret (mstatus.MPP = 0) into a one-instruction ecall payload; the
+# M-mode handler records mcause/mepc/mtval and the entry mstatus, then
+# returns to M-mode. The verdict checks mcause == 8 (ecall from
+# U-mode), mepc == the payload ecall address, and entry MPP == U.
+UMODE_SRCS := src/boot.S src/uart.c \
+              src/umode/umode_trap.S src/umode/umode_main.c
+UMODE_OBJS := $(UMODE_SRCS:.c=.o)
+UMODE_OBJS := $(UMODE_OBJS:.S=.o)
+
+umode.elf: $(UMODE_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(UMODE_OBJS)
+
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -230,6 +244,10 @@ run-mal: mal.elf
 run-amo: amo.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel amo.elf
 
+# Run the M-mode to U-mode trap transition module under QEMU.
+run-umode: umode.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel umode.elf
+
 # PLIC claim/complete module: its own binary sharing only boot.S and the
 # UART driver with the other demos. Drives the PLIC directly on the virt
 # machine: enables the UART interrupt (source 10), asserts it with a
@@ -313,6 +331,6 @@ run-counter-alias: counter-alias.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel counter-alias.elf
 
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf
 
 .PHONY: all run clean

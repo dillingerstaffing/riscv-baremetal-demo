@@ -1,0 +1,8 @@
+M-mode to U-mode trap transition
+dropping to U-mode: one-instruction ecall payload...
+
+--- M-mode to U-mode trap report ---
+trap: mcause=0x8 mepc=0x8000044c mtval=0x0
+payload ecall at 0x8000044c, mstatus at trap entry 0xa00000000
+RESULT: PASS
+qemu-system-riscv64: terminating on signal 15 from pid 7823 (timeout)
