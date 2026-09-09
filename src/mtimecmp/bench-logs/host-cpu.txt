@@ -1,0 +1,4 @@
+model name: AMD EPYC 9D25 126-Core Processor
+cpu MHz from /proc/cpuinfo:
+cpu MHz		: 1497.749
+cpu MHz		: 1497.749

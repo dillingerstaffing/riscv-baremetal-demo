@@ -26,7 +26,7 @@ MIS_OBJS := $(MIS_OBJS:.S=.o)
 mal.elf: $(MIS_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MIS_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -213,7 +213,23 @@ plic.elf: $(PLIC_OBJS) link.ld
 run-plic: plic.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel plic.elf
 
+# mtimecmp accuracy module: its own binary sharing only boot.S, the UART
+# driver, and the preempt CLINT driver with the other demos. Arms
+# mtimecmp 5000 ticks ahead over 1000 trials and stamps trap delivery
+# with rdtime/rdcycle.
+MT_SRCS := src/boot.S src/uart.c src/preempt/clint.c \
+           src/mtimecmp/mt_trap.S src/mtimecmp/mt_main.c
+MT_OBJS := $(MT_SRCS:.c=.o)
+MT_OBJS := $(MT_OBJS:.S=.o)
+
+mtimecmp.elf: $(MT_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MT_OBJS)
+
+# Run the mtimecmp accuracy experiment under QEMU.
+run-mtimecmp: mtimecmp.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mtimecmp.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf
 
 .PHONY: all run clean

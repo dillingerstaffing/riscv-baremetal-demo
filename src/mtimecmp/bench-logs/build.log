@@ -1,0 +1,6 @@
+$ make mtimecmp.elf CROSS=riscv-none-elf-
+riscv-none-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/preempt/clint.c -o src/preempt/clint.o
+riscv-none-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/mtimecmp/mt_trap.S -o src/mtimecmp/mt_trap.o
+riscv-none-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/mtimecmp/mt_main.c -o src/mtimecmp/mt_main.o
+riscv-none-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -T link.ld -o mtimecmp.elf src/boot.o src/uart.o src/preempt/clint.o src/mtimecmp/mt_trap.o src/mtimecmp/mt_main.o
+/home/hatch/workspace/toolchains/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: mtimecmp.elf has a LOAD segment with RWX permissions
