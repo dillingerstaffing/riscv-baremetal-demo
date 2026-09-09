@@ -26,7 +26,20 @@ MIS_OBJS := $(MIS_OBJS:.S=.o)
 mal.elf: $(MIS_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MIS_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf
+# Misaligned LR/SC experiment module: its own binary sharing only
+# boot.S and the UART driver with the other demos. Issues a misaligned
+# lr.w, a misaligned sc.w after an aligned lr, and a misaligned lr/sc
+# pair at fixed unaligned addresses and reports whether each traps
+# (with the exact trap register values) or completes transparently.
+AMO_SRCS := src/boot.S src/uart.c \
+            src/amo/amo_trap.S src/amo/amo_main.c
+AMO_OBJS := $(AMO_SRCS:.c=.o)
+AMO_OBJS := $(AMO_OBJS:.S=.o)
+
+amo.elf: $(AMO_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(AMO_OBJS)
+
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -213,6 +226,10 @@ run-wfi-latency: wfi-latency.elf
 run-mal: mal.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mal.elf
 
+# Run the misaligned LR/SC experiment under QEMU.
+run-amo: amo.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel amo.elf
+
 # PLIC claim/complete module: its own binary sharing only boot.S and the
 # UART driver with the other demos. Drives the PLIC directly on the virt
 # machine: enables the UART interrupt (source 10), asserts it with a
@@ -296,6 +313,6 @@ run-counter-alias: counter-alias.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel counter-alias.elf
 
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf
 
 .PHONY: all run clean

@@ -1,0 +1,18 @@
+amo: misaligned LR/SC experiment
+hart mhartid=0
+trap vector installed at 0x800001c8
+control: aligned load/store on scratch: ok
+scratch base=0x800011b0
+T1 lr.w address=0x800011b2 (base+2, not 4-byte aligned)
+T1 lr: seen=1 mcause=0x4 mepc=0x800004bc mtval=0x800011b2 resume=0x800004c0
+T1 lr TRAPPED: mcause=0x4 (4 = load address misaligned)
+T2: aligned lr.w at 0x800011b0, then sc.w at 0x800011b2 storing 0x5a5a5a5a
+T2 sc: seen=0 mcause=0x0 mepc=0x0 mtval=0x0 resume=0x80000598
+T2 sc completed transparently: sc return=1 (0=success, 1=failure)
+bytes at addr..addr+3 = 0xb2 0xa1 0xd5 0xc3 
+T2 sc returned 1 (failure): checking memory unchanged
+T3 skipped: T1's lr.w trapped, so a misaligned pair can
+never reach the sc; the lr trap is the finding.
+RESULT: PASS
+done
+qemu-system-riscv64: terminating on signal 15 from pid 6968 (timeout)
