@@ -1,0 +1,14 @@
+misaligned: misaligned load/store experiment
+hart mhartid=0
+trap vector installed at 0x800001c8
+control: aligned load/store on scratch: ok
+scratch base=0x80000c00
+lw address=0x80000c01 (base+1, not 4-byte aligned)
+lw: seen=0 mcause=0x0 mepc=0x0 mtval=0x0 resume=0x80000446
+lw completed transparently: loaded=0xffffffffd5a1b2c3 byte-wise reference=0xd5a1b2c3
+sw address=0x80000c02 (base+2, not 4-byte aligned) value=0x12345678
+sw: seen=0 mcause=0x0 mepc=0x0 mtval=0x0 resume=0x8000050e
+sw completed transparently: bytes read back = 0x78 0x56 0x34 0x12 (expect 78 56 34 12)
+RESULT: PASS
+done
+qemu-system-riscv64: terminating on signal 15 from pid 8633 (timeout)

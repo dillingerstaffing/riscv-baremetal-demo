@@ -14,7 +14,19 @@ SRCS := src/boot.S src/switch.S src/uart.c src/sched.c src/tasks.c src/main.c
 OBJS := $(SRCS:.c=.o)
 OBJS := $(OBJS:.S=.o)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf
+# Misaligned-access experiment module: its own binary sharing only boot.S
+# and the UART driver with the other demos. Issues a misaligned lw and a
+# misaligned sw at fixed unaligned addresses and reports whether each
+# traps (with the exact trap register values) or completes transparently.
+MIS_SRCS := src/boot.S src/uart.c \
+            src/misaligned/mis_trap.S src/misaligned/mis_main.c
+MIS_OBJS := $(MIS_SRCS:.c=.o)
+MIS_OBJS := $(MIS_OBJS:.S=.o)
+
+mal.elf: $(MIS_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MIS_OBJS)
+
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -180,7 +192,11 @@ wfi-latency.elf: $(WFI_OBJS) link.ld
 run-wfi-latency: wfi-latency.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel wfi-latency.elf
 
+# Run the misaligned-access experiment under QEMU.
+run-mal: mal.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mal.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf
 
 .PHONY: all run clean
