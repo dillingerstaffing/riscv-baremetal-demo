@@ -53,7 +53,7 @@ UMODE_OBJS := $(UMODE_OBJS:.S=.o)
 umode.elf: $(UMODE_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(UMODE_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -347,7 +347,25 @@ msip.elf: $(MSIP_OBJS) link.ld
 run-msip: msip.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel msip.elf
 
+# mtvec vectored-dispatch module: its own binary sharing only boot.S
+# and the UART driver with the other demos. Programs mtvec MODE=1
+# (vectored), triggers a synchronous U-mode ecall (code 8) and a
+# CLINT machine timer interrupt (code 7), and verifies each trap's
+# landing address and mcause against the measured dispatch behavior
+# documented in the module's PROOF.md.
+MTV_SRCS := src/boot.S src/uart.c \
+            src/mtvec-vectored/mtv_trap.S src/mtvec-vectored/mtv_main.c
+MTV_OBJS := $(MTV_SRCS:.c=.o)
+MTV_OBJS := $(MTV_OBJS:.S=.o)
+
+mtvec-vectored.elf: $(MTV_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MTV_OBJS)
+
+# Run the mtvec vectored-dispatch module under QEMU.
+run-mtvec-vectored: mtvec-vectored.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mtvec-vectored.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf
 
 .PHONY: all run clean
