@@ -89,6 +89,19 @@ round-robin scheduler with real assembly context switches.
   the 10 MHz `mtime`), post-complete claim returns 0, identical PASS
   on 3 runs (see `src/plic/PROOF.md` for the build log, the raw run
   output, and the QEMU PLIC model behavior this depends on).
+- **Sv39 page-table walk** (`sv39.elf`, see `src/sv39/`): builds a
+  minimal Sv39 table by hand in RAM, enables it with `satp` (MODE=8,
+  ASID=0) plus `sfence.vma`, drops from M-mode to S-mode, and exercises
+  the hardware walker: a store/load round trip through VA `0x40000000`
+  (three-level walk `root[1] -> l1[0] -> l0[0]`, leaf PTE `0x20000cc7`
+  flags VRWAD), then unmapped loads that die at each walk level.
+  Measured on QEMU: round trip returns `0xdeadbeefcafebabe` with the
+  physical page holding the same value; all three fault tests report
+  `mcause=13` (load page fault) with `mtval` equal to the faulting VA
+  (`0x40001000`, `0x50000000`, `0xc0000000`), `mepc` exactly the faulting
+  `ld`, and `stval=0` (traps taken in M-mode), identical PASS on 3 runs
+  (see `src/sv39/PROOF.md` for the build log, the raw run output, and
+  the QEMU walker behavior this depends on).
 
 ## Project layout
 
@@ -156,6 +169,13 @@ riscv-baremetal-demo/
                   calibration, statistics, in-program PASS/FAIL checks
       mt_trap.S   M-mode trap entry stamping rdtime/rdcycle on entry
       PROOF.md    build log, three QEMU run logs, results and limits
+    sv39/         Sv39 page-table walk and fault path (built as sv39.elf)
+      sv39_main.c hand-built 3-level tables, satp/sfence.vma, M->S drop,
+                  mapped round trip and 3 fault tests with in-program
+                  PASS/FAIL checks
+      sv39_trap.S M-mode trap entry recording mcause/mepc/mtval/stval
+      PROOF.md    build log, three QEMU run logs, PTE layout, results
+                  and limits
 ```
 
 ## How to build and run
@@ -259,3 +279,4 @@ which only works because every task runs on its own stack.
 - lab 14: Misaligned load/store experiment, M-mode trap handler recording mcause/mepc/mtval, QEMU 8.2.2 virt completes misaligned lw/sw transparently (no traps): lw loaded 0xffffffffd5a1b2c3 matching the sign-extended byte-wise reference, sw round-tripped 0x12345678 exactly with the neighboring byte untouched, identical across 3 runs
 - lab 15: PLIC claim/complete round-trip, source 10 (UART0) enabled via priority/enable/threshold, asserted with a looped-back UART byte: claim returns id 10 (29655-32310 rdcycle units across 3 runs), complete 29730-40230 units (host-time MMIO costs, mtime-calibrated), post-complete claim returns 0, RESULT: PASS on all 3 runs
 - lab 16: mtimecmp delivery-offset measurement (mtimecmp.elf), mtimecmp armed 5000 ticks ahead of mtime, 1000 trials per run x 3 runs on QEMU 8.2.2: delivery offset 102-115 min, 152-198 median, 814-881 p99, 992-998 max ticks; rdcycle/mtime calibration 149 on every run; every trial delivered exactly one timer interrupt, zero spurious traps, offset never negative; RESULT: PASS on all 3 runs
+- lab 17: Sv39 page-table walk and fault path (sv39.elf), hand-built 3-level table mapping one 4 KiB page at VA 0x40000000 (leaf PTE 0x20000cc7, flags VRWAD), satp MODE=8 ASID=0 with sfence.vma, S-mode execution: mapped store/load round-trips 0xdeadbeefcafebabe with the physical page holding the same value, unmapped loads at each walk level report mcause=13 with mtval equal to the faulting VA (0x40001000, 0x50000000, 0xc0000000), mepc exactly the faulting ld, stval=0 (M-mode traps), verified on QEMU 8.2.2, RESULT: PASS on all 3 runs

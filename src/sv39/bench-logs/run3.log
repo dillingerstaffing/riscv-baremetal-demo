@@ -1,0 +1,23 @@
+sv39-walk: Sv39 page-table walk and fault path (backlog item 39)
+m-mode: mhartid=0
+control: data page readable/writable before translation: ok
+table: VA 0x40000000 -> vpn2=1 vpn1=0 vpn0=0
+table: root_pt[1] =0x20001c01 ppn=0x80007 flags=V
+table: l1_test[0] =0x20001801 ppn=0x80006 flags=V
+table: l0_test[0] =0x20000cc7 ppn=0x80003 flags=VRWAD
+table: root_pt[2] =0x200000cf ppn=0x80000 flags=VRWXAD
+table: root_pt[0] =0x20001401 ppn=0x80005 flags=V
+table: l1_uart[128]=0x20001001 ppn=0x80004 flags=V
+table: l0_uart[0] =0x40000c7 ppn=0x10000 flags=VRWAD
+m-mode: pmpcfg0=0xf00 (entry1: TOR [0, 0x80400000) R|W|X)
+m-mode: satp=0x8000000000080008 (MODE=8 ASID=0)
+m-mode: entering S-mode
+s-mode: entered, translation active
+mapped: stored 0xdeadbeefcafebabe via VA 0x40000000, loaded 0xdeadbeefcafebabe seen=0
+mapped: physical page now holds 0xdeadbeefcafebabe
+fault-l0: seen=1 mcause=0xd mepc=0x80000360 mtval=0x40001000 stval=0x0 resume-4=0x80000360
+fault-l1: seen=1 mcause=0xd mepc=0x80000360 mtval=0x50000000 stval=0x0 resume-4=0x80000360
+fault-l2: seen=1 mcause=0xd mepc=0x80000360 mtval=0xc0000000 stval=0x0 resume-4=0x80000360
+RESULT: PASS (mapped round-trip ok, all faults mcause=13)
+done
+qemu-system-riscv64: terminating on signal 15 from pid 14976 (timeout)

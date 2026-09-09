@@ -26,7 +26,7 @@ MIS_OBJS := $(MIS_OBJS:.S=.o)
 mal.elf: $(MIS_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MIS_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -229,7 +229,23 @@ mtimecmp.elf: $(MT_OBJS) link.ld
 run-mtimecmp: mtimecmp.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mtimecmp.elf
 
+# Sv39 page-table walk module: its own binary sharing only boot.S and
+# the UART driver with the other demos. Builds a two-level Sv39 table
+# by hand, enables it via satp, accesses a mapped page with MPRV=1 /
+# MPP=S, and verifies the load-page-fault path on unmapped VAs.
+SV39_SRCS := src/boot.S src/uart.c \
+             src/sv39/sv39_trap.S src/sv39/sv39_main.c
+SV39_OBJS := $(SV39_SRCS:.c=.o)
+SV39_OBJS := $(SV39_OBJS:.S=.o)
+
+sv39.elf: $(SV39_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SV39_OBJS)
+
+# Run the Sv39 page-table walk module under QEMU.
+run-sv39: sv39.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel sv39.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf
 
 .PHONY: all run clean
