@@ -53,7 +53,7 @@ UMODE_OBJS := $(UMODE_OBJS:.S=.o)
 umode.elf: $(UMODE_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(UMODE_OBJS)
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -384,7 +384,27 @@ cycmon.elf: $(CYCMON_OBJS) link.ld
 run-cycmon: cycmon.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel cycmon.elf
 
+# mstatus.FS write/readback module: its own binary sharing only
+# boot.S and the UART driver with the other demos. Writes the FS
+# field (bits 14:13) of mstatus through all four values, reads back
+# the full mstatus word after each write, and reports the write/
+# readback pairs plus whether any non-FS bit changed. On PASS it
+# shuts the machine down via the virt test-device finisher so the
+# QEMU process exit code (0) reflects the verdict; on FAIL it parks
+# the hart instead.
+FSCHECK_SRCS := src/boot.S src/uart.c \
+                src/fs-check/fs_main.c
+FSCHECK_OBJS := $(FSCHECK_SRCS:.c=.o)
+FSCHECK_OBJS := $(FSCHECK_OBJS:.S=.o)
+
+fs-check.elf: $(FSCHECK_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(FSCHECK_OBJS)
+
+# Run the mstatus.FS write/readback module under QEMU.
+run-fs-check: fs-check.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel fs-check.elf
+
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf
 
 .PHONY: all run clean

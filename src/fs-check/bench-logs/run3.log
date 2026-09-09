@@ -1,0 +1,16 @@
+fs-check: mstatus.FS field write/readback measurement
+baseline mstatus: 0xa00000000 (FS bits read as 0)
+iteration 0:
+  wrote FS=0 readback=0xa00000000 FS_readback=0 SD=0
+  wrote FS=1 readback=0xa00002000 FS_readback=1 SD=0
+  wrote FS=2 readback=0xa00004000 FS_readback=2 SD=0
+  wrote FS=3 readback=0x8000000a00006000 FS_readback=3 SD=1
+iteration 1:
+  wrote FS=0 readback=0xa00000000 FS_readback=0 SD=0
+  wrote FS=1 readback=0xa00002000 FS_readback=1 SD=0
+  wrote FS=2 readback=0xa00004000 FS_readback=2 SD=0
+  wrote FS=3 readback=0x8000000a00006000 FS_readback=3 SD=1
+FS readback == written value on all writes: yes
+non-FS non-SD bits unchanged across all writes: yes
+FS readback consistent across iterations: yes
+RESULT: PASS
