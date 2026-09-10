@@ -1,0 +1,34 @@
+
+========================================
+satp ASID write/readback + WARL discovery
+========================================
+
+satp at boot (M-mode read) = 0x0
+setup complete; dropping to S-mode...
+in S-mode; satp experiment begins
+
+WARL discovery:
+  write            = 0xffff00000000000
+  readback         = 0xffff00000000000
+  writable ASID mask = 0xffff
+  discovered ASIDLEN = 16
+  MODE field readback = 0
+  PPN field readback  = 0x0
+
+round-trip (MODE=0, PPN=0):
+  ASID write = 0x0 readback = 0x0 asid = 0x0  PASS
+  ASID write = 0x100000000000 readback = 0x100000000000 asid = 0x1  PASS
+  ASID write = 0x800000000000000 readback = 0x800000000000000 asid = 0x8000  PASS
+  ASID write = 0xffff00000000000 readback = 0xffff00000000000 asid = 0xffff  PASS
+
+MODE WARL probe (write MODE=15, reserved):
+  write            = 0xf000000000000000
+  readback         = 0x0
+  MODE field       = 0
+  ASID field       = 0x0
+  PPN field        = 0x0
+
+traps observed = 0
+
+COMPLETION MARKER: satp-asid run finished
+RESULT: PASS
