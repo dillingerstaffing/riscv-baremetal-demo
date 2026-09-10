@@ -302,3 +302,4 @@ which only works because every task runs on its own stack.
 - mtimecmp-oneshot: One-shot mtimecmp disarm from inside the trap handler (see `src/mtimecmp-oneshot/`)
 - mie-stie: STIE vs MTIE enable-bit separation (see `src/mie-stie/`)
 - mcause-warl: mcause WARL software-write probe; backlog premise not reproduced, QEMU 8.2.2 virt implements all 64 bits software-writable (all-ones and zero writes read back, trap entry overwrites regardless), 3 runs byte-identical PASS (see `src/mcause-warl/`)
+- stvec-vectored: S-mode vectored stvec, supervisor timer interrupt (code 5) lands at BASE+20 and supervisor external interrupt (code 9, PLIC claim 10) lands at BASE+36, scause 0x8000000000000005 and 0x8000000000000009 respectively, 2 traps, 0 unexpected, mideleg 0x220, 3 runs byte-identical PASS (see `src/stvec-vectored/`)
