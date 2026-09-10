@@ -1,0 +1,13 @@
+mideleg-route: selective delegation routing test
+boot: medeleg=0x0 mideleg=0x1444
+mideleg: write=0x0 readback=0x1444
+mideleg: write=0x200 readback=0x1644
+medeleg: write=0x0 readback=0x0
+timer: m_traps=1 mcause=0x8000000000000005
+plic: priority[10]=1 enable10=1 thresh=0
+assert: pending10=1 (spins=0)
+ext: s_traps=1 scause=0x8000000000000009 sepc=0x800002e0 expected=0x800002e0 claim=10
+final: mideleg=0x1644
+RESULT: PASS
+done
+qemu-system-riscv64: terminating on signal 15 from pid 6819 (timeout)

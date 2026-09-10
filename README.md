@@ -279,6 +279,7 @@ which only works because every task runs on its own stack.
 - cycmon: rdcycle monotonicity around a fixed nop window (see `src/cycmon/`)
 - fs-check: mstatus.FS field write/readback and SD-bit behavior (see `src/fs-check/`)
 - medeleg-mask: medeleg/mideleg writable-mask discovery with write/readback (see `src/medeleg-mask/`)
+- mideleg-route: mideleg set to delegate only the supervisor external interrupt (bit 9 readback-verified against the hypervisor-forced bits); pended supervisor timer traps to M-mode (mcause 0x8000000000000005) while the PLIC supervisor-context UART interrupt traps to S-mode (scause 0x8000000000000009, sepc at the interrupted instruction, claim 10), 3 runs PASS (see `src/mideleg-route/`)
 - wfi-resume-pc: WFI resume-PC probe, trap entry at wfi and resume at wfi+4 (see `src/wfi-resume-pc/`)
 - lrsc-histogram: Aligned LR/SC attempts-to-success histogram on a single hart (see `src/lrsc-histogram/`)
 - pmp-tor: PMP TOR boundary test with two entries forming one exact boundary (see `src/pmp-tor/`)
