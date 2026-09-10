@@ -1,0 +1,7 @@
+mepc-resume-skip: handler adds 4 to mepc, fault skipped once
+setup: mtvec=0x800001c8 mie=0x0
+addrs: fault=0x80000312 resume=0x80000316 delta=4
+trap: count=1 mcause=0x5 mtval=0xffffffffc0000000
+mepc: before=0x80000312 after=0x80000316 delta=4 insn@mepc_before=0x5a503
+post: marker=0xdeadbeefdeadbeef a0=0xa0a0a0a0a0a0a0a0 a1=0xffffffffc0000000
+RESULT: PASS (traps=1)
