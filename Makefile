@@ -39,6 +39,24 @@ AMO_OBJS := $(AMO_OBJS:.S=.o)
 amo.elf: $(AMO_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(AMO_OBJS)
 
+# LR/SC attempt-histogram module: its own binary sharing only boot.S
+# and the UART driver with the other demos. Runs 10,000 aligned
+# lr.w/sc.w pairs on a single hart with no contention, records the
+# attempts-to-success histogram, and verifies every stored value by
+# readback. A minimal trap handler halts the hart on any trap, so the
+# run's own PASS/FAIL verdict also covers "no trap fired".
+LRH_SRCS := src/boot.S src/uart.c \
+            src/lrsc-histogram/lrsc_trap.S src/lrsc-histogram/lrsc_main.c
+LRH_OBJS := $(LRH_SRCS:.c=.o)
+LRH_OBJS := $(LRH_OBJS:.S=.o)
+
+lrsc-histogram.elf: $(LRH_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(LRH_OBJS)
+
+# Run the LR/SC attempt-histogram module under QEMU.
+run-lrsc-histogram: lrsc-histogram.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel lrsc-histogram.elf
+
 # M-mode to U-mode trap transition module: its own binary sharing only
 # boot.S and the UART driver with the other demos. Drops to U-mode with
 # mret (mstatus.MPP = 0) into a one-instruction ecall payload; the
@@ -72,7 +90,7 @@ medeleg-mask.elf: $(MDEL_OBJS) link.ld
 run-medeleg-mask: medeleg-mask.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel medeleg-mask.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
