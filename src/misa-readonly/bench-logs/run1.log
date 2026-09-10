@@ -1,0 +1,6 @@
+misa-readonly: misa WARL read-only check
+boot: misa=0x80000000001411ad
+write: value=0xffffffffffffffff readback=0x80000000001411ad
+alive: sum1to100=5050
+traps: count=0
+RESULT: PASS

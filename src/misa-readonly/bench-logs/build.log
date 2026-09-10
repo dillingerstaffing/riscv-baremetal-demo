@@ -1,0 +1,2 @@
+/usr/lib/gcc/riscv64-unknown-elf/13.2.0/../../../riscv64-unknown-elf/bin/ld: warning: misa-readonly.elf has a LOAD segment with RWX permissions
+built misa-readonly.elf
