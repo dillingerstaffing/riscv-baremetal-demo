@@ -1,0 +1,12 @@
+wfi-resume-pc: trap at wfi resumes at wfi+4, regs intact (item 87)
+mhartid=0
+trap: mtvec=0x800001c8 mscratch=0x80000df0
+control: traps-with-msip-clear=0 (expect 0)
+run 0: wfi_addr=0x80000406 trap_mepc=0x80000406 resume_pc=0x8000040a
+run 0: register diffs=0/31
+run 1: wfi_addr=0x80000406 trap_mepc=0x80000406 resume_pc=0x8000040a
+run 1: register diffs=0/31
+run 2: wfi_addr=0x80000406 trap_mepc=0x80000406 resume_pc=0x8000040a
+run 2: register diffs=0/31
+RESULT: PASS (3 runs: resume==wfi+4, 0/31 register diffs each)
+done

@@ -72,7 +72,7 @@ medeleg-mask.elf: $(MDEL_OBJS) link.ld
 run-medeleg-mask: medeleg-mask.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel medeleg-mask.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -255,6 +255,23 @@ wfi-latency.elf: $(WFI_OBJS) link.ld
 run-wfi-latency: wfi-latency.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel wfi-latency.elf
 
+# WFI resume-PC module: its own binary sharing only boot.S and the UART
+# driver with the other demos. Captures the exact wfi address via an
+# asm numeric local label, takes a CLINT machine software interrupt
+# with mepc at the wfi, and verifies mret resumes at wfi+4 with all of
+# x1-x31 bit-identical, over three runs.
+WFIRPC_SRCS := src/boot.S src/uart.c \
+               src/wfi-resume-pc/rpc_trap.S src/wfi-resume-pc/rpc_main.c
+WFIRPC_OBJS := $(WFIRPC_SRCS:.c=.o)
+WFIRPC_OBJS := $(WFIRPC_SRCS:.S=.o)
+
+wfi-resume-pc.elf: $(WFIRPC_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(WFIRPC_OBJS)
+
+# Run the WFI resume-PC module under QEMU.
+run-wfi-resume-pc: wfi-resume-pc.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel wfi-resume-pc.elf
+
 # Run the misaligned-access experiment under QEMU.
 run-mal: mal.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mal.elf
@@ -424,6 +441,6 @@ run-fs-check: fs-check.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel fs-check.elf
 
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf
 
 .PHONY: all run clean
