@@ -1,0 +1,9 @@
+mcause-warl: mcause write-any/read-legal check
+boot: mcause=0x0
+trap: mtvec=0x800001c8
+trap1: handler-cause=0xb mepc=0x8000036c count=1
+trap1: mcause-readback=0xb (expect 0xb)
+write-ones: write=0xffffffffffffffff last-cause=0xb readback=0xffffffffffffffff
+write-zero: write=0x0 last-cause=0xb readback=0x0
+trap2: handler-cause=0xb mcause-readback=0xb count=2
+RESULT: PASS (traps=2)
