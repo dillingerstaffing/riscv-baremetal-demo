@@ -1,0 +1,13 @@
+mret-no-restore: handler clobbers a0..a7 with no restore
+setup: mtvec=0x800001c8 mie=0x0
+trap: count=1 mcause=0xb mepc=0x80000556 mtval=0x0 insn@mepc=0x73
+regs: before -> after (handler wrote)
+  a0: 0x1111111111111111 -> 0x9999999999999999 (handler 0x9999999999999999)
+  a1: 0x2222222222222222 -> 0xaaaaaaaaaaaaaaaa (handler 0xaaaaaaaaaaaaaaaa)
+  a2: 0x3333333333333333 -> 0xbbbbbbbbbbbbbbbb (handler 0xbbbbbbbbbbbbbbbb)
+  a3: 0x4444444444444444 -> 0xcccccccccccccccc (handler 0xcccccccccccccccc)
+  a4: 0x5555555555555555 -> 0xdddddddddddddddd (handler 0xdddddddddddddddd)
+  a5: 0x6666666666666666 -> 0xeeeeeeeeeeeeeeee (handler 0xeeeeeeeeeeeeeeee)
+  a6: 0x7777777777777777 -> 0xffffffffffffffff (handler 0xffffffffffffffff)
+  a7: 0x8888888888888888 -> 0x123456789abcdef0 (handler 0x123456789abcdef0)
+RESULT: PASS (traps=1)
