@@ -1,0 +1,21 @@
+
+========================================
+stvec direct-mode write/readback
++ delegated S-mode trap delivery
+========================================
+
+stvec at boot          = 0x0
+handler base (svd_trap_entry) = 0x800001c8
+stvec write            = 0x800001c8
+stvec readback         = 0x800001c8
+medeleg at boot        = 0x0
+medeleg after csrs 9   = 0x200
+setup complete; dropping to S-mode at the ecall payload...
+
+--- trap record (S-mode, via stvec direct) ---
+  scause     = 0x9
+  sepc       = 0x8000058e
+  stval      = 0x0
+  ecall_addr = 0x8000058e
+  traps      = 1
+RESULT: PASS
