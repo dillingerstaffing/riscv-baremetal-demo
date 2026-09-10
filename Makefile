@@ -177,7 +177,7 @@ medeleg-mask.elf: $(MDEL_OBJS) link.ld
 run-medeleg-mask: medeleg-mask.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel medeleg-mask.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf pmp-napot-size.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -342,6 +342,27 @@ pmp-tor.elf: $(PMPTOR_OBJS) link.ld
 # Run the PMP TOR-boundary module under QEMU.
 run-pmp-tor: pmp-tor.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel pmp-tor.elf
+
+# PMP NAPOT size-decoding module: its own binary sharing only boot.S and
+# the UART driver with the other demos. Programs a locked no-access
+# NAPOT entry at 4 KiB and a second locked no-access NAPOT entry at
+# 64 KiB over the same 64 KiB scratch region, then proves by boundary
+# probes (last byte inside / first byte outside for each encoded size,
+# plus the same address probed under both encodings) that the
+# fault/no-fault boundary moves exactly as the pmpaddr trailing-ones
+# size encoding predicts. On PASS it parks the hart; capture the log
+# with timeout.
+PNS_SRCS := src/boot.S src/uart.c \
+            src/pmp-napot-size/pns_trap.S src/pmp-napot-size/pns_main.c
+PNS_OBJS := $(PNS_SRCS:.c=.o)
+PNS_OBJS := $(PNS_OBJS:.S=.o)
+
+pmp-napot-size.elf: $(PNS_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(PNS_OBJS)
+
+# Run the PMP NAPOT size-decoding module under QEMU.
+run-pmp-napot-size: pmp-napot-size.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel pmp-napot-size.elf
 
 # CSR readback / ISA probe module: its own binary sharing only boot.S
 # and the UART driver with the other demos. Reads misa/marchid/mimpid
@@ -672,6 +693,6 @@ run-mpp-encoding: mpp-encoding.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mpp-encoding.elf
 
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) $(PNS_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf pmp-napot-size.elf
 
 .PHONY: all run clean

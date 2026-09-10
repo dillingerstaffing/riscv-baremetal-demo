@@ -1,0 +1,21 @@
+pmp-napot-size: PMP NAPOT size-decoding test
+hart mhartid=0
+control: scratch pattern + sentinel writable before PMP: ok
+config: base=0x80020000 pmpaddr0=0x200081ff (NAPOT 4 KiB [0x80020000, 0x80021000)) pmpaddr1=0x20009fff (NAPOT 64 KiB [0x80020000, 0x80030000))
+phase A: entry0 = locked NAPOT 4 KiB deny
+config: pmpaddr0 readback=0x200081ff
+config: pmpcfg0 readback=0x98
+control: address outside region still accessible: ok
+lbu @0x80022000: seen=0 mcause=0x0 mepc=0x0 mtval=0x0 resume-8=0x80000270 byte=0x0
+lbu @0x80020fff: seen=1 mcause=0x5 mepc=0x80000270 mtval=0x80020fff resume-8=0x80000270 byte=0x0
+lbu @0x80021000: seen=0 mcause=0x5 mepc=0x80000270 mtval=0x80020fff resume-8=0x80000270 byte=0x0
+phase B: entry1 = locked NAPOT 64 KiB deny
+config: pmpaddr1 readback=0x20009fff
+config: pmpcfg0 readback=0x9898 (locked byte0 must hold 0x98)
+lbu @0x80022000: seen=1 mcause=0x5 mepc=0x80000270 mtval=0x80022000 resume-8=0x80000270 byte=0x0
+lbu @0x8002ffff: seen=1 mcause=0x5 mepc=0x80000270 mtval=0x8002ffff resume-8=0x80000270 byte=0x0
+lbu @0x80030000: seen=0 mcause=0x5 mepc=0x80000270 mtval=0x8002ffff resume-8=0x80000270 byte=0x0
+lbu @0x80030004: seen=0 mcause=0x5 mepc=0x80000270 mtval=0x8002ffff resume-8=0x80000270 byte=0xa5
+RESULT: PASS (boundary moved 4 KiB -> 64 KiB with the encoding)
+done
+qemu-system-riscv64: terminating on signal 15 from pid 50026 (timeout)
