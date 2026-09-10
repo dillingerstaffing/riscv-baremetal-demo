@@ -1,0 +1,8 @@
+mcycle-write: mcycle write/readback/advance measurement
+baseline: mcycle0=0x3ff7fb47364 mcycle1=0x3ff7fb48e67 delta=6915
+write/readback: written=0x100000000 readback=0x100001cc5 delta=7365
+write took effect (readback >= written, delta <= 100000): yes
+advance: 0x10011fbd4 0x100140a1e 0x100155fe5 0x10016b354
+advance samples strictly increasing: yes
+advance samples all >= written base: yes
+RESULT: PASS
