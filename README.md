@@ -308,3 +308,4 @@ which only works because every task runs on its own stack.
 - src/cycmon/: 1000 rdcycle deltas around 100 exact nops, 3 runs, min 135 ticks, median 135-150, max 34-48k ticks, 0 backward reads, PASS
 
 - src/fs-check/: mstatus.FS field written 0..3, 8 write/readback pairs x 3 runs, FS readback == written on every write, only SD moves (FS=3), 3 runs byte-identical, PASS
+- src/medeleg-mask/: medeleg/mideleg all-ones write/readback on QEMU 8.2.2, 3 runs: medeleg writable mask 0xf0bfff, mideleg writable mask 0x3666, both restored to boot values (mideleg boot is nonzero 0x1444), pre/post-restore M-mode ecall traps match exactly (mcause=0xb), PASS x3
