@@ -90,7 +90,7 @@ medeleg-mask.elf: $(MDEL_OBJS) link.ld
 run-medeleg-mask: medeleg-mask.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel medeleg-mask.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf pmp-tor.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -239,6 +239,22 @@ pmp.elf: $(PMP_OBJS) link.ld
 # Run the PMP denial-test module under QEMU.
 run-pmp: pmp.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel pmp.elf
+
+# PMP TOR-boundary module: its own binary sharing only boot.S and the
+# UART driver with the other demos. Two TOR entries form one exact
+# boundary: the last allowed byte reads clean, the first denied byte
+# traps with a load access fault (mcause 5).
+PMPTOR_SRCS := src/boot.S src/uart.c \
+               src/pmp-tor/pmt_trap.S src/pmp-tor/pmt_main.c
+PMPTOR_OBJS := $(PMPTOR_SRCS:.c=.o)
+PMPTOR_OBJS := $(PMPTOR_OBJS:.S=.o)
+
+pmp-tor.elf: $(PMPTOR_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(PMPTOR_OBJS)
+
+# Run the PMP TOR-boundary module under QEMU.
+run-pmp-tor: pmp-tor.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel pmp-tor.elf
 
 # CSR readback / ISA probe module: its own binary sharing only boot.S
 # and the UART driver with the other demos. Reads misa/marchid/mimpid
@@ -459,6 +475,6 @@ run-fs-check: fs-check.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel fs-check.elf
 
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf
 
 .PHONY: all run clean

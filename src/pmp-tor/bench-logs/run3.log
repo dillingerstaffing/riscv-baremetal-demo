@@ -1,0 +1,13 @@
+pmp-tor-boundary: PMP TOR boundary test
+hart mhartid=0
+control: scratch readable/writable before PMP: ok
+control: sentinel 0x5A at boundary-1: ok
+config: pmpaddr0=0x20000800 (TOR [0, 0x80002000) allow) pmpaddr1=0x20000c00 (TOR [0x80002000, 0x80003000) deny,locked)
+config: pmpcfg0 readback=0x880f
+config: pmpcfg0 after clear attempt=0x8800 (entry1 byte 0x88 locked, entry0 byte cleared)
+control: address outside region still accessible: ok
+lbu @0x80001fff: seen=0 mcause=0x0 mepc=0x0 mtval=0x0 resume-8=0x80000272 byte=0x5a
+lbu @0x80002000: seen=1 mcause=0x5 mepc=0x80000272 mtval=0x80002000 resume-8=0x80000272 byte=0xd
+RESULT: PASS (boundary-1 readable, boundary traps mcause=5)
+done
+qemu-system-riscv64: terminating on signal 15 from pid 4796 (timeout)
