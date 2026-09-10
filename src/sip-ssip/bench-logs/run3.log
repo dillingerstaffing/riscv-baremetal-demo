@@ -1,0 +1,12 @@
+sip-ssip: sip SSIP (bit 1) delegation-gated write/readback check
+boot: mie=0x0 mstatus=0xa00000000
+trap: mtvec=0x800001c8
+boot: sip=0x0 mip=0x80 mideleg=0x1444 (SSI delegated: 0)
+phaseA set (not delegated): sip=0x0 mip=0x80
+delegated: mideleg=0x1446
+phaseB set (delegated): sip=0x2 (SSIP=1) mip=0x82
+phaseB clear (delegated): sip=0x0 mip=0x80
+restored: mideleg=0x1444 sip=0x0
+traps: count=0
+end: mie=0x0 mstatus=0xa00000000
+RESULT: PASS

@@ -192,6 +192,11 @@ riscv-baremetal-demo/
                     quiet windows verifying no re-delivery after clear
       msip_trap.S   M-mode trap entry recording mcause/mepc/mtval
       PROOF.md    build log, three QEMU run logs, results and limits
+    sip-ssip/     sip SSIP pending bit, delegation-gated writability (built as sip-ssip.elf)
+      sip_main.c    mideleg-delegation phases, csrs/csrc set/clear cycles,
+                    sip/mip readback checks, trap-count check
+      sip_trap.S    M-mode trap entry recording mcause/mepc/mtval
+      PROOF.md    build log, three QEMU run logs, results and limits
 ```
 
 ## How to build and run
@@ -316,4 +321,5 @@ which only works because every task runs on its own stack.
 - src/mcycle-write/: mcycle write/readback/advance (mcycle-write.elf), bare-metal M-mode on QEMU 8.2.2: csrw writes 0x100000000, immediate readbacks 0x100001e1e/0x100001d5b/0x100001cc5 across 3 runs (delta ~7.4-7.7k host-tick units, write takes effect on this emulator), 4 further readbacks strictly advancing above the written base every run, baseline double-read deltas 6870/6885/6915; not byte-identical across runs (host-clock time base) but structurally identical, RESULT: PASS x3
 - src/mip-msip/: CLINT msip pending-bit tracking in mip (mip-msip.elf), bare-metal M-mode on QEMU 8.2.2 with interrupts disabled: writes the CLINT msip register and reads mip to verify the MSIP pending bit (bit 3) sets and clears with the msip write/clear, without enabling the interrupt. Boot mip observed 0x80 (MTIP pending), tracked and conserved across the test; non-MSIP bits unchanged by msip operations. 3 runs, RESULT: PASS x3
 - src/mie-msip/: mie MSIE bit as independent interrupt gate (mie-msip.elf), bare-metal M-mode on QEMU 8.2.2: with MSIE clear, CLINT msip=1 produces 0 traps; with MSIE set, msip triggers exactly 1 machine software interrupt (mcause 0x8000000000000003). mie readbacks: 0x0 at boot, 0x0 after clear, 0x8 after set, 0x0 after clear. 3 runs byte-identical, RESULT: PASS x3
+- src/sip-ssip/: sip SSIP (bit 1) delegation-gated writability (sip-ssip.elf), bare-metal M-mode on QEMU 8.2.2 with mie.MSIE and mstatus.MIE read back clear throughout: with the supervisor software interrupt not delegated (boot mideleg 0x1444), csrs sip bit 1 is dropped, sip stays 0x0 and mip bit 1 stays clear; after delegating bit 1 in mideleg (readback 0x1446), csrs sip bit 1 sets sip to 0x2 with all other sip bits unchanged and mip bit 1 follows (mip 0x82, the boot 0x80 MTIP conserved), then csrc sip bit 1 returns sip to 0x0 and clears mip bit 1; mideleg restored to 0x1444 with sip back at 0x0; trap count 0 on all phases, 3 runs byte-identical, RESULT: PASS x3
 - src/mie-global/: mstatus.MIE global interrupt gate (mie-global.elf), bare-metal M-mode on QEMU 8.2.2 with mie MSIE=1 held constant and msip driven by the 32-bit CLINT access form (64-bit msip accesses fault on this emulator, measured in src/msip/): msip=1 with MIE=0 gives 0 traps and the pending bit stays set in mip; setting MIE fires exactly 1 machine software interrupt (mcause 0x8000000000000003, trap-entry mstatus shows MIE=0/MPIE=1/MPP=3), no re-delivery after msip clear; re-clearing MIE re-arms the gate. mstatus readbacks 0xa00000000 (MIE=0) and 0xa00000008 written (read back 0xa00000088 because the trap+mret interleaving sets MPIE before the readback, documented as a delivery-promptness measurement). 3 runs byte-identical, RESULT: PASS x3
