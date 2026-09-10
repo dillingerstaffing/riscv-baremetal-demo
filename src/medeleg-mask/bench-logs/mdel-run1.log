@@ -1,0 +1,9 @@
+medeleg-mask: medeleg/mideleg writable-bit measurement
+boot: medeleg=0x0 mideleg=0x1444
+trap1: traps=1 mcause=0xb mepc=0x8000020a mtval=0x0
+mask: medeleg-write=0xffffffffffffffff readback1=0xf0bfff readback2=0xf0bfff
+mask: mideleg-write=0xffffffffffffffff readback1=0x3666 readback2=0x3666
+restore: medeleg=0x0 mideleg=0x1444
+trap2: traps=2 mcause=0xb mepc=0x8000020a mtval=0x0
+RESULT: PASS
+done
