@@ -1,0 +1,14 @@
+mie-stie: mie.STIE vs mie.MTIE enable-bit separation check
+boot: mie=0x0 mstatus.MIE=0 mip=0x0
+trap: mtvec=0x800001e4
+irq-global: mstatus.MIE=1 (stays set for the run)
+phase1: mie-after-write=0x20 (expect 0x20)
+phase1: spins-to-MTIP-pending=704 mip=0x80 (MTIP bit SET)
+phase1: traps-with-STIE-only=0 (expect 0), mip-after-window=0x80 (MTIP bit SET)
+phase2: mie-after-write=0xa0 (expect 0xa0)
+phase2: spins-to-trap=0
+phase2: mcause=0x8000000000000007 mepc=0x800004da trap-count=1
+phase2: mip-after-handler=0x0 (MTIP bit clear)
+phase2: traps-after-quiet=1 (expect 1)
+end: mstatus.MIE=1 mie=0xa0
+RESULT: PASS (traps=1)
