@@ -1,0 +1,19 @@
+mie-msip: mie.MSIE enable-bit gate check
+boot: mie=0x0 mstatus.MIE=0
+trap: mtvec=0x80000830
+irq-global: mstatus.MIE=1 (stays set for the run)
+phase1: mie-after-clear=0x0 (mie.MSIE=0)
+phase1: msip-readback=1
+phase1: traps-with-MSIE-clear=0 (expect 0)
+phase1: msip-after-clear=0
+phase2: mie-after-set=0x8 (mie.MSIE=1)
+phase2: msip-readback=1
+phase2: spins-to-trap=0
+phase2: mcause=0x8000000000000003 mepc=0x80000450 trap-count=1
+phase2: msip-after-handler=0
+phase2: traps-after-quiet=1 (expect 1)
+regate: mie-after-clear=0x0 (mie.MSIE=0)
+regate: msip-readback=1
+regate: traps-with-MSIE-clear=1 (expect 1)
+end: mstatus.MIE=1
+RESULT: PASS (traps=1)
