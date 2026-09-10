@@ -300,3 +300,4 @@ which only works because every task runs on its own stack.
 - cycle-read-latency: rdcycle read-latency floor from back-to-back csrr reads (see `src/cycle-read-latency/`)
 - mtimecmp-oneshot: One-shot mtimecmp disarm from inside the trap handler (see `src/mtimecmp-oneshot/`)
 - mie-stie: STIE vs MTIE enable-bit separation (see `src/mie-stie/`)
+- mcause-warl: mcause WARL software-write probe; backlog premise not reproduced, QEMU 8.2.2 virt implements all 64 bits software-writable (all-ones and zero writes read back, trap entry overwrites regardless), 3 runs byte-identical PASS (see `src/mcause-warl/`)
