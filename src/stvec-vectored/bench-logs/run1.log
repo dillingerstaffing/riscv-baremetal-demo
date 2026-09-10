@@ -1,0 +1,14 @@
+stvec-vectored: S-mode vectored stvec offset test
+sstc: stce=1
+mideleg: write=0x0 readback=0x1444
+mideleg: write=0x220 readback=0x1664
+medeleg: write=0x0 readback=0x0
+stvec: written=0x80000201 readback=0x80000201
+plic: priority[10]=1 enable10=1 thresh=0
+smode: stvec=0x80000201 base=0x80000200 mode=1
+table: base=0x80000200 vec5=0x80000214 (expect 0x80000214) vec9=0x80000224 (expect 0x80000224)
+timer: armed (delta=2000000)
+timer: ev_count=1 scause=0x8000000000000005 landing=0x80000214 idx=5 (expect 0x80000214) stimecmp=0xffffffffffffffff
+ext: asserted, pending observed
+ext: ev_count=2 scause=0x8000000000000009 landing=0x80000224 idx=9 (expect 0x80000224) claim=10
+RESULT: PASS
