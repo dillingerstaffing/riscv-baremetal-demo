@@ -1,3 +1,6 @@
+<!-- PROOF-HEADER
+-->
+
 # PROOF: two-hart SMP bring-up on RISC-V
 
 ## What was built

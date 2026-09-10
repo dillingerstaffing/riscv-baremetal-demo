@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: CLINT msip write drives the mip MSIP pending bit (backlog item 111)
 
 ## What was built

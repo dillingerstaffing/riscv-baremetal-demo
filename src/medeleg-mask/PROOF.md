@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: medeleg/mideleg writable-mask measurement (backlog item 84)
 
 ## What was built

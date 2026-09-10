@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: PLIC claim/complete round-trip (backlog item 32)
 
 ## What was built

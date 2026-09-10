@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: mie.MSIE bit gates machine software interrupt delivery (backlog item 112)
 
 ## What was built

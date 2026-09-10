@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: satp ASID write/readback + WARL discovery (S-mode)
 
 ## What was built

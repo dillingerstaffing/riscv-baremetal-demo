@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # PROOF.md: mtvec vectored trap dispatch (backlog item 74)
 
 ## What was built

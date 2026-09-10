@@ -1,3 +1,7 @@
+<!-- PROOF-HEADER
+Environment: QEMU 8.2.2
+-->
+
 # PROOF: preemptive scheduler on the RISC-V machine timer
 
 ## What was built

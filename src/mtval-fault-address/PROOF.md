@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: load and store access faults report the same exact faulting address in mtval (backlog item 134, "riscv mtval-fault-address")
 
 ## What was built

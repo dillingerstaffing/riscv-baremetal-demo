@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: CLINT mtime write/readback/advance measurement (backlog item 135)
 
 ## What was built

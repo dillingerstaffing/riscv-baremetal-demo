@@ -24,10 +24,8 @@ round-robin scheduler with real assembly context switches.
 - **Preemptive scheduling** (`preempt.elf`, see `src/preempt/`): the CLINT
   machine timer (`mtime`/`mtimecmp`) fires every 1 ms; an assembly trap
   handler saves the full register context (x1-x31 plus `mepc`) and
-  switches tasks, so three tasks that never yield still interleave.
-  Measured on QEMU: interrupt latency min 13.6 us, context-switch cost
-  min 17.3 us (see `src/preempt/PROOF.md` for the build log, the raw run
-  output, and how each number was measured).
+  switches tasks, so three tasks that never yield still interleave
+  (see `src/preempt/`).
 - **S-mode trap delegation** (`smode.elf`, see `src/smode/`): the M-mode
   boot stub delegates supervisor interrupts and S-mode exceptions via
   `medeleg`/`mideleg`, installs `stvec`, opens S-mode memory with a PMP
@@ -35,73 +33,44 @@ round-robin scheduler with real assembly context switches.
   `menvcfg.STCE` for Sstc, then `sret` drops to S-mode. The scheduler
   runs entirely in S-mode on the delegated supervisor timer interrupt
   (`stimecmp`), with no M-mode involvement after boot. A matching
-  M-mode baseline shares the scheduler core via `-DTRAP_SMODE`. Measured
-  on QEMU 8.2.2, five trials per binary, 200 ticks each: exact 200/200
-  tick and switch counts every trial, latency and switch cost in the
-  same band as the M-mode baseline with no systematic delegation
-  penalty above host noise (see `src/smode/PROOF.md`).
+  M-mode baseline shares the scheduler core via `-DTRAP_SMODE`
+  (see `src/smode/`).
 - **virtio-blk block driver** (`virtio-blk.elf`, see `src/virtio-blk/`):
   discovers the virtio-mmio block device on the bus, runs the spec's
   device status sequence, negotiates the interface (1.x via
   `VIRTIO_F_VERSION_1` when offered, legacy `QueuePFN`/`QueueAlign`
   otherwise), lays out a 128-entry split virtqueue in RAM, and issues a
-  real sector write followed by a sector read. Measured on QEMU: 512/512
-  bytes round-tripped through sector 0 with 0 mismatches, device status
-  OK on both requests (see `src/virtio-blk/PROOF.md` for the build log,
-  the raw run output, and a host-side check of the backing image).
+  real sector write followed by a sector read
+  (see `src/virtio-blk/`).
 - **SMP bring-up** (`smp.elf`, see `src/smp/`): two-hart startup on
   `-smp 2`. Every hart reads `mhartid`, installs a private stack from a
   static array, and hart 1 spins on a release flag until hart 0 starts
   it. UART output from both harts is serialized with an `amoswap`
-  spinlock. Measured on QEMU: bring-up latency 1,595,175 cycles (run 1)
-  and 3,554,055 cycles (run 2), release stamp to hart 1's first stamp;
-  both harts reported `mhartid` 0 and 1 with disjoint stack slices
-  (see `src/smp/PROOF.md` for the build log, the raw run output, and
-  how each number was measured).
+  spinlock (see `src/smp/`).
 - **Cycle-accurate UART baud check** (`uart-baud.elf`, see
   `src/uart-baud/`): programs the ns16550a divisor latch for divisors
   1, 12, and 96, and measures the bit timing the UART model actually
   produces, using the receive FIFO's character timeout in internal
   loopback, stamped with `rdcycle` calibrated against the 10 MHz
-  `mtime`. Measured on QEMU: ppm error shrinks with longer timeouts
-  (about 0.3% at divisor 96), the signature of additive host latency on
-  a correct 1/D baud law, not a baud error (see `src/uart-baud/PROOF.md`
-  for the build log, the raw run output, and the limits of
-  verification).
+  `mtime` (see `src/uart-baud/`).
 - **WFI wakeup latency** (`wfi-latency.elf`, see `src/wfi-latency/`):
   arms the CLINT timer 20000 mtime ticks (2 ms) ahead, then either
   executes `wfi` or spins on a flag, and measures the latency from the
   programmed wakeup to the first instruction after `mret`, with 400
-  interleaved trials of each kind per run (first 8 discarded). Measured
-  on QEMU: waking a halted vcpu costs about 1.5 to 1.9x the
-  timer-interrupt latency of a spinning hart, roughly 130 to 230 ticks
-  (13 to 23 us) of extra vcpu-wakeup latency in the quieter runs; the
-  trap path itself is identical either way (see
-  `src/wfi-latency/PROOF.md` for the build log, three raw QEMU run
-  logs, the clock calibration, and the limits of verification).
+  interleaved trials of each kind per run (first 8 discarded)
+  (see `src/wfi-latency/`).
 - **PLIC claim/complete** (`plic.elf`, see `src/plic/`): drives the
   platform-level interrupt controller directly through its
   memory-mapped registers. Enables the UART interrupt (source 10) via
   priority/enable/threshold, asserts it with a looped-back UART byte,
-  claims it, and completes it. Measured on QEMU: claim returns id 10,
-  claim step about 29655-32310 `rdcycle` units, complete step about
-  29730-40230 units (host-time MMIO costs, calibrated per run against
-  the 10 MHz `mtime`), post-complete claim returns 0, identical PASS
-  on 3 runs (see `src/plic/PROOF.md` for the build log, the raw run
-  output, and the QEMU PLIC model behavior this depends on).
+  claims it, and completes it (see `src/plic/`).
 - **Sv39 page-table walk** (`sv39.elf`, see `src/sv39/`): builds a
   minimal Sv39 table by hand in RAM, enables it with `satp` (MODE=8,
   ASID=0) plus `sfence.vma`, drops from M-mode to S-mode, and exercises
   the hardware walker: a store/load round trip through VA `0x40000000`
-  (three-level walk `root[1] -> l1[0] -> l0[0]`, leaf PTE `0x20000cc7`
-  flags VRWAD), then unmapped loads that die at each walk level.
-  Measured on QEMU: round trip returns `0xdeadbeefcafebabe` with the
-  physical page holding the same value; all three fault tests report
-  `mcause=13` (load page fault) with `mtval` equal to the faulting VA
-  (`0x40001000`, `0x50000000`, `0xc0000000`), `mepc` exactly the faulting
-  `ld`, and `stval=0` (traps taken in M-mode), identical PASS on 3 runs
-  (see `src/sv39/PROOF.md` for the build log, the raw run output, and
-  the QEMU walker behavior this depends on).
+  (three-level walk `root[1] -> l1[0] -> l0[0]`, leaf PTE with VRWAD
+  flags set), then unmapped loads that die at each walk level
+  (see `src/sv39/`).
 
 ## Project layout
 
@@ -293,45 +262,41 @@ which only works because every task runs on its own stack.
 - `sbrk`-style heap and dynamic task creation
 
 ## Labs
-- lab 10: Preempt benchmarks, code size -O2 3831 vs -O0 4761 bytes, switch cost measured and mtime cross-checked (commit 3971bb4)
-- lab 11: Bare-metal UART shell, help/echo/regs/uptime, verified on QEMU (commit 06c817b)
-- lab 12: S-mode trap delegation, scheduler in S-mode via medeleg/mideleg, exact 200/200 tick and switch counts, no delegation penalty above noise (commit 19ed2a7)
-- lab 13: PMP no-access denial test, locked NAPOT region over 4 KiB scratch, load traps mcause=5 mepc=0x80000416, store traps mcause=7 mepc=0x800004be, mtval=0x80002000 both, verified on QEMU
-- lab 14: Misaligned load/store experiment, M-mode trap handler recording mcause/mepc/mtval, QEMU 8.2.2 virt completes misaligned lw/sw transparently (no traps): lw loaded 0xffffffffd5a1b2c3 matching the sign-extended byte-wise reference, sw round-tripped 0x12345678 exactly with the neighboring byte untouched, identical across 3 runs
-- lab 15: PLIC claim/complete round-trip, source 10 (UART0) enabled via priority/enable/threshold, asserted with a looped-back UART byte: claim returns id 10 (29655-32310 rdcycle units across 3 runs), complete 29730-40230 units (host-time MMIO costs, mtime-calibrated), post-complete claim returns 0, RESULT: PASS on all 3 runs
-- lab 16: mtimecmp delivery-offset measurement (mtimecmp.elf), mtimecmp armed 5000 ticks ahead of mtime, 1000 trials per run x 3 runs on QEMU 8.2.2: delivery offset 102-115 min, 152-198 median, 814-881 p99, 992-998 max ticks; rdcycle/mtime calibration 149 on every run; every trial delivered exactly one timer interrupt, zero spurious traps, offset never negative; RESULT: PASS on all 3 runs
-- lab 18: CSR alias check (csr.elf), bare-metal M-mode readback of misa/marchid/mimpid plus seven hand-written probe instructions covering the A, C, D, F, H, I, and M letters under a trap handler recording mcause/mepc (the S and U letters are reported by misa but not instruction-probed): misa 0x80000000001411ad (MXL=2 RV64, letters ACDFHIMSU, double-read stable), marchid 0x0, mimpid 0x0, all probes PASS on QEMU 8.2.2 (amoswap.w, c.addi, fadd.d, fadd.s, hfence.gvma, add, mul) with exact expected results and no traps, verified on 3 runs, RESULT: PASS
-- ecall ABI round-trip (ecall.elf), bare-metal M-mode to S-mode drop with environment calls: M-mode trap handler saves and restores every register x1-x31 around the C dispatcher, per-call ground truth mcause=9 and the instruction word at mepc=0x00000073 (the ecall encoding), handler-received a0-a5 compared word for word against the payload's loaded constants and returned a0 checked against an independently computed XOR, program output byte-identical across 3 QEMU 8.2.2 runs, RESULT: PASS each
-- counter-alias check (counter-alias.elf), bare-metal M-mode mcycle vs rdcycle lockstep read back-to-back over 1000 samples cross-checked against mtime: calibration 119/119 (exact agreement) on all 3 QEMU 8.2.2 runs, back-to-back delta min=108 median=120, counter rate diff 1-2%, no backward counter and no borrow, RESULT: PASS on all 3 runs
-- lab 19: Misaligned LR/SC experiment (amo.elf), M-mode trap handler recording mcause/mepc/mtval: misaligned lr.w at base+2 traps every run (mcause=4, mepc exactly the faulting lr, mtval the faulting address), misaligned sc.w after an aligned lr does not trap but returns 1 (reservation dropped, memory unchanged), misaligned lr/sc pair unreachable since the lr traps, identical across 3 runs, RESULT: PASS
-- M-mode to U-mode trap transition (umode.elf), M-mode trap handler recording mcause/mepc/mtval, one PMP NAPOT R/W/X entry, mret with mstatus.MPP=0 into a one-instruction U-mode ecall payload: mcause=0x8 (ecall from U-mode; a failed drop would have raised 11), mepc=0x80000440 exactly the payload ecall, mtval=0x0, trap-entry mstatus MPP bits = 0 (U-mode), exactly 1 trap per run, byte-identical across 3 QEMU 8.2.2 runs, RESULT: PASS
-- msip software-interrupt delivery (msip.elf), bare-metal M-mode trap handler recording mcause/mepc/mtval: CLINT msip set for hart 0 fires exactly one machine software interrupt (mcause=0x8000000000000003, trap-entry mepc exactly the waiting instruction) over two set/clear cycles, a quiet window after each clear shows zero re-delivery traps, delivery latency 77670/79860/82155 rdcycle units (cycle 1) and 27240/27255/34305 (cycle 2) across 3 QEMU 8.2.2 runs, RESULT: PASS on all 3 runs
-- mtvec vectored dispatch (mtvec-vectored.elf), bare-metal RV64 M-mode: mtvec programmed to 0x80000201 (BASE 0x80000200, MODE=1) over a 16-entry table of jal stubs; two U-mode ecalls trap with mcause=0x8 and land at BASE (synchronous exceptions enter at BASE on QEMU 8.2.2, not BASE+32), one machine timer interrupt traps with mcause=0x8000000000000007 and lands at 0x8000021c = BASE+28; mtimecmp disarmed to all-ones after the handler, no refire; RESULT: PASS, output byte-identical across 3 QEMU 8.2.2 runs
-- rdcycle monotonicity (cycmon.elf), bare-metal M-mode reads of the `cycle` CSR around a fixed 100-nop window, 1000 samples per run x 3 runs on QEMU 8.2.2 (disassembly-verified: exactly 100 nops between the two reads, nothing else): every delta strictly positive, 0 backward reads, min/median/max deltas 135/150/34620, 135/135/33735, 135/150/48060 host ticks across the 3 runs, 0 outliers above 2^20 ticks each run; PASS shuts down via the virt test-device finisher (QEMU exit 0), FAIL parks the hart (observed timeout exit 124 on a host-stall trip of the earlier absolute bound, which became the 1% outlier allowance); RESULT: PASS on all 3 runs
-- mstatus.FS field write/readback (fs-check.elf), bare-metal M-mode writes of the FS field (bits 14:13) through 0, 1, 2, 3 with full-word `mstatus` readback after each write, two iterations per run x 3 runs on QEMU 8.2.2 (boot baseline 0xa00000000): FS read back exactly the written value on all 8 writes every run, every non-FS bit unchanged except SD (bit 63), which reads 1 exactly when FS=3 (the OR-reduction behavior, confirmed in QEMU source); 3 runs byte-identical, RESULT: PASS on all 3 runs
-
-- src/cycmon/: 1000 rdcycle deltas around 100 exact nops, 3 runs, min 135 ticks, median 135-150, max 34-48k ticks, 0 backward reads, PASS
-
-- src/fs-check/: mstatus.FS field written 0..3, 8 write/readback pairs x 3 runs, FS readback == written on every write, only SD moves (FS=3), 3 runs byte-identical, PASS
-- src/medeleg-mask/: medeleg/mideleg all-ones write/readback on QEMU 8.2.2, 3 runs: medeleg writable mask 0xf0bfff, mideleg writable mask 0x3666, both restored to boot values (mideleg boot is nonzero 0x1444), pre/post-restore M-mode ecall traps match exactly (mcause=0xb), PASS x3
-- src/wfi-resume-pc/: M-mode probe on QEMU 8.2.2, 3 runs x 3 traps: machine software interrupt taken with mepc at wfi (0x80000406), handler advances saved mepc by 4, mret resumes at 0x8000040a = wfi+4, all 31 registers bit-identical pre/post on every trap, mcause 0x8000000000000003, RESULT: PASS x3
-- src/lrsc-histogram/: 10000 aligned lr.w/sc.w pairs, single hart, no contention, on QEMU 8.2.2, 3 runs: attempts-to-success histogram is a single spike, attempts=1 count=10000 every run, max attempts 1, all 10000 stored values verified by readback, 0 traps, 3 runs byte-identical, RESULT: PASS x3
-- src/pmp-tor/: PMP TOR boundary test (pmp-tor.elf), two TOR entries forming one exact boundary on QEMU 8.2.2, entry 0 allows [0, 0x80002000), entry 1 denies [0x80002000, 0x80003000) locked (pmpcfg0 0x880f, clear attempt leaves 0x8800): lbu of last allowed byte 0x80001fff completes with no trap returning the 0x5a sentinel, lbu of first denied byte 0x80002000 traps mcause=0x5 with mepc=0x80000272 exactly the faulting instruction and mtval=0x80002000 exactly the faulting address, 3 runs byte-identical, RESULT: PASS x3
-- src/mpp-encoding/: mstatus.MPP encoding write/return/verify (mpp-encoding.elf), bare-metal M-mode on QEMU 8.2.2: writes the MPP field through all four encodings, reads back the CSR, and mrets into a one-instruction ecall payload at 0x800002d2, recording mcause/mepc/mtval and the trap-entry MPP bits. Measured tuples: 00->(mcause 0x8, MPP 0), 01->(0x9, 1), 11->(0xb, 3); the reserved 10 write is coerced to 00 at write time (readback 0) and behaves as U (mcause 0x8, entry MPP 0). mepc 0x800002d2 exactly the payload ecall and mtval 0x0 on every phase, exactly 1 trap per phase, 3 runs byte-identical, RESULT: PASS x3
-- src/mcycle-write/: mcycle write/readback/advance (mcycle-write.elf), bare-metal M-mode on QEMU 8.2.2: csrw writes 0x100000000, immediate readbacks 0x100001e1e/0x100001d5b/0x100001cc5 across 3 runs (delta ~7.4-7.7k host-tick units, write takes effect on this emulator), 4 further readbacks strictly advancing above the written base every run, baseline double-read deltas 6870/6885/6915; not byte-identical across runs (host-clock time base) but structurally identical, RESULT: PASS x3
-- src/mip-msip/: CLINT msip pending-bit tracking in mip (mip-msip.elf), bare-metal M-mode on QEMU 8.2.2 with interrupts disabled: writes the CLINT msip register and reads mip to verify the MSIP pending bit (bit 3) sets and clears with the msip write/clear, without enabling the interrupt. Boot mip observed 0x80 (MTIP pending), tracked and conserved across the test; non-MSIP bits unchanged by msip operations. 3 runs, RESULT: PASS x3
-- src/mie-msip/: mie MSIE bit as independent interrupt gate (mie-msip.elf), bare-metal M-mode on QEMU 8.2.2: with MSIE clear, CLINT msip=1 produces 0 traps; with MSIE set, msip triggers exactly 1 machine software interrupt (mcause 0x8000000000000003). mie readbacks: 0x0 at boot, 0x0 after clear, 0x8 after set, 0x0 after clear. 3 runs byte-identical, RESULT: PASS x3
-- src/sip-ssip/: sip SSIP (bit 1) delegation-gated writability (sip-ssip.elf), bare-metal M-mode on QEMU 8.2.2 with mie.MSIE and mstatus.MIE read back clear throughout: with the supervisor software interrupt not delegated (boot mideleg 0x1444), csrs sip bit 1 is dropped, sip stays 0x0 and mip bit 1 stays clear; after delegating bit 1 in mideleg (readback 0x1446), csrs sip bit 1 sets sip to 0x2 with all other sip bits unchanged and mip bit 1 follows (mip 0x82, the boot 0x80 MTIP conserved), then csrc sip bit 1 returns sip to 0x0 and clears mip bit 1; mideleg restored to 0x1444 with sip back at 0x0; trap count 0 on all phases, 3 runs byte-identical, RESULT: PASS x3
-- src/mie-global/: mstatus.MIE global interrupt gate (mie-global.elf), bare-metal M-mode on QEMU 8.2.2 with mie MSIE=1 held constant and msip driven by the 32-bit CLINT access form (64-bit msip accesses fault on this emulator, measured in src/msip/): msip=1 with MIE=0 gives 0 traps and the pending bit stays set in mip; setting MIE fires exactly 1 machine software interrupt (mcause 0x8000000000000003, trap-entry mstatus shows MIE=0/MPIE=1/MPP=3), no re-delivery after msip clear; re-clearing MIE re-arms the gate. mstatus readbacks 0xa00000000 (MIE=0) and 0xa00000008 written (read back 0xa00000088 because the trap+mret interleaving sets MPIE before the readback, documented as a delivery-promptness measurement). 3 runs byte-identical, RESULT: PASS x3
-- src/sc-fail/: LR/SC failure path (sc-fail.elf), bare-metal M-mode on QEMU 8.2.2: sc.w with no preceding lr.w returns 1 (no reservation), lr.w on address A followed by sc.w on address B returns 1 (mismatched address), memory unchanged in both cases, zero traps across 3 runs; control test (sc.w matching the lr.w reservation) returns 0. RESULT: PASS x3
-- src/mret-no-restore/: M-mode trap handler that clobbers a0..a7 with no restore (mret-no-restore.elf), bare-metal M-mode on QEMU 8.2.2: one ecall traps exactly once (mcause=0xb, mepc=0x80000556 exactly the ecall, mtval=0x0, insn at mepc 0x73), the pre-trap caller loaded a0..a7 with 0x1111...-0x8888... sentinels and reads back the handler's 0x9999...-0x123456789abcdef0 set after mret, all 8 registers match the handler values, proving the caller-saved convention is a software contract rather than hardware. 3 runs byte-identical, RESULT: PASS x3
-- src/stvec-direct/: S-mode direct-mode stvec setup and trap delivery (stvec-direct.elf), bare-metal on QEMU 8.2.2: stvec programmed with MODE=00 (direct) reads back 0x800001c8 with mode bits clear, medeleg 0x200, one S-mode ecall traps exactly once (scause 0x9, sepc 0x8000058e exactly the ecall, traps = 1). 3 runs byte-identical, RESULT: PASS x3
-- src/mepc-resume-skip/: trap-resume skip (mepc-resume-skip.elf), bare-metal M-mode on QEMU 8.2.2: handler adds 4 to mepc before mret; one 4-byte faulting lw at an unmapped address traps exactly once (mcause=0x5 load access fault, mtval=0xffffffffc0000000, mepc 0x80000312 at trap entry, 0x80000316 after the +4), the instruction at faulting+4 ran (marker 0xdeadbeefdeadbeef) and the faulting load never committed (a0 sentinel 0xa0a0a0a0a0a0a0a0 intact, a1 unchanged); fault/resume addresses taken with in-asm numeric local labels. 3 runs byte-identical, RESULT: PASS x3
-- src/pmp-napot-size/: PMP NAPOT size-decoding test (pmp-napot-size.elf), bare-metal M-mode on QEMU 8.2.2: two locked no-access NAPOT entries over one 64 KiB scratch region at base 0x80020000, entry 0 pmpaddr0=0x200081ff (trailing-ones 0x1ff, 4 KiB [0x80020000, 0x80021000)), entry 1 pmpaddr1=0x20009fff (trailing-ones 0x1fff, 64 KiB [0x80020000, 0x80030000)), config bytes 0x98 (L=1, A=NAPOT, no perms), pmpcfg0 reads back 0x9898 proving the locked byte 0 held while byte 1 installed. Phase A (4 KiB only): lbu at 0x80022000 completes with no trap returning pattern byte 0x00, lbu at 0x80020fff (last byte inside) traps mcause=0x5 with mepc=0x80000270 exactly the faulting instruction (resume-8, disassembly-verified) and mtval=0x80020fff exactly the faulting address, lbu at 0x80021000 (first byte outside) completes with no trap. Phase B (64 KiB added): the same lbu at 0x80022000 now traps mcause=0x5 with mepc=0x80000270 and mtval=0x80022000, lbu at 0x8002ffff (last byte inside large region) traps mcause=0x5 mtval=0x8002ffff, lbu at 0x80030000 (first byte outside) completes with no trap, dedicated outside sentinel reads back 0xa5 with no trap. 3 runs byte-identical, RESULT: PASS x3
-- src/mtime-write/: CLINT mtime write/readback/advance coherence (mtime-write.elf), bare-metal M-mode on QEMU 8.2.2: wrote 0x100000000 to mtime (0x0200bff8) as two 32-bit stores (low word then high word), read back with a stable-pair 32-bit read (high, low, high with agreement), no 64-bit CLINT access ever issued. Write/readback/delta triples across 3 runs: written 0x100000000 every run, readbacks 0x1000002b2 / 0x10000021d / 0x1000001f9, deltas 690 / 541 / 505 mtime ticks (10 MHz); the written value is unreachable by natural advancement (baseline ~1M ticks at write time), so the readback match genuinely discriminates a stuck write. Post-write advance samples strictly increasing and above the written base on all runs; rdcycle-vs-mtime calibration 149 on all 3 runs. Not byte-identical across runs (host-clock time base) but structurally identical, RESULT: PASS x3
-- src/satp-asid/: satp ASID write/readback and WARL discovery in S-mode (satp-asid.elf), bare-metal on QEMU 8.2.2: writes satp with distinct ASIDs and reads back, discovering ASIDLEN=16 on this machine; ASID round-trip verified for {0x0, 0x1, 0x8000, 0xffff} with 0 traps across 3 runs; MODE/VPN fields behave per spec; QEMU exit code 0 on all runs
-- src/mtval-fault-address/: load vs store fault mtval agreement (mtval-fault-address.elf), bare-metal M-mode on QEMU 8.2.2: one lw and one sw at the same unmapped address 0xffffffffc0000000, each under a 4-byte .option norvc encoding with fault addresses taken via in-asm numeric local labels; both traps report mtval=0xffffffffc0000000 exactly (mcause 0x5 vs 0x7), mepc exactly each faulting instruction (0x80000326 / 0x8000036e), resume minus fault 4 for both, exactly 2 traps per run, a0 sentinel intact after the load (fault never committed); 3 runs RESULT: PASS x3
-- src/mcounteren/: M-mode rdcycle is not gated by mcounteren (mcounteren.elf), bare-metal M-mode on QEMU 8.2.2: boot mcounteren readback 0x0 on all 3 runs; writability probe writes 0x7 (CY|TM|IR), readback 0x7 exactly, which proves the later 0 write took effect rather than being silently ignored; write mcounteren=0 reads back 0x0; five rdcycle samples with mcounteren=0 strictly advance on every run (sample deltas run1: +19380, +360, +180, +150; run2: +23775, +435, +165, +165; run3: +20550, +375, +165, +165), proving the enable bits gate only S and U mode reads; mcounteren restored to the boot value 0x0, readback 0x0; 3 runs RESULT: PASS x3
-- src/cycle-read-latency/: rdcycle read-latency floor (cycle-read-latency.elf), bare-metal M-mode on QEMU 8.2.2: 38 bursts of 27 back-to-back csrr reads = 1026 reads (disassembly-verified: 27 consecutive rdcycle instructions, zero instructions between them), 988 in-burst deltas per run x 3 runs: every delta strictly positive, 0 bad deltas, 0 traps; min/median/max = 135/165/222525, 135/180/1530195, 135/165/9810 host ticks (rdcycle samples the host tick counter; the max outliers are host scheduling stalls, not read latencies); rdcycle-vs-mtime calibration 155/154/151 cycles per tick; RESULT: PASS x3
-- src/mtimecmp-oneshot/: one-shot mtimecmp disarm (mtimecmp-oneshot.elf), bare-metal M-mode on QEMU 8.2.2: mtimecmp armed exactly one mtime tick ahead (mtime+1), the handler disarms by writing all-ones to mtimecmp while still inside the trap, mip MTIP bit reads 0x0 (clear) after the disarm write, and with mstatus MIE and mie MTIE still enabled a quiet window of 1,000,000 back-to-back rdcycle reads fires zero re-delivery traps. Per run: trap_count=1, mcause=0x8000000000000007, mepc=0x80000332 (inside the os_loop spin), traps in window=0; VERDICT lines byte-identical across 3 runs, RESULT: PASS x3
-- src/mie-stie/: STIE vs MTIE enable-bit separation (mie-stie.elf), bare-metal M-mode on QEMU 8.2.2: with mstatus.MIE set and mip.MTIP pending, mie=0x20 (STIE only) delivers zero traps over a 2,000,000-spin quiet window (mip reads 0x80, MTIP still pending); control sets mie=0xA0 (MTIE|STIE) and the still-pending MTIP delivers exactly one machine timer interrupt (mcause=0x8000000000000007), handler disarms via all-ones mtimecmp write, zero re-deliveries in the follow-up quiet window; RESULT: PASS x3
+- lab 10: Preemptive scheduler on the CLINT machine timer with full-context switches (see `src/preempt/`)
+- lab 11: Bare-metal UART shell with help/echo/regs/uptime commands (see `src/shell/`)
+- lab 12: Scheduler running in S-mode on the delegated supervisor timer interrupt (see `src/smode/`)
+- lab 13: PMP no-access denial test with a locked NAPOT region over scratch RAM (see `src/pmp/`)
+- lab 14: Misaligned load/store experiment with exact instruction layout (see `src/misaligned/`)
+- lab 15: PLIC claim/complete round-trip driving the UART interrupt (see `src/plic/`)
+- lab 16: mtimecmp delivery-offset measurement over timed trials (see `src/mtimecmp/`)
+- lab 18: CSR readback of misa/marchid/mimpid plus hand-written extension probes (see `src/csr/`)
+- lab 19: Misaligned LR/SC experiment (see `src/amo/`)
+- ecall: Ecall ABI round-trip, S-mode payload with an M-mode handler that preserves every register (see `src/ecall/`)
+- counter-alias: mcycle vs rdcycle lockstep check cross-checked against mtime (see `src/counter-alias/`)
+- umode: M-mode to U-mode trap transition via mret with MPP=0 (see `src/umode/`)
+- msip: CLINT msip software-interrupt delivery with set/clear cycles (see `src/msip/`)
+- mtvec-vectored: Vectored mtvec dispatch of U-mode ecalls and the timer interrupt (see `src/mtvec-vectored/`)
+- cycmon: rdcycle monotonicity around a fixed nop window (see `src/cycmon/`)
+- fs-check: mstatus.FS field write/readback and SD-bit behavior (see `src/fs-check/`)
+- medeleg-mask: medeleg/mideleg writable-mask discovery with write/readback (see `src/medeleg-mask/`)
+- wfi-resume-pc: WFI resume-PC probe, trap entry at wfi and resume at wfi+4 (see `src/wfi-resume-pc/`)
+- lrsc-histogram: Aligned LR/SC attempts-to-success histogram on a single hart (see `src/lrsc-histogram/`)
+- pmp-tor: PMP TOR boundary test with two entries forming one exact boundary (see `src/pmp-tor/`)
+- mpp-encoding: mstatus.MPP encoding write/return/verify across privilege modes (see `src/mpp-encoding/`)
+- mcycle-write: mcycle write/readback/advance coherence (see `src/mcycle-write/`)
+- mip-msip: CLINT msip pending-bit tracking in mip with interrupts disabled (see `src/mip-msip/`)
+- mie-msip: mie MSIE bit as an independent interrupt gate (see `src/mie-msip/`)
+- sip-ssip: sip SSIP pending bit with delegation-gated writability (see `src/sip-ssip/`)
+- mie-global: mstatus.MIE as the global interrupt gate (see `src/mie-global/`)
+- sc-fail: LR/SC failure path, sc with no reservation and mismatched addresses (see `src/sc-fail/`)
+- mret-no-restore: Trap handler that clobbers a0-a7 without restoring them (see `src/mret-no-restore/`)
+- stvec-direct: S-mode direct-mode stvec setup and trap delivery (see `src/stvec-direct/`)
+- mepc-resume-skip: Trap-resume skip by advancing mepc past the faulting instruction (see `src/mepc-resume-skip/`)
+- pmp-napot-size: PMP NAPOT size-decoding test over nested regions (see `src/pmp-napot-size/`)
+- mtime-write: CLINT mtime write/readback/advance coherence (see `src/mtime-write/`)
+- satp-asid: satp ASID write/readback and WARL discovery in S-mode (see `src/satp-asid/`)
+- mtval-fault-address: Load vs store fault mtval agreement at the same address (see `src/mtval-fault-address/`)
+- mcounteren: mcounteren, showing M-mode rdcycle is not gated by the enable bits (see `src/mcounteren/`)
+- cycle-read-latency: rdcycle read-latency floor from back-to-back csrr reads (see `src/cycle-read-latency/`)
+- mtimecmp-oneshot: One-shot mtimecmp disarm from inside the trap handler (see `src/mtimecmp-oneshot/`)
+- mie-stie: STIE vs MTIE enable-bit separation (see `src/mie-stie/`)

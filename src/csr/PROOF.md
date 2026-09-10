@@ -1,3 +1,10 @@
+<!-- PROOF-HEADER
+Checks: 7
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: misa readback with per-extension instruction probes
 
 ## What was built

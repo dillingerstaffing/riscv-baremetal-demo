@@ -1,3 +1,10 @@
+<!-- PROOF-HEADER
+Checks: 5
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # PROOF: counter-alias check (backlog item 59)
 
 Backlog item 59: in M-mode on QEMU, read `mcycle` and `rdcycle`

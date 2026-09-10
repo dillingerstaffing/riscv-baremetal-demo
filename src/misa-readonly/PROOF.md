@@ -1,3 +1,10 @@
+<!-- PROOF-HEADER
+Checks: 5
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: misa WARL read-only check (backlog item 142)
 
 ## What was built

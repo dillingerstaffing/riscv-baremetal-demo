@@ -1,3 +1,10 @@
+<!-- PROOF-HEADER
+Checks: 8
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # PROOF: mstatus.FS field write/readback measurement (backlog item 80)
 
 Backlog item 80: in M-mode, write the FS field (bits 14:13) of

@@ -1,3 +1,6 @@
+<!-- PROOF-HEADER
+-->
+
 # PROOF: bare-metal UART shell on RISC-V
 
 ## What was built

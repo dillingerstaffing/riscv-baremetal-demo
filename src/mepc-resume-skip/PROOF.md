@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: M-mode trap handler adds 4 to mepc, faulting load skipped exactly once (backlog item "riscv mepc-resume-skip")
 
 ## What was built

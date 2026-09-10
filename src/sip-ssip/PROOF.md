@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: sip SSIP (bit 1) is writable only while mideleg delegates the supervisor software interrupt
 
 ## What was built

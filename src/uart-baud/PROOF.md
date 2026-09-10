@@ -1,3 +1,7 @@
+<!-- PROOF-HEADER
+Environment: QEMU 8.2.2
+-->
+
 # Proof: cycle-accurate UART baud check (backlog item #14)
 
 ## What was built

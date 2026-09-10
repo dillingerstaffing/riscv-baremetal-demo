@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # PROOF: mtimecmp one-shot disarm with quiet window
 
 Backlog item 148. One machine timer interrupt is armed exactly one

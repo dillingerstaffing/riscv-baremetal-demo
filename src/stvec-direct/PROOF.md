@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: stvec direct-mode write/readback + delegated S-mode trap delivery
 
 ## What was built

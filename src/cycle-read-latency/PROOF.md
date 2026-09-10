@@ -1,3 +1,10 @@
+<!-- PROOF-HEADER
+Checks: 2964
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # PROOF: rdcycle read-latency floor (backlog item 145)
 
 Backlog item 145: in M-mode on QEMU, 1000 consecutive rdcycle reads

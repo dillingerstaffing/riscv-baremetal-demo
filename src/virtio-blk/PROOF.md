@@ -1,3 +1,11 @@
+<!-- PROOF-HEADER
+Checks: 512
+Mismatches: 0
+Checksum: 0xf9e05dc5
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # PROOF: virtio-blk block driver on QEMU's virt board
 
 ## What was built

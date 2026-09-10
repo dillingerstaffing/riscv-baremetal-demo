@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # PROOF: mie.STIE vs mie.MTIE enable-bit separation
 
 Backlog item 149. In M-mode on QEMU, with mstatus.MIE set and a

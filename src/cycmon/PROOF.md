@@ -1,3 +1,10 @@
+<!-- PROOF-HEADER
+Checks: 3
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # PROOF: rdcycle monotonicity over a 100-nop window (backlog item 77)
 
 Backlog item 77: in M-mode on QEMU, read `rdcycle` around a fixed

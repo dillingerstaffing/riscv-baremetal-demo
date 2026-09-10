@@ -1,3 +1,9 @@
+<!-- PROOF-HEADER
+Checks: 10
+Mismatches: 0
+Environment: QEMU 8.2.2
+-->
+
 # PROOF: S-mode trap delegation for the preemptive scheduler
 
 ## What was built

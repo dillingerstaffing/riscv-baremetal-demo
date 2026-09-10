@@ -1,3 +1,10 @@
+<!-- PROOF-HEADER
+Checks: 2400
+Mismatches: 0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # Proof: WFI wakeup latency (backlog item 28)
 
 ## What was built
