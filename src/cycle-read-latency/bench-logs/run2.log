@@ -1,0 +1,25 @@
+cycle-read-latency: rdcycle read-latency floor
+calibration: 1548615 cycles over 10000 mtime ticks = 154 + 8615/10000 cycles per mtime tick
+reads: 1026 in 38 bursts of 27; deltas: 988
+delta between successive reads: min=135 median=180 max=1530195 (host ticks)
+histogram, 16 bins, width=95638 ticks:
+  bin 0 [0..95637]: 987
+  bin 1 [95638..191275]: 0
+  bin 2 [191276..286913]: 0
+  bin 3 [286914..382551]: 0
+  bin 4 [382552..478189]: 0
+  bin 5 [478190..573827]: 0
+  bin 6 [573828..669465]: 0
+  bin 7 [669466..765103]: 0
+  bin 8 [765104..860741]: 0
+  bin 9 [860742..956379]: 0
+  bin 10 [956380..1052017]: 0
+  bin 11 [1052018..1147655]: 0
+  bin 12 [1147656..1243293]: 0
+  bin 13 [1243294..1338931]: 0
+  bin 14 [1338932..1434569]: 0
+  bin 15 [1434570..1530207]: 1
+bad deltas (0 or >2^40): 0
+traps: 0
+RESULT: PASS
+[harness] qemu exit status: 0
