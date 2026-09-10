@@ -1,0 +1,9 @@
+sepc-resume-skip: S-mode handler adds 4 to sepc, fault skipped once
+setup: stvec=0x800001c8 satp=0x0 mie=0x0
+setup: medeleg=0x2020
+setup complete; dropping to S-mode...
+addrs: fault=0x800003e2 resume=0x800003e6 delta=4
+trap: count=1 scause=0x5 stval=0xffffffffc0000000
+sepc: before=0x800003e2 after=0x800003e6 delta=4 insn@sepc_before=0x5a503
+post: marker=0xdeadbeefdeadbeef a0=0xa0a0a0a0a0a0a0a0 a1=0xffffffffc0000000
+RESULT: PASS (traps=1)
