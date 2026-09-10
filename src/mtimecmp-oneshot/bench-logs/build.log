@@ -1,0 +1,3 @@
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/mtimecmp-oneshot/os_main.c -o src/mtimecmp-oneshot/os_main.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -T link.ld -o mtimecmp-oneshot.elf src/boot.o src/uart.o src/preempt/clint.o src/mtimecmp-oneshot/os_trap.o src/mtimecmp-oneshot/os_main.o
+/usr/lib/gcc/riscv64-unknown-elf/13.2.0/../../../riscv64-unknown-elf/bin/ld: warning: mtimecmp-oneshot.elf has a LOAD segment with RWX permissions

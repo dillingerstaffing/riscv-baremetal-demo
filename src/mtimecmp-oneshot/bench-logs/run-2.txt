@@ -1,0 +1,12 @@
+mtimecmp-oneshot: one-shot disarm, quiet window (backlog item 148)
+mtvec=0x800001e4 mscratch=0x80002cc0
+arming mtimecmp = mtime+1 tick
+arm: mtimecmp=0x255f7 (mtime+1), clean=0 (1 = mtime still below cmp when the write landed)
+trap_count=1 mcause=0x8000000000000007 mepc=0x80000332
+spin loop bounds: os_loop=0x80000332 os_done=0x8000033a
+mip after disarm=0x0 (MTIP bit clear)
+quiet window: 1000000 rdcycle reads with MIE on, mtimecmp=all-ones
+quiet window rdcycle delta=142814880 (reads done=1000000)
+traps in quiet window=0
+VERDICT trap_count=1 mcause=0x8000000000000007 mepc=0x80000332 quiet_window_reads=1000000 quiet_window_traps=0
+RESULT: PASS
