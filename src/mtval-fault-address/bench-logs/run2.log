@@ -1,0 +1,9 @@
+mtval-fault-address: load vs store fault mtval agreement
+setup: mtvec=0x800001c8 mie=0x0
+load:  fault=0x80000326 resume=0x8000032a delta=4
+load trap:  mcause=0x5 mepc=0x80000326 mtval=0xffffffffc0000000 insn=0x5a503
+store: fault=0x8000036e resume=0x80000372 delta=4
+store trap: mcause=0x7 mepc=0x8000036e mtval=0xffffffffc0000000 insn=0xa5a023
+compare: mtval_load=0xffffffffc0000000 mtval_store=0xffffffffc0000000 equal=yes unmapped=0xffffffffc0000000
+post: a0_load=0xa0a0a0a0a0a0a0a0 a1_load=0xffffffffc0000000 a0_store=0xa0a0a0a0a0a0a0a0 a1_store=0xffffffffc0000000
+RESULT: PASS (traps=2)

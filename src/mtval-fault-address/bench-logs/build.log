@@ -1,0 +1,4 @@
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/mtval-fault-address/mfa_trap.S -o src/mtval-fault-address/mfa_trap.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/mtval-fault-address/mfa_main.c -o src/mtval-fault-address/mfa_main.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -T link.ld -o mtval-fault-address.elf src/boot.o src/uart.o src/mtval-fault-address/mfa_trap.o src/mtval-fault-address/mfa_main.o
+/home/hatch/workspace/toolchains/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: mtval-fault-address.elf has a LOAD segment with RWX permissions

@@ -200,7 +200,30 @@ medeleg-mask.elf: $(MDEL_OBJS) link.ld
 run-medeleg-mask: medeleg-mask.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel medeleg-mask.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf
+# mtval-fault-address module: its own binary sharing only boot.S and
+# the UART driver with the other demos. Issues a load access fault and
+# a store access fault at the same unmapped address and publishes the
+# mcause/mepc/mtval triple for each, verifying both traps report the
+# exact faulting address in mtval (mcause 0x5 vs 0x7). The fault and
+# resume addresses are captured with in-asm numeric local labels; the
+# handler records mcause/mtval/mepc per trap into a two-record save
+# area and resumes at a resume address each test stored before the
+# fault. On PASS it shuts the machine down via the virt test-device
+# finisher so the QEMU process exit code (0) reflects the verdict; on
+# FAIL it parks the hart instead.
+MFA_SRCS := src/boot.S src/uart.c \
+            src/mtval-fault-address/mfa_trap.S src/mtval-fault-address/mfa_main.c
+MFA_OBJS := $(MFA_SRCS:.c=.o)
+MFA_OBJS := $(MFA_OBJS:.S=.o)
+
+mtval-fault-address.elf: $(MFA_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MFA_OBJS)
+
+# Run the mtval-fault-address module under QEMU.
+run-mtval-fault-address: mtval-fault-address.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mtval-fault-address.elf
+
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf mtval-fault-address.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -716,6 +739,6 @@ run-mpp-encoding: mpp-encoding.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mpp-encoding.elf
 
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) $(PNS_OBJS) $(SATPA_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf pmp-napot-size.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) $(PNS_OBJS) $(SATPA_OBJS) $(MFA_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf pmp-napot-size.elf mtval-fault-address.elf
 
 .PHONY: all run clean
