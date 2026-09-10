@@ -1,0 +1,9 @@
+mcounteren-mmode-gating: M-mode rdcycle vs mcounteren=0
+boot: mcounteren=0x0
+boot: rdcycle pair = 0x1d54bd80d7 -> 0x1d54bd9a72 (delta=6555)
+probe: csrw mcounteren, 0x7; readback=0x7
+write: csrw mcounteren, 0; readback=0x0
+rdcycle samples with mcounteren=0: 0x1d54f3a333 0x1d54f3f379 0x1d54f3f4f0 0x1d54f3f595 0x1d54f3f63a
+rdcycle deltas with mcounteren=0: +20550 +375 +165 +165
+restore: csrw mcounteren, 0x0; readback=0x0
+RESULT: PASS
