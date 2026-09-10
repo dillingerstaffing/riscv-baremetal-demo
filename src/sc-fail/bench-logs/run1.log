@@ -1,0 +1,14 @@
+sc-fail: store-conditional failure-path experiment
+hart mhartid=0
+trap vector installed (halts the hart on any trap)
+test(a) sc.w with no lr.w:
+  before=0xaaaaaaaa rd=1 after=0xaaaaaaaa
+test(b) lr.w on A, sc.w on B (different address):
+  before_a=0xaaaaaaaa before_b=0xbbbbbbbb
+  rd=1 after_a=0xaaaaaaaa after_b=0xbbbbbbbb
+test(c) control: lr.w then sc.w on same cell:
+  rd=0 after_a=0x12345678
+trap seen-flag=0
+RESULT: PASS
+done
+qemu-system-riscv64: terminating on signal 15 from pid 24995 (timeout)

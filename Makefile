@@ -57,6 +57,24 @@ lrsc-histogram.elf: $(LRH_OBJS) link.ld
 run-lrsc-histogram: lrsc-histogram.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel lrsc-histogram.elf
 
+# SC-without-reservation failure-path module: its own binary sharing
+# only boot.S and the UART driver with the other demos. Issues sc.w
+# with no preceding lr.w, then lr.w on address A followed by sc.w on
+# address B, and reports for each the rd result, the before/after
+# memory readbacks, and the trap count (0 expected). A minimal trap
+# handler records mcause/mepc/mtval and halts the hart on any trap.
+SCF_SRCS := src/boot.S src/uart.c \
+            src/sc-fail/scf_trap.S src/sc-fail/scf_main.c
+SCF_OBJS := $(SCF_SRCS:.c=.o)
+SCF_OBJS := $(SCF_OBJS:.S=.o)
+
+sc-fail.elf: $(SCF_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SCF_OBJS)
+
+# Run the SC failure-path module under QEMU.
+run-sc-fail: sc-fail.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel sc-fail.elf
+
 # M-mode to U-mode trap transition module: its own binary sharing only
 # boot.S and the UART driver with the other demos. Drops to U-mode with
 # mret (mstatus.MPP = 0) into a one-instruction ecall payload; the
@@ -90,7 +108,7 @@ medeleg-mask.elf: $(MDEL_OBJS) link.ld
 run-medeleg-mask: medeleg-mask.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel medeleg-mask.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
