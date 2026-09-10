@@ -1,0 +1,9 @@
+mtime-write: CLINT mtime write/readback/advance measurement
+clock: 1000000 mtime ticks -> rdcycle delta 149961630 (ratio 149 rdcycle units per tick)
+baseline: mtime0=0xf9de9 mtime1=0xfa089 delta=672
+write/readback: written=0x100000000 readback=0x1000002b2 delta=690
+write took effect (readback >= written, delta <= 100000): yes
+advance: 0x1000023cc 0x100002960 0x100002bba 0x100002e0b
+advance samples strictly increasing: yes
+advance samples all >= written base: yes
+RESULT: PASS
