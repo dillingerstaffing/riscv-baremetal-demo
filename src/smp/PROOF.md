@@ -1,4 +1,8 @@
 <!-- PROOF-HEADER
+Checks: 4
+Mismatches: 0
+Environment: QEMU
+Verdict: PASS
 -->
 
 # PROOF: two-hart SMP bring-up on RISC-V

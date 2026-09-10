@@ -1,4 +1,8 @@
 <!-- PROOF-HEADER
+Checks: 6
+Mismatches: 0
+Environment: QEMU
+Verdict: PASS
 -->
 
 # PROOF: bare-metal UART shell on RISC-V

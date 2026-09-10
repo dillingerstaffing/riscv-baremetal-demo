@@ -1,5 +1,5 @@
 <!-- PROOF-HEADER
-Checks: 8
+Checks: 4
 Mismatches: 0
 Environment: QEMU 8.2.2
 Verdict: PASS
