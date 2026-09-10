@@ -1,0 +1,31 @@
+mstatus.MPP encoding write/return/verify
+
+phase 0: MPP=00 (U), write done, readback MPP=0
+
+--- phase 0: wrote MPP=00 (U) ---
+write/return: wrote MPP=0, MPP readback=0
+landing (payload ecall) address: 0x800002d2
+trap: mcause=0x8 mepc=0x800002d2 mtval=0x0 entry MPP=0
+
+phase 1: MPP=01 (S), write done, readback MPP=1
+
+--- phase 1: wrote MPP=01 (S) ---
+write/return: wrote MPP=1, MPP readback=1
+landing (payload ecall) address: 0x800002d2
+trap: mcause=0x9 mepc=0x800002d2 mtval=0x0 entry MPP=1
+
+phase 2: MPP=10 (reserved), write done, readback MPP=0
+
+--- phase 2: wrote MPP=10 (reserved) ---
+write/return: wrote MPP=2, MPP readback=0
+landing (payload ecall) address: 0x800002d2
+trap: mcause=0x8 mepc=0x800002d2 mtval=0x0 entry MPP=0
+
+phase 3: MPP=11 (M), write done, readback MPP=3
+
+--- phase 3: wrote MPP=11 (M) ---
+write/return: wrote MPP=3, MPP readback=3
+landing (payload ecall) address: 0x800002d2
+trap: mcause=0xb mepc=0x800002d2 mtval=0x0 entry MPP=3
+
+RESULT: PASS
