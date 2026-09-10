@@ -1,0 +1,9 @@
+mip-msip: CLINT msip-to-mip pending-bit tracking check
+boot: mie.MSIE=0 mstatus.MIE=0 mip=0x80 msip=0
+note: non-MSIP mip bits at boot=0x80 mtime=0x5c070 mtimecmp0=0x0
+set1: msip-readback=1 mip=0x88 (mip.MSIP=1)
+clear1: msip-readback=0 mip=0x80 (mip.MSIP=0)
+set2: msip-readback=1 mip=0x88 (mip.MSIP=1)
+clear2: msip-readback=0 mip=0x80 (mip.MSIP=0)
+end: mie.MSIE=0 mstatus.MIE=0
+RESULT: PASS
