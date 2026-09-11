@@ -406,3 +406,10 @@ which only works because every task runs on its own stack.
   S-mode all-ones sip write probed with mideleg bit 5 clear and set;
   the readbacks in the two configurations settle which delegation
   setting reproduces the STIP writability premise.
+- **medeleg illegal-instruction route** (see `src/medeleg-illegal-inst-route/`):
+  medeleg bit 2 selects the trap destination for illegal instructions;
+  with the bit clear the trap lands in M-mode, with the bit set it lands
+  in S-mode.
+- **stval illegal-instruction capture** (see `src/stval-illegal-capture/`):
+  on an S-mode illegal-instruction trap the hart records the faulting
+  encoding in stval.
