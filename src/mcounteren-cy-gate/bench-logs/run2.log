@@ -1,0 +1,38 @@
+
+========================================
+mcounteren: S-mode rdcycle gating trap
+mcounteren=0x0: rdcycle must trap; 0x1: it must read
+========================================
+
+boot: mcounteren=0x0
+probe: csrw mcounteren, 0x7; readback=0x7
+write: csrw mcounteren, 0x0; readback=0x0
+medeleg readback=0x4
+setup complete; dropping to S-mode...
+in S-mode; mcounteren cycle-gate experiment begins
+
+phase A: rdcycle with mcounteren=0x0 (expect S-mode trap):
+  fault site (label 1)  = 0x80000288
+  resume site (label 2) = 0x8000028c
+  scause  = 0x2
+  stval   = 0xc0002973
+  sepc    = 0x80000288
+  sepc+4  = 0x8000028c
+  traps   = 1
+  rdcycle dest register = 0xdeadbeefdeadbeef (sentinel = 0xdeadbeefdeadbeef)
+
+phase B: ecall to M-mode to set mcounteren=0x1:
+  ecall site (label 1) = 0x800003d2
+  mcause  = 0x9
+  mepc    = 0x800003d2
+  M-mode traps = 1
+  mcounteren readback after set = 0x1
+
+phase C: rdcycle with mcounteren=0x1 (expect success):
+  fault site (label 1) = 0x8000049c
+  sample 1 = 0x259dd4fcc41
+  sample 2 = 0x259dd4fe97e  (delta = 7485)
+  S-mode traps after phase C = 1
+
+checksum (FNV-1a over verdict values) = 0x4d74f3e95211308e
+RESULT: PASS
