@@ -441,7 +441,7 @@ mcounteren.elf: $(MCE_OBJS) link.ld
 run-mcounteren: mcounteren.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcounteren.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf mstatus-sie-toggle.elf sstatus-mxr.elf amo-add-atomicity.elf sip-seip-write.elf scounteren-ir-gate.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf medeleg-ecall-u-route.elf mideleg-mtip-route.elf mie-msie-gate.elf mie-mtie-gate.elf mideleg-seip-route.elf sip-stip-mideleg-reconcile.elf medeleg-illegal-inst-route.elf medeleg-breakpoint.elf stval-illegal-capture.elf stval-ecall-capture.elf pmp-napot-encode.elf sstatus-fs-dirty.elf satp-mode-warl.elf sstatus-spp-sret-u.elf sie-ssip-clear-suppresses.elf stvec-vectored-mode.elf fflags-nx-inexact.elf frm-rounding-write.elf fflags-uf-underflow.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf mstatus-sie-toggle.elf sstatus-mxr.elf amo-add-atomicity.elf sip-seip-write.elf scounteren-ir-gate.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf medeleg-ecall-u-route.elf mideleg-mtip-route.elf mie-msie-gate.elf mie-mtie-gate.elf mideleg-seip-route.elf sip-stip-mideleg-reconcile.elf medeleg-illegal-inst-route.elf medeleg-breakpoint.elf stval-illegal-capture.elf stval-ecall-capture.elf pmp-napot-encode.elf sstatus-fs-dirty.elf satp-mode-warl.elf sstatus-spp-sret-u.elf sie-ssip-clear-suppresses.elf stvec-vectored-mode.elf fflags-nx-inexact.elf frm-rounding-write.elf fflags-uf-underflow.elf fflags-of-overflow.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -1662,7 +1662,7 @@ run-mcause-interrupt-bit: mcause-interrupt-bit.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcause-interrupt-bit.elf
 
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(AAA_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) $(SS_OBJS) $(PNS_OBJS) $(SATPA_OBJS) $(SATPB_OBJS) $(MFA_OBJS) $(MCE_OBJS) $(CRL_OBJS) $(MTOS_OBJS) $(STOS_OBJS) $(STIE_OBJS) $(MCA_OBJS) $(MIDR_OBJS) $(SVV_OBJS) $(SCB_OBJS) $(MIDW_OBJS) $(MIDT_OBJS) $(D0_OBJS) $(PLB_OBJS) $(MSRC_OBJS) $(METOG_OBJS) $(SSP_OBJS) $(SPU_OBJS) $(SIPW_OBJS) $(MPNT_OBJS) $(SSG_OBJS) $(STG_OBJS) $(SSW_OBJS) $(STW_OBJS) $(MSG_OBJS) $(MCB_OBJS) $(SCW_OBJS) $(SSUM_OBJS) $(MXR_OBJS) $(SCCY_OBJS) $(SEIPW_OBJS) $(SCIR_OBJS) $(MSSR_OBJS) $(MEDE_OBJS) $(UMUR_OBJS) $(SEIP_OBJS) $(STRM_OBJS) sip-stip-mideleg-reconcile.elf demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf stvec-vectored.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mideleg-mtip-route.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sstatus-spp-sret-u.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf mstatus-sie-toggle.elf sstatus-mxr.elf scounteren-cy-gate.elf amo-add-atomicity.elf sip-seip-write.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf scounteren-ir-gate.elf mideleg-seip-route.elf $(MILI_OBJS) medeleg-illegal-inst-route.elf $(MEBK_OBJS) medeleg-breakpoint.elf $(STVC_OBJS) $(STEC_OBJS) $(PNEN_OBJS) pmp-napot-encode.elf stval-illegal-capture.elf stval-ecall-capture.elf $(FNX_OBJS) fflags-nx-inexact.elf $(FFU_OBJS) fflags-uf-underflow.elf $(SFD_OBJS) sstatus-fs-dirty.elf $(SMW_OBJS) satp-mode-warl.elf $(SSCS_OBJS) sie-ssip-clear-suppresses.elf $(STVM_OBJS) stvec-vectored-mode.elf $(FRW_OBJS) frm-rounding-write.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(AAA_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) $(SS_OBJS) $(PNS_OBJS) $(SATPA_OBJS) $(SATPB_OBJS) $(MFA_OBJS) $(MCE_OBJS) $(CRL_OBJS) $(MTOS_OBJS) $(STOS_OBJS) $(STIE_OBJS) $(MCA_OBJS) $(MIDR_OBJS) $(SVV_OBJS) $(SCB_OBJS) $(MIDW_OBJS) $(MIDT_OBJS) $(D0_OBJS) $(PLB_OBJS) $(MSRC_OBJS) $(METOG_OBJS) $(SSP_OBJS) $(SPU_OBJS) $(SIPW_OBJS) $(MPNT_OBJS) $(SSG_OBJS) $(STG_OBJS) $(SSW_OBJS) $(STW_OBJS) $(MSG_OBJS) $(MCB_OBJS) $(SCW_OBJS) $(SSUM_OBJS) $(MXR_OBJS) $(SCCY_OBJS) $(SEIPW_OBJS) $(SCIR_OBJS) $(MSSR_OBJS) $(MEDE_OBJS) $(UMUR_OBJS) $(SEIP_OBJS) $(STRM_OBJS) sip-stip-mideleg-reconcile.elf demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf stvec-vectored.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mideleg-mtip-route.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sstatus-spp-sret-u.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf mstatus-sie-toggle.elf sstatus-mxr.elf scounteren-cy-gate.elf amo-add-atomicity.elf sip-seip-write.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf scounteren-ir-gate.elf mideleg-seip-route.elf $(MILI_OBJS) medeleg-illegal-inst-route.elf $(MEBK_OBJS) medeleg-breakpoint.elf $(STVC_OBJS) $(STEC_OBJS) $(PNEN_OBJS) pmp-napot-encode.elf stval-illegal-capture.elf stval-ecall-capture.elf $(FNX_OBJS) fflags-nx-inexact.elf $(FFU_OBJS) fflags-uf-underflow.elf $(FOF_OBJS) fflags-of-overflow.elf $(SFD_OBJS) sstatus-fs-dirty.elf $(SMW_OBJS) satp-mode-warl.elf $(SSCS_OBJS) sie-ssip-clear-suppresses.elf $(STVM_OBJS) stvec-vectored-mode.elf $(FRW_OBJS) frm-rounding-write.elf
 .PHONY: all run clean
 
 # scounteren.TM U-mode rdtime gate module (backlog scounteren-tm-gate):
@@ -2139,6 +2139,40 @@ fflags-uf-underflow.elf: $(FFU_OBJS) link.ld
 # Run the fflags-uf-underflow module under QEMU.
 run-fflags-uf-underflow: fflags-uf-underflow.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel fflags-uf-underflow.elf
+
+# fflags.OF accrual module (backlog "riscv fflags-of-overflow"): its own
+# binary sharing only boot.S and the UART driver with the other
+# demos. Sets mstatus.FS to Initial (1) (an FP instruction with
+# FS == Off would raise illegal-instruction), clears fcsr with
+# csrw fcsr, x0 (frm=RNE) and requires the readback 0x00, executes
+# one overflowing double multiply 1e308 * 1e308 as a real in-asm
+# volatile fmul.d loaded with fmv.d.x from the 0x7FEFFFFFFFFFFFFF
+# bit pattern (the largest finite double), and requires the fcsr
+# readback to be exactly 0x5 (OF=bit 2 and NX=bit 0 set, UF/DZ/NV
+# all 0, frm still RNE). The exact product, about 1e616, exceeds
+# the largest finite double, so the operation overflows; the
+# RNE-delivered result is +infinity, which differs from the exact
+# finite product, so it is inexact too. Clears fcsr again and
+# requires the readback 0x00. Sanity anchor, logged not asserted:
+# the product read back with fmv.x.d is 0x7FF0000000000000
+# (+infinity); the verdict rests on the fflags checks. A counting
+# M-mode trap handler is installed as a safety net; the run
+# requires its counter to stay 0. On PASS it shuts the machine
+# down via the virt test-device finisher so the QEMU process exit
+# code (0) reflects the verdict; on FAIL it parks the hart instead.
+# NOTE: src/boot.S must stay first in FOF_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+FOF_SRCS := src/boot.S src/uart.c \
+            src/fflags-of-overflow/fof_trap.S src/fflags-of-overflow/fof_main.c
+FOF_OBJS := $(FOF_SRCS:.c=.o)
+FOF_OBJS := $(FOF_OBJS:.S=.o)
+
+fflags-of-overflow.elf: $(FOF_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(FOF_OBJS)
+
+# Run the fflags-of-overflow module under QEMU.
+run-fflags-of-overflow: fflags-of-overflow.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel fflags-of-overflow.elf
 
 # sie.SSIE gate module (backlog item "riscv
 # sie-ssip-clear-suppresses"): its own binary sharing only boot.S and
