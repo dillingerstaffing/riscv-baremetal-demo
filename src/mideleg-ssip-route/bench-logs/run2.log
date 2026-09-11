@@ -1,0 +1,17 @@
+mideleg-ssip-route: supervisor software interrupt delegation test
+boot: mideleg=0x1444
+mideleg: write=0x0 readback=0x1444
+mideleg: write=0x2 readback=0x1446
+medeleg: write=0x0 readback=0x0
+control: s_traps=0 m_traps=0
+negctl: msip-readback=1
+negctl: s_traps=0 m_traps=0 msip-still-set=1
+negctl: msip-after-clear=0
+ssi: sip-after-pend=0x2
+ssi: spins=0 s_traps=1 scause=0x8000000000000001 sepc=0x8000040e expected=0x8000040e sip-at-entry=0x2
+ssi: sip-after-handler=0x0 m_traps=0
+quiet: s_traps=1 m_traps=0
+final: mideleg-programmed=0x1446
+RESULT: PASS
+done
+qemu-system-riscv64: terminating on signal 15 from pid 11311 (timeout)
