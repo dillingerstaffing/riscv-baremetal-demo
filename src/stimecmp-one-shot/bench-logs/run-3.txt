@@ -1,0 +1,19 @@
+stimecmp-one-shot: S-mode one-shot disarm, quiet window (backlog item 137)
+Sstc probe: menvcfg.STCE sticks (present)
+mideleg=0x1464
+dropping to S-mode
+in S-mode: enabling sie.STIE, checking boot disarm
+stimecmp at S-mode entry=0xffffffffffffffff
+sip before arming=0x0
+arming stimecmp = mtime+1000 ticks
+arm: stimecmp=0x1756d clean=0 (1 = mtime still below cmp when the write landed)
+trap_count=1 scause=0x8000000000000005 sepc=0x80000342
+spin loop bounds: stos_loop=0x80000342 stos_done=0x8000034a
+sip after in-handler disarm=0x0 (STIP bit clear), stimecmp readback=0xffffffffffffffff
+quiet window: 1000000 rdcycle reads with SIE on, stimecmp=all-ones
+quiet window rdcycle delta=104922390 (reads done=1000000)
+traps in quiet window=0
+stimecmp after quiet window=0xffffffffffffffff m_writes=1 s_writes=2
+VERDICT trap_count=1 scause=0x8000000000000005 sepc=0x80000342 quiet_window_reads=1000000 quiet_window_traps=0 stimecmp_final=0xffffffffffffffff m_writes=1 s_writes=2 checksum=0x8bd6d3fe55b327cb
+checks=16 fails=0
+RESULT: PASS
