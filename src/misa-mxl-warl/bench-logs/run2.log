@@ -1,0 +1,8 @@
+misa-mxl-warl: misa.MXL WARL legalization check
+boot: misa=0x80000000001411ad
+write: value=0x40000000001411ad
+readback: misa=0x80000000001411ad
+restore: misa=0x80000000001411ad
+traps: count=0
+checksum=0xdf03127f9aa56d
+RESULT: PASS
