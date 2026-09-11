@@ -416,3 +416,7 @@ which only works because every task runs on its own stack.
 - **PMP NAPOT encoding write/readback** (see `src/pmp-napot-encode/`):
   NAPOT patterns for 4 KiB, 64 KiB, and 1 MiB regions read back exactly
   from pmpaddr0, and the pmpcfg0 A field takes the NAPOT value.
+- **mstatus.FS Off-to-Dirty on an FP write** (see `src/sstatus-fs-dirty/`):
+  with FS set to Initial, one fmv.d.x moves mstatus.FS to Dirty with SD
+  set, a second FP write keeps it sticky, and clearing restores the boot
+  mstatus word exactly, with no trap firing anywhere in the sequence.
