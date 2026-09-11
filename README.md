@@ -389,3 +389,7 @@ which only works because every task runs on its own stack.
   mstatus.MPRV (bit 17) reads back exactly as written; set via csrs
   yields boot|MPRV, clear via csrc restores the boot value, with zero
   traps.
+- **mie.MTIE gate** (see `src/mie-mtie-gate/`): mie.MTIE is the M-mode
+  enable bit for the machine timer interrupt; with MTIE clear a pended
+  timer interrupt stays pending with no trap, with MTIE set it delivers
+  exactly one M-mode trap.
