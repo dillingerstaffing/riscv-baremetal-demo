@@ -1,0 +1,6 @@
+== toolchain ==
+riscv64-unknown-elf-gcc (13.2.0-11ubuntu1+12) 13.2.0
+QEMU emulator version 8.2.2 (Debian 1:8.2.2+ds-0ubuntu1.18)
+== build ==
+/usr/lib/gcc/riscv64-unknown-elf/13.2.0/../../../riscv64-unknown-elf/bin/ld: warning: mcounteren-time-gate.elf has a LOAD segment with RWX permissions
+built mcounteren-time-gate.elf

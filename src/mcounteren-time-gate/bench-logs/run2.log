@@ -1,0 +1,31 @@
+
+========================================
+mcounteren: S-mode rdtime gating trap
+mcounteren=0x1: rdtime must trap, rdcycle must read
+========================================
+
+boot: mcounteren=0x0
+probe: csrw mcounteren, 0x7; readback=0x7
+write: csrw mcounteren, 0x1; readback=0x1
+medeleg readback=0x4
+setup complete; dropping to S-mode...
+in S-mode; mcounteren time-gate experiment begins
+
+phase A: rdtime with mcounteren=0x1 (expect S-mode trap):
+  fault site (label 1)  = 0x80000288
+  resume site (label 2) = 0x8000028c
+  scause  = 0x2
+  stval   = 0xc01024f3
+  sepc    = 0x80000288
+  sepc+4  = 0x8000028c
+  traps   = 1
+  rdtime dest register = 0xdeadbeefdeadbeef (sentinel = 0xdeadbeefdeadbeef)
+
+phase B: rdcycle with mcounteren=0x1 (expect success):
+  fault site (label 1) = 0x800003da
+  sample 1 = 0x3fe0a456012
+  sample 2 = 0x3fe0a45811e  (delta = 8460)
+  S-mode traps after phase B = 1
+
+checksum (FNV-1a over verdict values) = 0xd1d0b4647fd56387
+RESULT: PASS
