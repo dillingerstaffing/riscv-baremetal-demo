@@ -1,0 +1,10 @@
+amo-add-atomicity: amoadd.w read-modify-write semantics
+hart mhartid=0
+control: aligned load/store roundtrip: ok
+phase A: final=0x10002710 expected=0x10002710 cycles=33623175
+phase B: final=0x200002bc expected=0x200002bc
+traps=0
+checksum=0x6214dda909b820e0 (FNV-1a over the two final cell values)
+summary: checks=10108 mismatches=0
+RESULT: PASS
+done

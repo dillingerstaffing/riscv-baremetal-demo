@@ -353,3 +353,6 @@ which only works because every task runs on its own stack.
 - **sstatus.MXR gate** (see `src/sstatus-mxr/`): sstatus.MXR makes
   execute-only pages readable to S-mode loads; MXR=0 faults, MXR=1
   returns the canary.
+- **amoadd.w read-modify-write** (see `src/amo-add-atomicity/`): single-hart
+  amoadd.w loop checks every returned old value, the exact final word,
+  and zero traps; single-hart contract only, no contention claim.
