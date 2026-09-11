@@ -1,0 +1,8 @@
+$ riscv64-unknown-elf-gcc [flags] -c src/boot.S -o src/boot.o
+$ riscv64-unknown-elf-gcc [flags] -c src/uart.c -o src/uart.o
+$ riscv64-unknown-elf-gcc [flags] -c src/medeleg-ecall/med_main.c -o src/medeleg-ecall/med_main.o
+$ riscv64-unknown-elf-gcc [flags] -c src/medeleg-ecall/med_trap.S -o src/medeleg-ecall/med_trap.o
+$ riscv64-unknown-elf-gcc [flags] -c src/medeleg-ecall/med_strap.S -o src/medeleg-ecall/med_strap.o
+$ riscv64-unknown-elf-gcc [flags] -T link.ld -o medeleg-ecall.elf src/boot.o src/uart.o src/medeleg-ecall/med_trap.o src/medeleg-ecall/med_strap.o src/medeleg-ecall/med_main.o
+/home/hatch/workspace/toolchains/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: medeleg-ecall.elf has a LOAD segment with RWX permissions
+build exit: 0

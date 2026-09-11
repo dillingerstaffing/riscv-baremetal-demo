@@ -1,0 +1,46 @@
+
+========================================
+medeleg-ecall: S-mode ecall delegation routing
+bit 9 set: S-mode handles, bit 9 clear: M-mode handles
+========================================
+
+boot: medeleg=0x0
+probe: csrw medeleg, 0x200; readback=0x200
+setup complete; dropping to S-mode for phase 1...
+in S-mode; phase 1: medeleg bit 9 set
+(S-mode ecall must be delegated to S-mode)
+
+phase 1 results:
+  ecall site (label 1)  = 0x800003ec
+  resume site (label 2) = 0x800003f0
+  scause  = 0x9
+  stval   = 0x0
+  sepc    = 0x800003ec
+  sepc+4  = 0x800003f0
+  S-mode traps  = 1
+  sstatus.SPP   = 1
+  M-mode traps  = 0
+
+phase 2: medeleg bit 9 clear
+(S-mode ecall must trap to M-mode)
+
+  M-mode traps after phase 1 = 1
+  medeleg after clear = 0x0
+dropping to S-mode for phase 2...
+in S-mode; phase 2 ecall (expect M-mode trap):
+phase 2 results:
+  ecall site (label 1) = 0x80000694
+  M-mode traps  = 2
+  mcause (ecall) = 0x9
+  mepc (ecall)   = 0x80000694
+  S-mode traps  = 1 (phase 1 ended at 1)
+
+final trap counts:
+  M-mode traps   = 3
+  phase-2 ecalls = 1
+  phase-completes= 2
+  S-mode traps   = 1
+
+checksum (FNV-1a over verdict values) = 0x024788976af70a1b
+checks=17 mismatches=0
+RESULT: PASS
