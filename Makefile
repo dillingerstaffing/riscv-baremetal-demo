@@ -1526,3 +1526,30 @@ scounteren-ir-gate.elf: $(SCIR_OBJS) link.ld
 # Run the scounteren.IR gate module under QEMU.
 run-scounteren-ir-gate: scounteren-ir-gate.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel scounteren-ir-gate.elf
+
+# mcountinhibit.CY gate module: its own binary sharing only boot.S and
+# the UART driver with the other demos. Runs entirely in M-mode on
+# hart 0 (QEMU boots the ELF straight into M-mode with -bios none):
+# records mcycle, writes mcountinhibit with CY (bit 0) set and
+# requires the readback to carry the bit, then samples mcycle 1000
+# times and requires zero advance (every readback identical); clears
+# CY, requires the zero readback, then samples mcycle again in
+# bounded spins and requires strictly increasing samples. A minimal
+# M-mode trap handler records mcause/mepc/mtval and a trap count,
+# then parks the hart; any trap is unexpected, so a printed PASS
+# implies zero traps. On PASS the machine shuts down via the virt
+# test-device finisher so the QEMU process exit code (0) reflects
+# the verdict; on FAIL it parks the hart instead.
+# NOTE: src/boot.S must stay first in MCYI_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+MCYI_SRCS := src/boot.S src/uart.c \
+            src/mcountinhibit-cy-gate/mcy_trap.S src/mcountinhibit-cy-gate/mcy_main.c
+MCYI_OBJS := $(MCYI_SRCS:.c=.o)
+MCYI_OBJS := $(MCYI_OBJS:.S=.o)
+
+mcountinhibit-cy-gate.elf: $(MCYI_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MCYI_OBJS)
+
+# Run the mcountinhibit.CY gate module under QEMU.
+run-mcountinhibit-cy-gate: mcountinhibit-cy-gate.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mcountinhibit-cy-gate.elf

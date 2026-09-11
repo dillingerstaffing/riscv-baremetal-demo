@@ -1,0 +1,21 @@
+
+========================================
+mcountinhibit.CY gates mcycle
+CY set must freeze it, CY clear must resume it
+========================================
+
+boot: mcountinhibit=0x0 mcycle(before gate)=0x2516c022ab9
+write: csrw mcountinhibit, 0x1 (CY); readback=0x1
+freeze: 1000 mcycle reads with CY=1
+  first=0x0 last=0x0 freeze delta (last - first)=0
+  samples differing from the first: 0
+write: csrw mcountinhibit, 0x0; readback=0x0
+resume: sampling mcycle with CY=0 (bounded spin per sample)...
+  samples: 0x2516c458872 0x2516c45d6ab 0x2516c46f504 0x2516c46f82e
+  consecutive deltas: 20025 73305 810
+  total resume delta (last - first)=94140
+traps recorded by the handler: 0
+
+checksum (FNV-1a over the measured samples) = 0x80bbb50de1020194
+checks: 7  mismatches: 0
+RESULT: PASS
