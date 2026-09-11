@@ -1,0 +1,9 @@
+sepc-warl: sepc software-write probe
+boot: sepc=0x0
+trap: mtvec=0x800001c8
+write-ones: write=0xffffffffffffffff readback=0xffffffffffffffff
+write-zero: write=0x0 readback=0x0
+trap: ecall-pc=0x800003bc handler-mepc=0x800003bc handler-sepc=0x0 cause=0xb count=1
+trap: sepc-readback=0x0 (expect 0x0)
+trap: mepc-readback=0x800003c0 (expect ecall pc + 4)
+RESULT: PASS (traps=1)

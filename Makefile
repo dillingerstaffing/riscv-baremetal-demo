@@ -310,7 +310,7 @@ mcounteren.elf: $(MCE_OBJS) link.ld
 run-mcounteren: mcounteren.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcounteren.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -841,6 +841,28 @@ mcause-warl.elf: $(MCA_OBJS) link.ld
 run-mcause-warl: mcause-warl.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcause-warl.elf
 
+# sepc WARL module: its own binary sharing only boot.S and the
+# UART driver with the other demos. Writes all-ones and zero to
+# sepc: on this hart both writes take effect, so the readbacks
+# report the written values and all 64 bits are software-writable.
+# A deliberate M-mode ecall then confirms trap entry overwrites the
+# register with the ecall pc (the handler records it and an
+# independent csrr readback agrees). The write/readback pairs are
+# the evidence. On PASS it shuts the machine down via the virt
+# test-device finisher so the QEMU process exit code (0) reflects
+# the verdict; on FAIL it parks the hart instead.
+SEPCW_SRCS := src/boot.S src/uart.c \
+            src/sepc-warl/sepc_trap.S src/sepc-warl/sepc_main.c
+SEPCW_OBJS := $(SEPCW_SRCS:.c=.o)
+SEPCW_OBJS := $(SEPCW_OBJS:.S=.o)
+
+sepc-warl.elf: $(SEPCW_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SEPCW_OBJS)
+
+# Run the sepc WARL module under QEMU.
+run-sepc-warl: sepc-warl.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel sepc-warl.elf
+
 # sip SSIP bit module: its own binary sharing only boot.S and the
 # UART driver with the other demos. Reads sip at boot as the
 # baseline, sets bit 1 (SSIP) with csrs and verifies the readback
@@ -912,5 +934,5 @@ run-cycle-read-latency: cycle-read-latency.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel cycle-read-latency.elf
 
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) $(SS_OBJS) $(PNS_OBJS) $(SATPA_OBJS) $(MFA_OBJS) $(MCE_OBJS) $(CRL_OBJS) $(MTOS_OBJS) $(STIE_OBJS) $(MCA_OBJS) $(MIDR_OBJS) $(SVV_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf stvec-vectored.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) $(SS_OBJS) $(PNS_OBJS) $(SATPA_OBJS) $(MFA_OBJS) $(MCE_OBJS) $(CRL_OBJS) $(MTOS_OBJS) $(STIE_OBJS) $(MCA_OBJS) $(MIDR_OBJS) $(SVV_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf stvec-vectored.elf sepc-warl.elf
 .PHONY: all run clean
