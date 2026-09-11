@@ -347,3 +347,9 @@ which only works because every task runs on its own stack.
 - **sie.STIE gate** (see `src/sie-stie-gate/`): sie.STIE is the S-mode
   per-interrupt enable for the supervisor timer interrupt; STIP stays
   pending without trapping while STIE is clear, and traps once STIE opens.
+- **scounteren.CY gate** (see `src/scounteren-cy-gate/`): scounteren.CY
+  gates U-mode rdcycle; CY clear traps with an illegal-instruction
+  exception, CY set returns an advancing count.
+- **sstatus.MXR gate** (see `src/sstatus-mxr/`): sstatus.MXR makes
+  execute-only pages readable to S-mode loads; MXR=0 faults, MXR=1
+  returns the canary.
