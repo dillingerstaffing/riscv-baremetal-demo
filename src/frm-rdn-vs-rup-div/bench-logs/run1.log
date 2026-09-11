@@ -1,0 +1,13 @@
+frm-rdn-vs-rup-div: RDN vs RUP rounding on fdiv.d 1.0/3.0
+setup: misa=0x80000000001411ad
+setup: mstatus FS after set=3 (expect 3=Dirty)
+frm-RDN: write fcsr=0x40 readback=0x40
+frm-RDN: q=0x3fd5555555555555 fcsr=0x41 (frm=2 fflags=0x1)
+frm-RUP: write fcsr=0x60 readback=0x60
+frm-RUP: q=0x3fd5555555555556 fcsr=0x61 (frm=3 fflags=0x1)
+anchor-RNE: q=0x3fd5555555555555 fcsr=0x1 (frm=0 fflags=0x1) equals-q_rdn=1 one-below-q_rup=1
+ulp: q_rdn=0x3fd5555555555555 q_rup=0x3fd5555555555556 (rup-rdn=0x1 xor=0x3)
+traps: count=0 mcause=0x0 mepc=0x0 mtval=0x0
+checks=16 mismatches=0
+checksum=0x108e47da413617b9
+RESULT: PASS
