@@ -1,0 +1,28 @@
+sip-stip-mideleg-reconcile: STIP write vs mideleg bit 5
+Sstc probe: menvcfg.STCE sticks (present)
+phaseA mideleg=0x1446
+dropping to S-mode
+in S-mode: Phase A, mideleg bit 5 (STI) CLEAR; SSI delegated
+sie at entry=0x0
+phaseA sip before=0x0
+phaseA writing all-ones to sip from S-mode
+phaseA sip after all-ones=0x2
+phaseA SSIP-stuck=1 STIP-stuck=0
+phaseA M-mode trap count=0 (expect 0)
+phaseA writing zero to sip from S-mode
+phaseA sip after zero=0x0
+phaseA done; ecall to M-mode to delegate STI for phase B
+phase B mideleg=0x1466
+M-mode trap count after the ecall=1 (expect 1)
+recorded mcause=0x9 (expect 9: S-mode ecall)
+phaseB sip before=0x0
+phaseB writing all-ones to sip from S-mode
+phaseB sip after all-ones=0x2
+phaseB SSIP-stuck=1 STIP-stuck=0
+phaseB M-mode trap count=1 (expect 1)
+phaseB writing zero to sip from S-mode
+phaseB sip after zero=0x0
+reconciliation: STIP-stuck phaseA=0 phaseB=0
+VERDICT mideleg_A=0x1446 mideleg_B=0x1466 sipA_after=0x2 stipA_stuck=0 sipB_after=0x2 stipB_stuck=0 traps=1 checksum=0xaee064c41add58e2
+checks=26 fails=0
+RESULT: PASS

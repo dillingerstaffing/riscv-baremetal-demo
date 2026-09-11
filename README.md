@@ -402,3 +402,7 @@ which only works because every task runs on its own stack.
   bit 9 takes on this hart, so a pended supervisor external interrupt
   traps exactly once in S-mode with scause 0x8000000000000009 and
   zero M-mode traps.
+- **sip.STIP vs mideleg bit 5** (see `src/sip-stip-mideleg-reconcile/`):
+  S-mode all-ones sip write probed with mideleg bit 5 clear and set;
+  the readbacks in the two configurations settle which delegation
+  setting reproduces the STIP writability premise.
