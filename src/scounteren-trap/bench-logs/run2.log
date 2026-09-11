@@ -1,0 +1,33 @@
+
+========================================
+scounteren: S-mode rdcycle gating trap
+mcounteren=0 must trap, CY set must read
+========================================
+
+boot: mcounteren=0x0
+probe: csrw mcounteren, 0x7; readback=0x7
+write: csrw mcounteren, 0; readback=0x0
+medeleg readback=0x4
+setup complete; dropping to S-mode...
+in S-mode; scounteren-trap experiment begins
+
+phase A: rdcycle with mcounteren=0 (expect S-mode trap):
+  fault site (label 1)  = 0x8000031e
+  resume site (label 2) = 0x80000322
+  scause  = 0x2
+  stval   = 0xc0002473
+  sepc    = 0x8000031e
+  sepc+4  = 0x80000322
+  traps   = 1
+  rdcycle dest register = 0xdeadbeefdeadbeef (sentinel = 0xdeadbeefdeadbeef)
+
+phase B: ecall to M-mode helper, then rdcycle with CY set:
+  M-mode ecall count (mt_traps) = 1
+  mcounteren after helper       = 0x1
+  fault site (label 1) = 0x800004e0
+  sample 1 = 0x13225607abd
+  sample 2 = 0x13225609b9c  (delta = 8415)
+  S-mode traps after phase B = 1
+
+checksum (FNV-1a over verdict values) = 0xefbc32d301fc1227
+RESULT: PASS

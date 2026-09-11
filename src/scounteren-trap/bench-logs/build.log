@@ -1,0 +1,3 @@
+$ riscv64-unknown-elf-gcc [flags] -c src/scounteren-trap/st_main.c -o src/scounteren-trap/st_main.o
+$ riscv64-unknown-elf-gcc [flags] -T link.ld -o scounteren-trap.elf src/boot.o src/uart.o src/scounteren-trap/st_trap.o src/scounteren-trap/mt_trap.o src/scounteren-trap/st_main.o
+/home/hatch/workspace/toolchains/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: scounteren-trap.elf has a LOAD segment with RWX permissions
