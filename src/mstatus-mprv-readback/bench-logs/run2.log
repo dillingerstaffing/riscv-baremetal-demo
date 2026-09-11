@@ -1,0 +1,14 @@
+
+========================================
+mstatus.MPRV write/readback: set via csrs, clear via csrc
+========================================
+
+boot: mstatus=0xa00000000 MPRV(bit17)=0 MPP(bits12:11)=0
+set: csrs mstatus, bit17; readback=0xa00020000
+clear: csrc mstatus, bit17; readback=0xa00000000
+restore: mstatus=0xa00000000 (boot was 0xa00000000)
+traps recorded by the handler: 0
+
+checksum (FNV-1a over the readback values) = 0x5ef757269922ecb1
+checks: 5  mismatches: 0
+RESULT: PASS
