@@ -1,0 +1,15 @@
+/home/hatch/workspace/qemu/usr/bin/qemu-system-riscv64 -machine virt -nographic -bios none -kernel frm-rounding-write.elf
+frm-rounding-write: every fcsr.frm mode writes and reads back
+setup: misa=0x80000000001411ad
+mode RNE: written frm=0 readback fcsr=0x0 frm=0 fflags=0
+mode RTZ: written frm=1 readback fcsr=0x20 frm=1 fflags=0
+mode RDN: written frm=2 readback fcsr=0x40 frm=2 fflags=0
+mode RUP: written frm=3 readback fcsr=0x60 frm=3 fflags=0
+mode RMM: written frm=4 readback fcsr=0x80 frm=4 fflags=0
+anchor RDN q=0x3fd5555555555555 expected=0x3fd5555555555555 ok=1
+anchor RUP q=0x3fd5555555555556 expected=0x3fd5555555555556 ok=1
+restored fcsr=0x0
+traps: count=0 mcause=0x0 mepc=0x0 mtval=0x0
+checks=17 mismatches=0
+checksum=0x44951e60b5903b3c
+RESULT: PASS
