@@ -1,0 +1,11 @@
+medeleg-ecall-destination: S-mode ecall destination switch test
+boot: medeleg=0x0
+phase1: medeleg-write=0x0 readback=0x0
+phase2: medeleg-write=0x200 readback=0x200
+p1: m_traps=1 mcause=0x9 mepc=0x800002c4 expected=0x800002c4 mstatus_mpp=1 s_traps=0
+p2: s_traps=1 scause=0x9 sepc=0x80000370 expected=0x80000370 sstatus_spp=1 m_traps=1
+quiet: m_traps=1 s_traps=1
+checksum=0x5ce302e5b39ef6f0
+RESULT: PASS
+done
+qemu-system-riscv64: terminating on signal 15 from pid 7104 (timeout)
