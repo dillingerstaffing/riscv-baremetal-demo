@@ -310,3 +310,5 @@ which only works because every task runs on its own stack.
 - scause-bit: scause INTERRUPT-bit probe; supervisor timer interrupt reports scause 0x8000000000000005 (bit 63 set, cause 5) and supervisor load page fault reports scause 0x000000000000000d (bit 63 clear, cause 13), 18 checks, 0 mismatches, 3 QEMU 8.2.2 runs PASS (see `src/scause-bit/`)
 - stimecmp-one-shot: S-mode stimecmp one-shot disarm, single supervisor timer interrupt then a quiet window with no re-delivery (see `src/stimecmp-one-shot/`)
 - mtvec-mode0-direct: mtvec MODE=0 direct trap entry, M-mode ecall and machine timer interrupt both land at BASE (see `src/mtvec-mode0-direct/`)
+- mie-toggle: mstatus.MIE global interrupt-enable gate in M-mode, 0 traps while MIE clear and exactly 1 trap after MIE set (see `src/mie-toggle/`)
+- mscratch-csrrw: csrrw atomic swap on mscratch, sentinel exchange with full restoration (see `src/mscratch-csrrw/`)
