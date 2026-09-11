@@ -1,0 +1,13 @@
+lrsc-store-invalidate: intervening-store reservation test
+hart mhartid=0
+trap vector installed (halts the hart on any trap)
+test(a) lr.w; sw; sc.w on A (same address):
+  before_a=0xaaaa0000 rd_a=1 after_a=0xbbbb1111
+test(b) control: lr.w; sc.w on B (no intervening store):
+  before_b=0xdddd3333 rd_b=0 after_b=0xeeee4444
+trap seen-flag=0
+checksum=0xa61fb63cece6cebc
+checks=6 fails=0
+RESULT: PASS
+done
+qemu-system-riscv64: terminating on signal 15 from pid 2969 (timeout)
