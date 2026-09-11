@@ -1,0 +1,15 @@
+mideleg-seip-route: supervisor external interrupt delegation test
+trap: mtvec=0x800001e4
+boot: mideleg=0x1444
+mideleg: write=0x0 readback=0x1444
+mideleg: write=0x200 readback=0x1644
+mideleg: write=0x1644 readback=0x1644
+medeleg: write=0x0 readback=0x0
+trap: stvec=0x8000021c
+pend: mip-after-csrs=0x200
+s-mode: sie=0x200
+control: s_traps=0 m_traps=0
+sei: spins=0 s_traps=1 scause=0x8000000000000009 sepc=0x800003bc expected=0x800003bc sip-at-entry=0x200
+quiet: s_traps=1 m_traps=0
+record checksum=0x44b4f8c94de3dbf9
+RESULT: PASS (checks=22)
