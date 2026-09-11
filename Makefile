@@ -363,7 +363,7 @@ mcounteren.elf: $(MCE_OBJS) link.ld
 run-mcounteren: mcounteren.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcounteren.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sstatus-mxr.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -1323,7 +1323,7 @@ run-mcause-interrupt-bit: mcause-interrupt-bit.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcause-interrupt-bit.elf
 
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) $(SS_OBJS) $(PNS_OBJS) $(SATPA_OBJS) $(SATPB_OBJS) $(MFA_OBJS) $(MCE_OBJS) $(CRL_OBJS) $(MTOS_OBJS) $(STOS_OBJS) $(STIE_OBJS) $(MCA_OBJS) $(MIDR_OBJS) $(SVV_OBJS) $(SCB_OBJS) $(MIDW_OBJS) $(D0_OBJS) $(PLB_OBJS) $(MSRC_OBJS) $(METOG_OBJS) $(SSP_OBJS) $(SIPW_OBJS) $(MPNT_OBJS) $(SSG_OBJS) $(STG_OBJS) $(SSW_OBJS) $(MCB_OBJS) $(SCW_OBJS) $(SSUM_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf stvec-vectored.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) $(SS_OBJS) $(PNS_OBJS) $(SATPA_OBJS) $(SATPB_OBJS) $(MFA_OBJS) $(MCE_OBJS) $(CRL_OBJS) $(MTOS_OBJS) $(STOS_OBJS) $(STIE_OBJS) $(MCA_OBJS) $(MIDR_OBJS) $(SVV_OBJS) $(SCB_OBJS) $(MIDW_OBJS) $(D0_OBJS) $(PLB_OBJS) $(MSRC_OBJS) $(METOG_OBJS) $(SSP_OBJS) $(SIPW_OBJS) $(MPNT_OBJS) $(SSG_OBJS) $(STG_OBJS) $(SSW_OBJS) $(MCB_OBJS) $(SCW_OBJS) $(SSUM_OBJS) $(SCCY_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf stvec-vectored.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf scounteren-cy-gate.elf
 .PHONY: all run clean
 
 # scounteren.TM U-mode rdtime gate module (backlog scounteren-tm-gate):
@@ -1351,6 +1351,33 @@ scounteren-tm-gate.elf: $(SCTG_OBJS) link.ld
 run-scounteren-tm-gate: scounteren-tm-gate.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel scounteren-tm-gate.elf
 
+# scounteren.CY U-mode rdcycle gate module (backlog scounteren-cy-gate):
+# its own binary sharing only boot.S and the UART driver with the
+# other demos. M-mode clears scounteren, sets mcounteren.CY (so the
+# M-level gate does not mask the S-level gate under test), delegates
+# the illegal-instruction trap and the U-mode ecall to S-mode, and
+# drops M -> S -> U twice: phase A expects the U-mode rdcycle with
+# CY clear to trap with scause=2, sepc exactly at the rdcycle site,
+# and the destination register still holding its sentinel; phase B
+# sets scounteren.CY in S-mode and expects both U-mode rdcycle reads
+# to succeed with strictly increasing samples. Every expectation is
+# an in-program check; on PASS it shuts the machine down via the
+# virt test-device finisher so the QEMU process exit code (0)
+# reflects the verdict; on FAIL it parks the hart instead.
+# NOTE: src/boot.S must stay first in SCCY_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+SCCY_SRCS := src/boot.S src/uart.c \
+            src/scounteren-cy-gate/sccy_trap.S src/scounteren-cy-gate/sccy_main.c
+SCCY_OBJS := $(SCCY_SRCS:.c=.o)
+SCCY_OBJS := $(SCCY_OBJS:.S=.o)
+
+scounteren-cy-gate.elf: $(SCCY_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SCCY_OBJS)
+
+# Run the scounteren.CY gate module under QEMU.
+run-scounteren-cy-gate: scounteren-cy-gate.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel scounteren-cy-gate.elf
+
 # menvcfg-stce module: its own binary sharing only boot.S and the UART
 # driver with the other demos. Reads menvcfg, probes the STCE bit's
 # WARL behavior (clear it, write all-ones, restore the boot value),
@@ -1373,3 +1400,31 @@ menvcfg-stce.elf: $(MENV_OBJS) link.ld
 # Run the menvcfg STCE advertisement probe under QEMU.
 run-menvcfg-stce: menvcfg-stce.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel menvcfg-stce.elf
+
+# sstatus.MXR gate module (proof-backlog item "sstatus-mxr-probe"): its
+# own binary sharing only boot.S and the UART driver with the other
+# demos. Builds a minimal Sv39 table by hand (identity megapages for
+# code/data/UART, one 4 KiB X-only leaf mapping VA 0x40000000 to a
+# canary page), delegates the load page fault (medeleg bit 13) to
+# S-mode, and mret drops into S-mode. Phase A with sstatus.MXR clear
+# does one ld from the X-only VA and requires exactly one trap with
+# scause 0xd, stval = the faulting VA, sepc = the faulting load (the
+# handler advances sepc by 4 and srets; a poisoned t0 proves the ld
+# never completed). Phase B sets MXR via csrs and requires the same
+# ld to return the canary with no new trap. On PASS it shuts the
+# machine down via the virt test-device finisher so the QEMU process
+# exit code (0) reflects the verdict; on FAIL it parks the hart
+# instead.
+# NOTE: src/boot.S must stay first in MXR_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+MXR_SRCS := src/boot.S src/uart.c \
+            src/sstatus-mxr/mxr_trap.S src/sstatus-mxr/mxr_main.c
+MXR_OBJS := $(MXR_SRCS:.c=.o)
+MXR_OBJS := $(MXR_OBJS:.S=.o)
+
+sstatus-mxr.elf: $(MXR_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MXR_OBJS)
+
+# Run the sstatus.MXR gate module under QEMU.
+run-sstatus-mxr: sstatus-mxr.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel sstatus-mxr.elf

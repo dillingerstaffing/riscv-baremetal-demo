@@ -1,0 +1,3 @@
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/sstatus-mxr/mxr_trap.S -o src/sstatus-mxr/mxr_trap.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/sstatus-mxr/mxr_main.c -o src/sstatus-mxr/mxr_main.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -T link.ld -o sstatus-mxr.elf src/boot.o src/uart.o src/sstatus-mxr/mxr_trap.o src/sstatus-mxr/mxr_main.o

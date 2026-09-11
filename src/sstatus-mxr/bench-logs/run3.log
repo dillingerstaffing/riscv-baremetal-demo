@@ -1,0 +1,21 @@
+sstatus-mxr: sstatus.MXR gate on X-only page loads (proof-backlog item "sstatus-mxr-probe")
+control: canary 0xe4ec0d1edeadbeef stored in the X-only page: ok
+table: VA 0x40000000 -> vpn2=1 vpn1=0 vpn0=0
+table: root_pt[2] =0x200000cf ppn=0x80000 flags=VRWXAD
+table: root_pt[1] =0x20002001 ppn=0x80008 flags=V
+table: root_pt[0] =0xcf ppn=0x0 flags=VRWXAD
+table: l1_test[0] =0x20001c01 ppn=0x80007 flags=V
+table: l0_test[0] =0x200018c9 ppn=0x80006 flags=VXAD
+m-mode: pmpcfg0=0x1f (entry0: NAPOT all-space R|W|X)
+m-mode: medeleg=0x2000 (bit 13: load page fault delegated)
+m-mode: satp=0x8000000000080009 (MODE=8 ASID=0)
+m-mode: entering S-mode
+s-mode: entered, translation active
+phase A: sstatus.MXR=0 (expect 0)
+phase A: traps=1 (expect 1) scause=0xd (expect 0xd) stval=0x40000000 (expect 0x40000000) sepc=0x800004f8
+fault load at mxrs_fault_load=0x800004f8 load_result=0x0 (expect 0) resumed=1 (expect 1)
+phase B: sstatus.MXR=1 (expect 1)
+phase B: load_result=0xe4ec0d1edeadbeef (expect canary 0xe4ec0d1edeadbeef) traps=1 (expect 1)
+VERDICT phase_a_traps=1 phase_b_traps=0 scause=0xd stval=0x40000000 sepc=0x800004f8 canary_readback=0xe4ec0d1edeadbeef checksum=0x99a7c23e47a279ba
+checks=31 fails=0
+RESULT: PASS
