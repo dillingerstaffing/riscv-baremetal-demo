@@ -1,0 +1,14 @@
+stval-ecall-capture: setup
+boot: medeleg=0x0
+medeleg: write=0x0 readback=0x0
+medeleg: write=0x100 readback=0x100
+medeleg: write=0x100 readback=0x100
+mie: readback=0x0
+stval-ecall-capture: U-mode environment-call stval capture test
+medeleg: write=0x0 readback=0x0
+medeleg: write=0x100 readback=0x100
+medeleg: write=0x100 readback=0x100
+ecall: spins=0 s_traps=1 scause=0x8 sepc=0x80000306 expected=0x80000306 stval=0x0 m_traps=0
+quiet: s_traps=1 m_traps=0
+record checksum=0x6d35f7bd48b0629d
+RESULT: PASS (checks=8)
