@@ -312,3 +312,5 @@ which only works because every task runs on its own stack.
 - mtvec-mode0-direct: mtvec MODE=0 direct trap entry, M-mode ecall and machine timer interrupt both land at BASE (see `src/mtvec-mode0-direct/`)
 - mie-toggle: mstatus.MIE global interrupt-enable gate in M-mode, 0 traps while MIE clear and exactly 1 trap after MIE set (see `src/mie-toggle/`)
 - mscratch-csrrw: csrrw atomic swap on mscratch, sentinel exchange with full restoration (see `src/mscratch-csrrw/`)
+- scounteren-trap: mcounteren gating of S-mode rdcycle, illegal-instruction trap when gated and successful read when enabled (see `src/scounteren-trap/`)
+- lrsc-store-invalidate: LR/SC reservation invalidation, intervening store makes sc.w fail while the uninterrupted pair succeeds (see `src/lrsc-store-invalidate/`)
