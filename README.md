@@ -303,6 +303,7 @@ which only works because every task runs on its own stack.
 - mtime-write: CLINT mtime write/readback/advance coherence (see `src/mtime-write/`)
 - satp-asid: satp ASID write/readback and WARL discovery in S-mode (see `src/satp-asid/`)
 - satp-bare: satp MODE=Bare write/readback with nonzero PPN in S-mode, plus the physical-access check that Bare means no address translation (see `src/satp-bare/`)
+- satp-mode-warl: satp MODE WARL probe of Bare, Sv39, Sv48, Sv57 and a reserved encoding in M-mode, with an Sv39 through-translation proof in S-mode (see `src/satp-mode-warl/`)
 - mtval-fault-address: Load vs store fault mtval agreement at the same address (see `src/mtval-fault-address/`)
 - mcounteren: mcounteren, showing M-mode rdcycle is not gated by the enable bits (see `src/mcounteren/`)
 - cycle-read-latency: rdcycle read-latency floor from back-to-back csrr reads (see `src/cycle-read-latency/`)

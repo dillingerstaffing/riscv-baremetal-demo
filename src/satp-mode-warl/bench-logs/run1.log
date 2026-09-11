@@ -1,0 +1,62 @@
+
+========================================
+satp MODE WARL probe (Bare/Sv39/Sv48/Sv57/reserved)
+========================================
+
+satp at boot (M-mode reads) = 0x0 / 0x0
+
+M-mode: satp.MODE discovery (PPN=0, ASID=0)
+
+probe MODE=0 (Bare):
+  prior    = 0x0
+  write    = 0x0
+  readback = 0x0
+  outcome: readback == write
+
+probe MODE=8 (Sv39):
+  prior    = 0x0
+  write    = 0x8000000000000000
+  readback = 0x8000000000000000
+  outcome: MODE field stuck at 8
+
+probe MODE=9 (Sv48):
+  prior    = 0x8000000000000000
+  write    = 0x9000000000000000
+  readback = 0x9000000000000000
+  outcome: STUCK (whole write took effect)
+
+probe MODE=10 (Sv57):
+  prior    = 0x9000000000000000
+  write    = 0xa000000000000000
+  readback = 0xa000000000000000
+  outcome: STUCK (whole write took effect)
+
+probe MODE=15 (reserved):
+  prior    = 0xa000000000000000
+  write    = 0xf000000000000000
+  readback = 0xa000000000000000
+  outcome: NO EFFECT (readback == prior)
+
+discovery done; satp restored to 0x0
+setup complete; dropping to S-mode...
+in S-mode; Sv39 translation proof begins
+
+satp on S-mode entry = 0x0 (boot record = 0x0)
+table: root_pt[2] = 0x200000cf (expect PPN 0x80000, flags V|R|W|X|A|D)
+table: root_pt[0] = 0xc7 (expect PPN 0x0, flags V|R|W|A|D)
+enable MODE=8 (Sv39), table PPN:
+  write = 0x8000000000080002
+  readback = 0x8000000000080002
+  MODE field = 8
+through-translation read: VA = 0x80003110 got = 0xc0ffee11deadbeef expected = 0xc0ffee11deadbeef
+restore MODE=0 (Bare):
+  readback = 0x0
+
+traps observed = 0
+final satp = 0x0 (boot record = 0x0)
+
+checks: 19 mismatches: 0
+checksum: 0x8844670da10ebc2d
+
+COMPLETION MARKER: satp-mode-warl run finished
+RESULT: PASS
