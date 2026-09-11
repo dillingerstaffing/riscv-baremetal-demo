@@ -1,0 +1,15 @@
+sip-write-probe: sip all-ones WARL write/readback probe
+boot: mie=0x0 mstatus=0xa00000000
+trap: mtvec=0x800001c8
+boot: sip=0x0 mip=0x80 mideleg=0x1444 (SSI delegated: 0)
+phase1 ones: sip=0x0 mip=0x80
+phase1 zero: sip=0x0 mip=0x80
+delegated: mideleg=0x1446
+phase2 ones: sip=0x2 mip=0x82
+phase2 zero: sip=0x0 mip=0x80
+restored: mideleg=0x1444 sip=0x0
+traps: count=0
+end: mie=0x0 mstatus=0xa00000000
+checks: 20 mismatches: 0
+digest: 0xc2640b707a330c6f
+RESULT: PASS
