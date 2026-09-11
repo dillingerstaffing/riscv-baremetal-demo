@@ -1,0 +1,12 @@
+fflags-uf-underflow: underflowing fmul.d must set fflags.UF+NX
+setup: mtvec=0x800001c8 mie=0x0
+setup: misa=0x80000000001411ad
+before: fcsr=0x0 fflags=0x0 frm=0
+after : fcsr=0x3 fflags=0x3 frm=0
+product bits=0x0
+cleared: fcsr=0x0 fflags=0x0 frm=0
+traps: count=0 mcause=0x0 mepc=0x0 mtval=0x0
+triple fcsr: before=0x0 after=0x3 cleared=0x0
+checks=15 mismatches=0
+checksum=0x694ad22729ed2d16
+RESULT: PASS
