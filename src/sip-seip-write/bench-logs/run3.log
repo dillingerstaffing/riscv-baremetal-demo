@@ -1,0 +1,17 @@
+sip-seip-write: S-mode sip.SEIP read-only probe
+Sstc probe: menvcfg.STCE sticks (present)
+mideleg=0x1446
+dropping to S-mode
+in S-mode: only SSI delegated (mideleg bit 1); SEI stays in M-mode
+sie at entry=0x0
+sip before=0x0
+writing all-ones to sip from S-mode
+sip after all-ones=0x2
+SSIP-stuck=1 STIP-stuck=0
+NOTE: STIP legalized away on this hart (matches the sip-stip-write sibling); SSIP is the write-executed proof
+M-mode trap count after the writes=0 (expect 0)
+writing zero to sip from S-mode
+sip after zero=0x0
+VERDICT sip_before=0x0 sip_after=0x2 sip_zeroed=0x0 traps=0 checksum=0xfbef9753a3301da1
+checks=17 fails=0
+RESULT: PASS

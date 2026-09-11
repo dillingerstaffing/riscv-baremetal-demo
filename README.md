@@ -356,3 +356,6 @@ which only works because every task runs on its own stack.
 - **amoadd.w read-modify-write** (see `src/amo-add-atomicity/`): single-hart
   amoadd.w loop checks every returned old value, the exact final word,
   and zero traps; single-hart contract only, no contention claim.
+- **sip.SEIP read-only** (see `src/sip-seip-write/`): S-mode all-ones
+  and zero writes to sip leave SEIP unchanged while SSIP sticks and
+  clears, with a counting M-mode handler proving no trap was involved.

@@ -379,7 +379,7 @@ mcounteren.elf: $(MCE_OBJS) link.ld
 run-mcounteren: mcounteren.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcounteren.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sstatus-mxr.elf amo-add-atomicity.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sstatus-mxr.elf amo-add-atomicity.elf sip-seip-write.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -1320,6 +1320,29 @@ sip-stip-write.elf: $(SSW_OBJS) link.ld
 run-sip-stip-write: sip-stip-write.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel sip-stip-write.elf
 
+# sip.SEIP read-only probe (backlog item riscv sip-seip-write): its
+# own binary sharing only boot.S and the UART driver with the other
+# demos. M-mode installs a counting trap vector, delegates nothing
+# (mideleg stays zero), opens memory with one PMP NAPOT entry, and
+# mret drops to S-mode. S-mode records the sip readback, writes
+# all-ones to sip, and requires SEIP (bit 9) to read back unchanged
+# while the software-writable SSIP bit sticks (proving the write
+# executed); the M-mode trap count must stay 0. A zero write must
+# clear SSIP/STIP with SEIP still unchanged. On PASS it shuts the
+# machine down via the virt test-device finisher so the QEMU process
+# exit code (0) reflects the verdict; on FAIL it parks the hart.
+SEIPW_SRCS := src/boot.S src/uart.c \
+              src/sip-seip-write/seipw_trap.S src/sip-seip-write/seipw_main.c
+SEIPW_OBJS := $(SEIPW_SRCS:.c=.o)
+SEIPW_OBJS := $(SEIPW_OBJS:.S=.o)
+
+sip-seip-write.elf: $(SEIPW_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SEIPW_OBJS)
+
+# Run the sip.SEIP read-only probe under QEMU.
+run-sip-seip-write: sip-seip-write.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel sip-seip-write.elf
+
 # mcause interrupt-bit module: its own binary sharing only boot.S and
 # the UART driver with the other demos. Records mcause for a
 # deliberate M-mode ecall (expect 0xb, bit 63 clear: a synchronous
@@ -1343,7 +1366,7 @@ run-mcause-interrupt-bit: mcause-interrupt-bit.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcause-interrupt-bit.elf
 
 clean:
-	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(AAA_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) $(SS_OBJS) $(PNS_OBJS) $(SATPA_OBJS) $(SATPB_OBJS) $(MFA_OBJS) $(MCE_OBJS) $(CRL_OBJS) $(MTOS_OBJS) $(STOS_OBJS) $(STIE_OBJS) $(MCA_OBJS) $(MIDR_OBJS) $(SVV_OBJS) $(SCB_OBJS) $(MIDW_OBJS) $(D0_OBJS) $(PLB_OBJS) $(MSRC_OBJS) $(METOG_OBJS) $(SSP_OBJS) $(SIPW_OBJS) $(MPNT_OBJS) $(SSG_OBJS) $(STG_OBJS) $(SSW_OBJS) $(MCB_OBJS) $(SCW_OBJS) $(SSUM_OBJS) $(MXR_OBJS) $(SCCY_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf stvec-vectored.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sstatus-mxr.elf scounteren-cy-gate.elf amo-add-atomicity.elf
+	rm -f $(OBJS) $(PREEMPT_OBJS) $(VIRTIO_OBJS) $(SMP_OBJS) $(SHELL_OBJS) $(UARTBAUD_OBJS) $(SMODE_S_OBJS) $(SMODE_M_OBJS) $(PMP_OBJS) $(WFI_OBJS) $(MIS_OBJS) $(PLIC_OBJS) $(MT_OBJS) $(SV39_OBJS) $(ECALL_OBJS) $(CA_OBJS) $(AMO_OBJS) $(AAA_OBJS) $(UMODE_OBJS) $(MSIP_OBJS) $(MTV_OBJS) $(CYCMON_OBJS) $(FSCHECK_OBJS) $(MDEL_OBJS) $(WFIRPC_OBJS) $(PMPTOR_OBJS) $(MPPENC_OBJS) $(MCW_OBJS) $(MMSP_OBJS) $(MIG_OBJS) $(MNR_OBJS) $(SVD_OBJS) $(MRS_OBJS) $(SS_OBJS) $(PNS_OBJS) $(SATPA_OBJS) $(SATPB_OBJS) $(MFA_OBJS) $(MCE_OBJS) $(CRL_OBJS) $(MTOS_OBJS) $(STOS_OBJS) $(STIE_OBJS) $(MCA_OBJS) $(MIDR_OBJS) $(SVV_OBJS) $(SCB_OBJS) $(MIDW_OBJS) $(D0_OBJS) $(PLB_OBJS) $(MSRC_OBJS) $(METOG_OBJS) $(SSP_OBJS) $(SIPW_OBJS) $(MPNT_OBJS) $(SSG_OBJS) $(STG_OBJS) $(SSW_OBJS) $(MCB_OBJS) $(SCW_OBJS) $(SSUM_OBJS) $(MXR_OBJS) $(SCCY_OBJS) $(SEIPW_OBJS) demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf stvec-vectored.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sstatus-mxr.elf scounteren-cy-gate.elf amo-add-atomicity.elf sip-seip-write.elf
 .PHONY: all run clean
 
 # scounteren.TM U-mode rdtime gate module (backlog scounteren-tm-gate):
