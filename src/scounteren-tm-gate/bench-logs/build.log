@@ -1,0 +1,6 @@
+$ riscv64-unknown-elf-gcc [flags] -c src/boot.S -o src/boot.o
+$ riscv64-unknown-elf-gcc [flags] -c src/uart.c -o src/uart.o
+$ riscv64-unknown-elf-gcc [flags] -c src/scounteren-tm-gate/sctg_trap.S -o src/scounteren-tm-gate/sctg_trap.o
+$ riscv64-unknown-elf-gcc [flags] -c src/scounteren-tm-gate/sctg_main.c -o src/scounteren-tm-gate/sctg_main.o
+$ riscv64-unknown-elf-gcc [flags] -T link.ld -o scounteren-tm-gate.elf src/boot.o src/uart.o src/scounteren-tm-gate/sctg_trap.o src/scounteren-tm-gate/sctg_main.o
+/home/hatch/workspace/toolchains/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: scounteren-tm-gate.elf has a LOAD segment with RWX permissions

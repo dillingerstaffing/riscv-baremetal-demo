@@ -1,0 +1,32 @@
+
+========================================
+scounteren.TM gates U-mode rdtime
+TM clear must trap, TM set must read
+========================================
+
+boot: scounteren=0x0
+probe: csrw scounteren, 0x7; readback=0x7
+write: csrw scounteren, 0; readback=0x0
+write: mcounteren.TM=1 (unblock the M-level gate); readback=0x2
+medeleg readback=0x104
+setup complete; dropping to S-mode...
+in S-mode; scounteren-tm-gate experiment begins
+phase A payload: rdtime site 0x80000254, ecall site 0x80000260
+dropping to U-mode with scounteren.TM=0...
+
+--- back in S-mode: phase A complete ---
+trap history:
+  [0] gated rdtime scause=0x2 stval=0xc01022f3 sepc=0x80000254 t0=0xdeadbeefdeadbeef a0=0x80001183
+  [1] SIG_A ecall  scause=0x8 stval=0x0 sepc=0x80000260 t0=0xdeadbeefdeadbeef a0=0xa5a5
+
+phase B: setting scounteren.TM in S-mode...
+  scounteren readback=0x2
+dropping to U-mode with scounteren.TM=1...
+
+--- back in S-mode: phase B complete ---
+  [2] SIG_B ecall  scause=0x8 stval=0x0 sepc=0x80000290 t0=0x495b2 a0=0xb5b5
+  rdtime sample 0 (t0) = 0x495b2
+  rdtime sample 1 (t1) = 0x495ef  (delta = 61)
+
+checksum (FNV-1a over verdict values) = 0x9756843e0befd207
+RESULT: PASS
