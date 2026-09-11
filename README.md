@@ -316,3 +316,4 @@ which only works because every task runs on its own stack.
 - scounteren-trap: mcounteren gating of S-mode rdcycle, illegal-instruction trap when gated and successful read when enabled (see `src/scounteren-trap/`)
 - lrsc-store-invalidate: LR/SC reservation invalidation, intervening store makes sc.w fail while the uninterrupted pair succeeds (see `src/lrsc-store-invalidate/`)
 - medeleg-ecall: medeleg bit 9 delegation of supervisor environment calls, S-mode ecall lands in the S-mode handler when delegated and traps to M-mode when cleared (see `src/medeleg-ecall/`)
+- sip-write-probe: sip WARL write/readback probe; only the SSIP bit is software-writable and only while mideleg delegates SSI, with mip tracking the pending bits as the read-only alias (see `src/sip-write-probe/`)
