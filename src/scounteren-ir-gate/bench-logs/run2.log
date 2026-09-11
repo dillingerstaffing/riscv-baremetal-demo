@@ -1,0 +1,32 @@
+
+========================================
+scounteren.IR gates U-mode rdinstret
+IR clear must trap, IR set must read
+========================================
+
+boot: scounteren=0x0
+probe: csrw scounteren, 0x7; readback=0x7
+write: csrw scounteren, 0; readback=0x0
+write: mcounteren.IR=1 (unblock the M-level gate); readback=0x4
+medeleg readback=0x104
+setup complete; dropping to S-mode...
+in S-mode; scounteren-ir-gate experiment begins
+phase A payload: rdinstret site 0x80000250, ecall site 0x8000025c
+dropping to U-mode with scounteren.IR=0...
+
+--- back in S-mode: phase A complete ---
+trap history:
+  [0] gated rdinstret scause=0x2 stval=0xc02022f3 sepc=0x80000250 t0=0xdeadbeefdeadbeef a0=0x800011bb
+  [1] SIG_A ecall  scause=0x8 stval=0x0 sepc=0x8000025c t0=0xdeadbeefdeadbeef a0=0x9a9a
+
+phase B: setting scounteren.IR in S-mode...
+  scounteren readback=0x4
+dropping to U-mode with scounteren.IR=1...
+
+--- back in S-mode: phase B complete ---
+  [2] SIG_B ecall  scause=0x8 stval=0x0 sepc=0x800002b0 t0=0x3eea896b4fb a0=0x9b9b
+  rdinstret sample 0 (t0) = 0x3eea896b4fb
+  rdinstret sample 1 (t1) = 0x3eea896e903  (delta = 13320)
+
+checksum (FNV-1a over verdict values) = 0x9756843e0befd207
+RESULT: PASS

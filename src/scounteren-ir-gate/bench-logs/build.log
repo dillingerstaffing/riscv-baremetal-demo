@@ -1,0 +1,3 @@
+=== build ===
+/usr/lib/gcc/riscv64-unknown-elf/13.2.0/../../../riscv64-unknown-elf/bin/ld: warning: scounteren-ir-gate.elf has a LOAD segment with RWX permissions
+BUILD_OK
