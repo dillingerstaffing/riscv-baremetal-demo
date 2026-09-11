@@ -1,0 +1,14 @@
+mie-msie-gate: mie.MSIE machine software-interrupt enable-gate check
+boot: mie=0x0 mstatus.MIE=0 mip=0x0 msip-mmio=0
+trap: mtvec=0x800001e4
+irq-global: mstatus.MIE=1 (stays set for the run)
+phaseA: mie-after-write=0x0 (expect 0x0)
+phaseA: msip-mmio-after-set=1 (expect 1)
+phaseA: mip=0x8 (MSIP bit SET)
+phaseA: traps-with-MSIE-clear=0 (expect 0), mip-after-window=0x8 (MSIP bit SET)
+phaseB: mie-after-write=0x8 (expect 0x8)
+phaseB: mcause=0x8000000000000003 mepc=0x800004dc trap-count=1
+phaseB: mip-after-handler=0x0 (MSIP bit clear)
+phaseC: traps-after-quiet=1 (expect 1)
+end: mstatus.MIE=1 mie=0x8
+RESULT: PASS (traps=1)

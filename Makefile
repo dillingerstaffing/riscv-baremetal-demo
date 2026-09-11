@@ -379,7 +379,7 @@ mcounteren.elf: $(MCE_OBJS) link.ld
 run-mcounteren: mcounteren.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcounteren.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf sstatus-mxr.elf amo-add-atomicity.elf sip-seip-write.elf scounteren-ir-gate.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf sstatus-mxr.elf amo-add-atomicity.elf sip-seip-write.elf scounteren-ir-gate.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf mie-msie-gate.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -974,6 +974,28 @@ mie-stie.elf: $(STIE_OBJS) link.ld
 run-mie-stie: mie-stie.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mie-stie.elf
 
+# mie.MSIE enable-gate module: its own binary sharing only boot.S and
+# the UART driver, and the CLINT driver with the other demos. With
+# mstatus.MIE set and the CLINT msip pended for hart 0 while MSIE is
+# clear, mip.MSIP must read pending with zero traps over a bounded
+# window; setting MSIE must then deliver exactly one machine
+# software interrupt (mcause 0x8000000000000003). The handler clears
+# the CLINT msip and no re-delivery follows. On PASS it shuts the
+# machine down via the virt test-device finisher so the QEMU process
+# exit code (0) reflects the verdict; on FAIL it parks the hart
+# instead.
+MSIE_SRCS := src/boot.S src/uart.c src/preempt/clint.c \
+             src/mie-msie-gate/msie_trap.S src/mie-msie-gate/msie_main.c
+MSIE_OBJS := $(MSIE_SRCS:.c=.o)
+MSIE_OBJS := $(MSIE_OBJS:.S=.o)
+
+mie-msie-gate.elf: $(MSIE_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MSIE_OBJS)
+
+# Run the mie.MSIE enable-gate module under QEMU.
+run-mie-msie-gate: mie-msie-gate.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mie-msie-gate.elf
+
 # mcause WARL module: its own binary sharing only boot.S and the
 # UART driver with the other demos. Takes one deliberate M-mode ecall
 # (mcause = 11), then writes all-ones and zero to mcause: on this
@@ -1547,8 +1569,8 @@ medeleg-ecall-destination.elf: $(MEDE_OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MEDE_OBJS)
 
 # Run the medeleg ecall-destination module under QEMU.
-run-medeleg-ecall-destination: medeleg-ecall-destination.elf
-	$(QEMU) -machine virt -nographic -bios none -kernel medeleg-ecall-destination.elf
+run-medeleg-ecall-destination: medeleg-ecall-destination.elf mie-msie-gate.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel medeleg-ecall-destination.elf mie-msie-gate.elf
 
 # scounteren.IR U-mode rdinstret gate module (backlog riscv scounteren-ir-gate):
 # its own binary sharing only boot.S and the UART driver with the
