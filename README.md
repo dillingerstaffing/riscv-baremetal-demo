@@ -318,6 +318,7 @@ which only works because every task runs on its own stack.
 - stimecmp-one-shot: S-mode stimecmp one-shot disarm, single supervisor timer interrupt then a quiet window with no re-delivery (see `src/stimecmp-one-shot/`)
 - mtvec-mode0-direct: mtvec MODE=0 direct trap entry, M-mode ecall and machine timer interrupt both land at BASE (see `src/mtvec-mode0-direct/`)
 - sstatus-spp: sstatus.SPP record on delegated S-mode ecall traps; supervisor ecalls delegated via medeleg bit 9, each trap enters the S-mode handler with SPP recording S-mode and scause reporting the S-mode environment call (see `src/sstatus-spp/`)
+- sstatus-spp-sret-u: sret with sstatus.SPP=0 drops to U-mode; the U-mode landing pad's privileged sstatus read traps to M-mode with mcause 2, mepc at the read site, and the trapped mstatus.MPP reading U-mode (see `src/sstatus-spp-sret-u/`)
 - mie-toggle: mstatus.MIE global interrupt-enable gate in M-mode, 0 traps while MIE clear and exactly 1 trap after MIE set (see `src/mie-toggle/`)
 - mscratch-csrrw: csrrw atomic swap on mscratch, sentinel exchange with full restoration (see `src/mscratch-csrrw/`)
 - scounteren-trap: mcounteren gating of S-mode rdcycle, illegal-instruction trap when gated and successful read when enabled (see `src/scounteren-trap/`)

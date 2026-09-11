@@ -1,0 +1,9 @@
+sstatus-spp-sret-u: sret with SPP=0 drops to U-mode
+deleg: medeleg=0x0
+spp: readback=0
+trap: count=1 mcause=0x2 mepc=0x8000023c mtval=0x100022f3 mpp=0
+site: expected=0x8000023c
+cksum=0x16e5b2ab913eb291
+s-traps=0
+RESULT: PASS
+done
