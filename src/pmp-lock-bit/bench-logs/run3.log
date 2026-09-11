@@ -1,0 +1,15 @@
+qemu-system-riscv64 -machine virt -nographic -bios none -kernel pmp-lock-bit.elf
+pmp-lock-bit: PMP lock-bit persistence test
+hart mhartid=0
+control: scratch readable/writable before PMP: ok
+config: pmpaddr0=0x200009ff (NAPOT 4 KiB at 0x80002000) pmpcfg0 entry0=0x98 (L=1 A=NAPOT R=W=X=0)
+config: pmpaddr0 readback=0x200009ff
+config: pmpcfg0 readback=0x98
+lock:   pmpcfg0 after all-ones write=0xffffffffffffff98
+lock:   entry0 byte unchanged (0x98); entries 1-7 read 0x0xff (unlocked, write accepted)
+lock:   pmpaddr0 after all-ones write=0x200009ff
+control: address outside region still accessible: ok
+load:  traps=1 mcause=0x5 mepc=0x80000540 mtval=0x80002000 resume-qemu-system-riscv64: terminating on signal 15 from pid 7673 (timeout)
+=5)
+done
+qemu-system-riscv64: terminating on signal 15 from pid 7724 (timeout)

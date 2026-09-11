@@ -1,0 +1,3 @@
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/pmp-lock-bit/plb_trap.S -o src/pmp-lock-bit/plb_trap.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/pmp-lock-bit/plb_main.c -o src/pmp-lock-bit/plb_main.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -T link.ld -o pmp-lock-bit.elf src/boot.o src/uart.o src/pmp-lock-bit/plb_trap.o src/pmp-lock-bit/plb_main.o
