@@ -344,3 +344,6 @@ which only works because every task runs on its own stack.
 - **scounteren.TM gate** (see `src/scounteren-tm-gate/`): scounteren.TM
   gates U-mode rdtime; a gated read traps as illegal instruction with
   sepc at the rdtime site, an enabled read returns the advancing timer.
+- **sie.STIE gate** (see `src/sie-stie-gate/`): sie.STIE is the S-mode
+  per-interrupt enable for the supervisor timer interrupt; STIP stays
+  pending without trapping while STIE is clear, and traps once STIE opens.
