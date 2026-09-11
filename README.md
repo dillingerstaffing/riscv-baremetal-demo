@@ -377,3 +377,7 @@ which only works because every task runs on its own stack.
   M-mode probe of the mcountinhibit.IR gate; with IR set the
   back-to-back minstret readbacks are identical, and clearing IR
   resumes the counter.
+- **menvcfg.STCE write/readback** (see `src/menvcfg-stce-write/`):
+  M-mode probe of the menvcfg.STCE control bit; the bit reads back
+  exactly as written, and an all-ones WARL probe reports the
+  legalized readback.
