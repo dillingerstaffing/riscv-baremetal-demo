@@ -426,3 +426,6 @@ which only works because every task runs on its own stack.
   with FS set to Initial, one fmv.d.x moves mstatus.FS to Dirty with SD
   set, a second FP write keeps it sticky, and clearing restores the boot
   mstatus word exactly, with no trap firing anywhere in the sequence.
+## Modules (Index of shipped labs)
+- **src/misa-mxl-warl/**: M-mode misa.MXL WARL write probe, verified on QEMU 8.2.2. [src/misa-mxl-warl/](src/misa-mxl-warl/)
+- **src/mtvec-direct-vectoring/**: M-mode Direct mtvec vectoring check (illegal-instruction + ecall) to BASE, measured on QEMU 8.2.2. [src/mtvec-direct-vectoring/](src/mtvec-direct-vectoring/)
