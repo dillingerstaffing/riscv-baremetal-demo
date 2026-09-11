@@ -1,0 +1,9 @@
+medeleg-illegal-inst-route: illegal-instruction trap destination switch test
+boot: medeleg=0x0
+phase1: medeleg-write=0x0 readback=0x0
+phase2: medeleg bit2 set readback=0x4
+p1: m_traps=1 mcause=0x2 mepc=0x800002d8 expected=0x800002d8 mstatus_mpp=1 mtval=0xffffffff s_traps=0
+p2: s_traps=1 scause=0x2 sepc=0x8000039e expected=0x8000039e sstatus_spp=1 stval=0xffffffff m_traps=1
+quiet: m_traps=1 s_traps=1
+checksum=0xd9b098bdf45ff160
+RESULT: PASS (checks=13)
