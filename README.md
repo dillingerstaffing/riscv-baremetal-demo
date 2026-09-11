@@ -433,3 +433,4 @@ which only works because every task runs on its own stack.
 - **src/misa-mxl-warl/**: M-mode misa.MXL WARL write probe, verified on QEMU 8.2.2. [src/misa-mxl-warl/](src/misa-mxl-warl/)
 - **src/mtvec-direct-vectoring/**: M-mode Direct mtvec vectoring check (illegal-instruction + ecall) to BASE, measured on QEMU 8.2.2. [src/mtvec-direct-vectoring/](src/mtvec-direct-vectoring/)
 - **src/medeleg-ecall-u-route/**: medeleg bit 8 routes a U-mode ecall to the S-mode handler; the restore ecall returns medeleg to its boot value. [src/medeleg-ecall-u-route/](src/medeleg-ecall-u-route/)
+- **src/mstatus-sie-toggle/**: mstatus.SIE gate driven from M-mode: a pending delegated supervisor software interrupt is suppressed with SIE clear and delivered with SIE set, on QEMU 8.2.2. [src/mstatus-sie-toggle/](src/mstatus-sie-toggle/)
