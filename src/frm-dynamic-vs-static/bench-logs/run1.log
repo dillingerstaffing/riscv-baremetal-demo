@@ -1,0 +1,11 @@
+frm-dynamic-vs-static: static rm in fdiv.d overrides fcsr.frm
+setup: misa=0x80000000001411ad
+setup: mstatus FS after set=3 (expect 3=Dirty)
+static-RNE under frm=RDN: q=0x3fd5555555555555 fcsr=0x41 (frm=2 fflags=0x1)
+static-RNE under frm=RUP: q=0x3fd5555555555555 fcsr=0x61 (frm=3 fflags=0x1)
+dynamic under frm=RDN: q=0x3fd5555555555555 fcsr=0x41 (frm=2 fflags=0x1)
+dynamic under frm=RUP: q=0x3fd5555555555556 fcsr=0x61 (frm=3 fflags=0x1)
+traps: count=0 mcause=0x0 mepc=0x0 mtval=0x0
+checks=19 mismatches=0
+checksum=0xaaf26cfb83385742
+RESULT: PASS
