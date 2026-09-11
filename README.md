@@ -397,3 +397,7 @@ which only works because every task runs on its own stack.
   bit 7 will not take on this hart, so an armed machine timer still
   traps in M-mode while the hart sits in S-mode, with zero S-mode
   arrivals.
+- **mideleg SEIP routing** (see `src/mideleg-seip-route/`): mideleg
+  bit 9 takes on this hart, so a pended supervisor external interrupt
+  traps exactly once in S-mode with scause 0x8000000000000009 and
+  zero M-mode traps.
