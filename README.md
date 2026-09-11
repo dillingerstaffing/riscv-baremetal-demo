@@ -335,3 +335,5 @@ which only works because every task runs on its own stack.
   the real cause.
 - **sip.STIP write** (see `src/sip-stip-write/`): S-mode writes to
   sip.STIP are legalized away on QEMU; the readback stays zero.
+- **sstatus.SUM gate** (see `src/sstatus-sum/`): sstatus.SUM gates S-mode
+  access to U-pages; SUM=0 faults the load, SUM=1 reads the canary.
