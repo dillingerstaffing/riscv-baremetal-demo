@@ -1,0 +1,7 @@
+mideleg-warl: mideleg write/legalized-readback check
+boot: mideleg=0x1444
+trap: mtvec=0x800001c8
+write-ones: write=0xffffffffffffffff readback=0x3666
+write-zero: write=0x0 readback=0x1444
+write-ones-again: write=0xffffffffffffffff readback=0x3666
+RESULT: PASS (checks=6)
