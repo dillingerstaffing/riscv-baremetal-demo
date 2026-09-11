@@ -1,0 +1,21 @@
+
+========================================
+mcountinhibit.IR gates minstret
+IR set must freeze it, IR clear must resume it
+========================================
+
+boot: mcountinhibit=0x0 minstret(before gate)=0x46172136357
+write: csrw mcountinhibit, 0x4 (IR); readback=0x4
+freeze: 1000 minstret reads with IR=1
+  first=0x0 last=0x0 freeze delta (last - first)=0
+  samples differing from the first: 0
+write: csrw mcountinhibit, 0x0; readback=0x0
+resume: sampling minstret with IR=0 (bounded spin per sample)...
+  samples: 0x4617250c6b6 0x46172511288 0x46172529306 0x4617252963f
+  consecutive deltas: 19410 98430 825
+  total resume delta (last - first)=118665
+traps recorded by the handler: 0
+
+checksum (FNV-1a over the measured samples) = 0x3de397993d13ee2a
+checks: 7  mismatches: 0
+RESULT: PASS

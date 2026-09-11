@@ -1606,3 +1606,31 @@ mcountinhibit-cy-gate.elf: $(MCYI_OBJS) link.ld
 # Run the mcountinhibit.CY gate module under QEMU.
 run-mcountinhibit-cy-gate: mcountinhibit-cy-gate.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcountinhibit-cy-gate.elf
+
+# mcountinhibit.IR gate module (backlog riscv mcountinhibit-ir-freeze):
+# its own binary sharing only boot.S and the UART driver with the
+# other demos. Runs entirely in M-mode on hart 0 (QEMU boots the ELF
+# straight into M-mode with -bios none): records minstret, writes
+# mcountinhibit with IR (bit 2) set and requires the readback to
+# carry the bit, then samples minstret 1000 times and requires zero
+# advance (every readback identical); clears IR, requires the zero
+# readback, then samples minstret again in bounded spins and
+# requires strictly increasing samples. A minimal M-mode trap
+# handler records mcause/mepc/mtval and a trap count, then parks
+# the hart; any trap is unexpected, so a printed PASS implies zero
+# traps. On PASS the machine shuts down via the virt test-device
+# finisher so the QEMU process exit code (0) reflects the verdict;
+# on FAIL it parks the hart instead.
+# NOTE: src/boot.S must stay first in MIRF_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+MIRF_SRCS := src/boot.S src/uart.c \
+            src/mcountinhibit-ir-freeze/mirf_trap.S src/mcountinhibit-ir-freeze/mirf_main.c
+MIRF_OBJS := $(MIRF_SRCS:.c=.o)
+MIRF_OBJS := $(MIRF_OBJS:.S=.o)
+
+mcountinhibit-ir-freeze.elf: $(MIRF_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MIRF_OBJS)
+
+# Run the mcountinhibit.IR gate module under QEMU.
+run-mcountinhibit-ir-freeze: mcountinhibit-ir-freeze.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mcountinhibit-ir-freeze.elf
