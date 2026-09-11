@@ -71,6 +71,12 @@ round-robin scheduler with real assembly context switches.
   (three-level walk `root[1] -> l1[0] -> l0[0]`, leaf PTE with VRWAD
   flags set), then unmapped loads that die at each walk level
   (see `src/sv39/`).
+- **sstatus.SIE interrupt gate** (see `src/sstatus-sie-gate/`): a pending
+  supervisor timer interrupt stays pending without trapping while SIE=0,
+  and traps exactly once the moment SIE=1.
+- **mcause interrupt bit** (see `src/mcause-interrupt-bit/`): mcause bit 63
+  distinguishes interrupt from exception, verified via M-mode ecall
+  (bit clear) and CLINT timer interrupt (bit set).
 
 ## Project layout
 
