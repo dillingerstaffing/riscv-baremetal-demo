@@ -325,3 +325,8 @@ which only works because every task runs on its own stack.
 - sip-write-probe: sip WARL write/readback probe; only the SSIP bit is software-writable and only while mideleg delegates SSI, with mip tracking the pending bits as the read-only alias (see `src/sip-write-probe/`)
 - mip-pending-no-trap: mip MSIP pending bit tracked with the MIE gate off, set on msip write and clear on release, 0 traps over a 100,000-cycle window (see `src/mip-pending-no-trap/`)
 - mcounteren-time-gate: mcounteren TM bit gates S-mode rdtime independently of the cycle counter; with mcounteren=0x1 (CY set, TM clear), S-mode rdtime raises an illegal-instruction trap (scause=0x2, sepc at the rdtime site) while rdcycle reads and advances, 11 checks, 0 mismatches, 3 QEMU 8.2.2 runs PASS (see `src/mcounteren-time-gate/`)
+- **mstatus.TW trap** (see `src/mstatus-tw-trap/`): setting mstatus.TW makes
+  an S-mode `wfi` trap as an illegal instruction, with sepc at the wfi site.
+- **mcounteren.IR gate** (see `src/mcounteren-ir-gate/`): mcounteren.IR gates
+  S-mode `rdinstret`; a gated read traps illegal-instruction while an
+  enabled read returns the retired-instruction count.
