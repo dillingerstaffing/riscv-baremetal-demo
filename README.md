@@ -373,3 +373,7 @@ which only works because every task runs on its own stack.
 - **sie.STIE write/readback** (see `src/sie-stie-write/`): M-mode WARL
   write/readback probe of the sie enable bits; with STIE delegated, an
   all-ones write admits only STIE, and csrs/csrc round-trips bit 5.
+- **mcountinhibit.IR freeze/resume** (see `src/mcountinhibit-ir-freeze/`):
+  M-mode probe of the mcountinhibit.IR gate; with IR set the
+  back-to-back minstret readbacks are identical, and clearing IR
+  resumes the counter.
