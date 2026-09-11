@@ -1326,3 +1326,26 @@ scounteren-tm-gate.elf: $(SCTG_OBJS) link.ld
 # Run the scounteren.TM gate module under QEMU.
 run-scounteren-tm-gate: scounteren-tm-gate.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel scounteren-tm-gate.elf
+
+# menvcfg-stce module: its own binary sharing only boot.S and the UART
+# driver with the other demos. Reads menvcfg, probes the STCE bit's
+# WARL behavior (clear it, write all-ones, restore the boot value),
+# then drops to S-mode and checks whether real stimecmp access agrees
+# with the advertisement; when honest, it arms a supervisor timer
+# interrupt from S-mode and requires exactly one delegated trap plus
+# a quiet window with no re-delivery. Every expectation is an
+# in-program check; on PASS the virt test-device finisher shuts the
+# machine down (QEMU exit 0), on FAIL the hart parks (timeout 124).
+# NOTE: src/boot.S must stay first in MENV_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+MENV_SRCS := src/boot.S src/uart.c \
+             src/menvcfg-stce/menv_main.c src/menvcfg-stce/menv_trap.S
+MENV_OBJS := $(MENV_SRCS:.c=.o)
+MENV_OBJS := $(MENV_OBJS:.S=.o)
+
+menvcfg-stce.elf: $(MENV_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MENV_OBJS)
+
+# Run the menvcfg STCE advertisement probe under QEMU.
+run-menvcfg-stce: menvcfg-stce.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel menvcfg-stce.elf

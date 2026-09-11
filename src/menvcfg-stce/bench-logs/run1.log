@@ -1,0 +1,32 @@
+
+========================================
+menvcfg-stce: STCE advertisement vs real Sstc presence
+========================================
+
+boot: menvcfg=0x2000000000000000 STCE(bit63)=0
+probe: csrc menvcfg, STCE; readback=0x2000000000000000
+probe: csrw menvcfg, all-ones; legalized readback=0xa0000000000000f1
+restore: csrw menvcfg, boot value; readback=0x2000000000000000
+set: csrs menvcfg, STCE; readback=0xa000000000000000 STCE sticks: yes (Sstc advertised)
+mideleg readback=0x1464
+setup complete; dropping to S-mode...
+in S-mode: phase 1, stimecmp access probe
+probe site (label 1)  = 0x800003c2
+resume site (label 2) = 0x800003c6
+S-mode traps during probe = 0
+probe readback (stimecmp, observed, not asserted) = 0x0
+STCE advertised = 1, S-mode access worked = 1 -> advertisement MATCHES reality
+
+phase 2: arming supervisor timer interrupt from S-mode
+arm: stimecmp=0x2b2ef clean=1 (1 = mtime still below cmp when the write landed)
+trap_count=1 scause=0x8000000000000005 sepc=0x80000210
+spin loop bounds: menv_loop=0x80000210 menv_done=0x80000218
+sip after in-handler disarm=0x0 (STIP bit clear), stimecmp readback=0xffffffffffffffff
+quiet window: 100000 rdcycle reads with SIE on, stimecmp=all-ones
+quiet window rdcycle delta=13905672 (reads done=100000)
+traps in quiet window=0
+stimecmp after quiet window=0xffffffffffffffff s_writes=2
+
+checksum (FNV-1a over verdict values) = 0xddf55eeede88e646
+checks=17 fails=0
+RESULT: PASS
