@@ -1,0 +1,39 @@
+scw: scause WARL check
+(S-mode cause register; cf. mcause-warl for M-mode)
+
+boot: scause=0x0
+boot: mideleg=0x1444
+trap: mtvec=0x800001c8
+trap: stvec=0x8000023c
+
+phase 1: WARL probes
+  write all-ones; readback=0xffffffffffffffff
+  write zero; readback=0x0
+
+phase 2: delegate, then trap from S-mode
+  medeleg=0x200 (exactly bit 9: ecall delegated, illegal-insn stays in M-mode)
+  pre-drop scause=0xffffffffffffffff (last software write before the S-mode trap)
+dropping to S-mode...
+
+in S-mode; ecall at a labeled site
+(medeleg bit 9 set: the trap must stay in S-mode)
+
+S-mode trap results:
+  ecall site (label 1)  = 0x80000364
+  resume site (label 2) = 0x80000368
+  scause  = 0x9 (expect 0x9)
+  stval   = 0x0
+  sepc    = 0x80000364
+  sepc+4  = 0x80000368
+  S-mode traps  = 1
+  sstatus.SPP   = 1
+  M-mode traps  = 0 (expect 0: the delegated ecall never reached M-mode)
+
+finish (M-mode):
+  M-mode traps = 1 (expect 1: only the phase-complete trap)
+  scause at finish = 0x9 (expect 0x9)
+  mideleg restored = 0x1444
+
+checksum (FNV-1a over verdict values) = 0x8cbf212d46b76670
+checks=23 mismatches=0
+RESULT: PASS
