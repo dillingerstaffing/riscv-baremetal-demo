@@ -296,6 +296,7 @@ which only works because every task runs on its own stack.
 - pmp-napot-size: PMP NAPOT size-decoding test over nested regions (see `src/pmp-napot-size/`)
 - mtime-write: CLINT mtime write/readback/advance coherence (see `src/mtime-write/`)
 - satp-asid: satp ASID write/readback and WARL discovery in S-mode (see `src/satp-asid/`)
+- satp-bare: satp MODE=Bare write/readback with nonzero PPN in S-mode, plus the physical-access check that Bare means no address translation (see `src/satp-bare/`)
 - mtval-fault-address: Load vs store fault mtval agreement at the same address (see `src/mtval-fault-address/`)
 - mcounteren: mcounteren, showing M-mode rdcycle is not gated by the enable bits (see `src/mcounteren/`)
 - cycle-read-latency: rdcycle read-latency floor from back-to-back csrr reads (see `src/cycle-read-latency/`)

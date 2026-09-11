@@ -1,0 +1,26 @@
+
+========================================
+satp MODE=Bare write/readback + direct
+physical access (S-mode)
+========================================
+
+satp at boot (M-mode read) = 0x0
+M-mode canary stored at 0x81000000 = 0xba5eba1100000001  PASS
+setup complete; dropping to S-mode...
+in S-mode; satp MODE=Bare experiment begins
+
+satp write/readback (MODE=Bare, nonzero PPN):
+  write            = 0xdeadbea0
+  readback         = 0xdeadbea0
+  MODE field       = 0
+  ASID field       = 0x0
+  PPN field        = 0xdeadbea0
+
+physical access under satp=Bare+PPN:
+  S-mode load of physical word = 0xba5eba1100000001  (M-mode canary = 0xba5eba1100000001)  PASS
+  S-mode store/loadback          = 0xba5eba1100000002  PASS
+
+traps observed = 0
+
+COMPLETION MARKER: satp-bare run finished
+RESULT: PASS
