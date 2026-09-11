@@ -1,0 +1,8 @@
+mtvec-direct-vectoring: direct-mode trap landing test
+mtvec: written=0x800001c8 readback=0x800001c8
+illegal: count=1 mcause=0x2 mepc=0x80000318 landing=0x800001c8
+ecall: count=1 mcause=0xb mepc=0x80000324 landing=0x800001c8
+sites: illegal=0x80000318 ecall=0x80000324
+unexpected: count=0 mcause=0x0
+checksum: fnv1a64=0x3ae8af5dbfec417
+RESULT: PASS
