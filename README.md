@@ -393,3 +393,7 @@ which only works because every task runs on its own stack.
   enable bit for the machine timer interrupt; with MTIE clear a pended
   timer interrupt stays pending with no trap, with MTIE set it delivers
   exactly one M-mode trap.
+- **mideleg MTIP routing** (see `src/mideleg-mtip-route/`): mideleg
+  bit 7 will not take on this hart, so an armed machine timer still
+  traps in M-mode while the hart sits in S-mode, with zero S-mode
+  arrivals.

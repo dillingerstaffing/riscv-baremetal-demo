@@ -1,0 +1,14 @@
+mideleg-mtip-route: machine timer interrupt routing check
+boot: mideleg=0x1444
+trap: mtvec=0x800001e8
+trap: stvec=0x80000244
+mideleg: write=0x0 readback=0x1444
+mideleg: write=0x80 readback=0x1444
+mideleg: write=0x14c4 readback=0x1444
+drop: mie=0x80 mideleg=0x1444
+s-mode: hart dropped to S-mode, timer disarmed
+arm: mtimecmp=0x2b231
+trap: m_traps=1 s_traps=0 mcause=0x8000000000000007 mtval=0x0
+quiet: m_traps=1 s_traps=0
+record checksum=0xc02ae00765d9bb85
+RESULT: PASS (checks=20)
