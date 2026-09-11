@@ -410,6 +410,10 @@ which only works because every task runs on its own stack.
   medeleg bit 2 selects the trap destination for illegal instructions;
   with the bit clear the trap lands in M-mode, with the bit set it lands
   in S-mode.
+- **medeleg breakpoint route** (see `src/medeleg-breakpoint/`):
+  medeleg bit 3 selects the trap destination for breakpoint traps;
+  with the bit clear an S-mode ebreak lands in M-mode, with the bit
+  set it lands in S-mode.
 - **stval illegal-instruction capture** (see `src/stval-illegal-capture/`):
   on an S-mode illegal-instruction trap the hart records the faulting
   encoding in stval.

@@ -1,0 +1,9 @@
+medeleg-breakpoint-route: breakpoint trap destination switch test
+boot: medeleg=0x0
+phase1: medeleg-write=0x0 readback=0x0
+phase2: medeleg bit3 set readback=0x8
+p1: m_traps=1 mcause=0x3 mepc=0x800002d4 expected=0x800002d4 mstatus_mpp=1 mtval=0x0 s_traps=0
+p2: s_traps=1 scause=0x3 sepc=0x80000392 expected=0x80000392 sstatus_spp=1 stval=0x0 m_traps=1
+quiet: m_traps=1 s_traps=1
+checksum=0x934b460eeaf296e0
+RESULT: PASS (checks=14)
