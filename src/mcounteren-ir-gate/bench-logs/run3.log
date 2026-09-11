@@ -1,0 +1,50 @@
+
+========================================
+mcounteren: S-mode rdinstret gating trap
+mcounteren=0x3: rdinstret must trap (IR clear);
+reopened to 0x7: rdinstret must read and advance
+========================================
+
+boot: mcounteren=0x0
+probe: csrw mcounteren, 0x7; readback=0x7
+write: csrw mcounteren, 0x3; readback=0x3
+medeleg readback=0x4
+setup complete; dropping to S-mode (phase A)...
+in S-mode; phase A: IR gate closed (mcounteren=0x3)
+
+gated: rdinstret with mcounteren=0x3 (expect S-mode trap):
+  fault site (label 1)  = 0x80000286
+  resume site (label 2) = 0x8000028a
+  scause  = 0x2
+  stval   = 0xc0202473
+  sepc    = 0x80000286
+  sepc+4  = 0x8000028a
+  traps   = 1
+  rdinstret dest register = 0xdeadbeefdeadbeef (sentinel = 0xdeadbeefdeadbeef)
+
+ungated: one rdcycle with mcounteren=0x3 (expect success):
+  fault site (label 1) = 0x800003d2
+  resume site (label 2) = 0x800003d6
+  sample = 0xdc3c93c00b
+  S-mode traps after rdcycle = 1
+
+phase A done; ecall to M-mode to reopen the IR gate
+
+in S-mode; phase B: IR gate reopened (mcounteren=0x7)
+
+M-mode ecall record:
+  mcause = 0x9
+  mepc = 0x80000470
+  ecall site (phase A) = 0x80000470
+  M-mode traps = 1
+  mcounteren readback after reopen = 0x7
+
+enabled: two rdinstret with mcounteren=0x7 (expect success):
+  fault site (label 1) = 0x800005e0
+  resume site (label 2) = 0x800005e4
+  sample 1 = 0xdc3d43a395
+  sample 2 = 0xdc3d47d6f4  (delta = 275295)
+  S-mode traps after phase B = 1
+
+checksum (FNV-1a over verdict values) = 0xdd2308106691e2e3
+RESULT: PASS

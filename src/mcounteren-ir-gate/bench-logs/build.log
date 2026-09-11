@@ -1,0 +1,2 @@
+/home/hatch/workspace/toolchains/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: mcounteren-ir-gate.elf has a LOAD segment with RWX permissions
+built mcounteren-ir-gate.elf
