@@ -1,0 +1,13 @@
+sstatus-fs-dirty: FP register write moves mstatus.FS Off->Dirty
+setup: mtvec=0x800001c8 mie=0x0
+setup: misa=0x80000000001411ad
+boot    : mstatus=0xa00000000 FS=0 SD=0
+initial : mstatus=0xa00002000 FS=1 SD=0
+after f1: mstatus=0x8000000a00006000 FS=3 SD=1
+after f2: mstatus=0x8000000a00006000 FS=3 SD=1
+cleared : mstatus=0xa00000000 FS=0 SD=0
+traps: count=0 mcause=0x0 mepc=0x0 mtval=0x0
+triple FS: before=1 after=3 cleared=0
+checks=14 mismatches=0
+checksum=0x4b39a10748f739ad
+RESULT: PASS
