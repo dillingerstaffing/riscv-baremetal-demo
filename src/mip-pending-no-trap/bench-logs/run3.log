@@ -1,0 +1,10 @@
+mip-pending-no-trap: mip reflects a pended interrupt with MIE clear
+boot: mie.MSIE=0 mstatus.MIE=0 mip=0x80
+trap: mtvec=0x800001cc
+set: msip-readback=1 mip=0x88 (mip.MSIP=1)
+window: cycles=100080 mip=0x88 traps=0
+clear: msip-readback=0 mip=0x80 (mip.MSIP=0)
+end: mie.MSIE=0 mstatus.MIE=0 traps=0
+checks: 17 mismatches: 0
+digest: 0xc1860c1ec97b7184
+RESULT: PASS
