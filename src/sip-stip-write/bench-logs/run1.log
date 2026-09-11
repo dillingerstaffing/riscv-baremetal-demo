@@ -1,0 +1,12 @@
+sip-stip-write: S-mode sip.STIP software-write probe
+Sstc probe: menvcfg.STCE sticks (present)
+mideleg=0x1464
+dropping to S-mode
+in S-mode: disarming stimecmp first, then sie.STIE on
+writing STIP via csrs sip,0x20
+sip readback after write=0x0 STIP-stuck=0
+NOTE: STIP write ignored (WARL legalize-away); no trap expected, quiet window only
+quiet: traps=0 (expect 0)
+VERDICT sip_after_write=0x0 stip_stuck=0 traps=0 checksum=0x778b1a14b6876aa7
+checks=8 fails=0
+RESULT: PASS (premise not reproduced: write ignored)
