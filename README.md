@@ -369,3 +369,4 @@ which only works because every task runs on its own stack.
   exactly at the rdinstret site, IR set returns strictly increasing
   samples; 18 checks, 0 mismatches, FNV-1a 0x9756843e0befd207
   identical on 3 QEMU 8.2.2 runs, Verdict PASS.
+- mcountinhibit-cy-gate: M-mode module verifying mcountinhibit.CY freezes mcycle (zero advance over 1000 reads) and resumes it on clear.
