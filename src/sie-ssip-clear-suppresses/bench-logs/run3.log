@@ -1,0 +1,17 @@
+sie-ssip-clear-suppresses: S-mode SSIE gate test
+boot: mideleg=0x1444
+mideleg: write=0x2 readback=0x1446
+medeleg: write=0x0 readback=0x0
+mip: after-pend=0x82
+S-mode entry: SIE=1
+S-mode entry: sie=0x0
+phase 1: polling with SSIE clear
+gated: reads-done=2000000 sip.SSIP-observed=1 traps-during-window=0 (expect 2000000 / 1 / 0)
+phase 2: opening sie.SSIE inside the labeled wait loop
+trap1: scause=0x8000000000000001 sepc=0x800002a0 expected=[0x8000029c,0x800002b0) traps=1 sip-at-entry=0x2
+after-trap: sip=0x0 m_traps=0 (expect 0x0 / 0)
+phase 3: quiet window
+quiet: reads-done=2000000 traps=1 (expect 2000000 / 1)
+VERDICT gated_traps=0 gated_ssip_observed=1 gate_open_traps=1 quiet_extra_traps=0 scause=0x8000000000000001 sip_ssip_final=0 ssie_after_open=1 checksum=0x87a8ee03efaf53f3
+checks=20 fails=0
+RESULT: PASS

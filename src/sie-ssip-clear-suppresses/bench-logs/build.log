@@ -1,0 +1,5 @@
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/sie-ssip-clear-suppresses/ssc_trap.S -o src/sie-ssip-clear-suppresses/ssc_trap.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/sie-ssip-clear-suppresses/ssc_main.c -o src/sie-ssip-clear-suppresses/ssc_main.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -T link.ld -o sie-ssip-clear-suppresses.elf src/boot.o src/uart.o src/sie-ssip-clear-suppresses/ssc_trap.o src/sie-ssip-clear-suppresses/ssc_main.o
+/home/hatch/workspace/toolchains/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: sie-ssip-clear-suppresses.elf has a LOAD segment with RWX permissions
+make exit: 0
