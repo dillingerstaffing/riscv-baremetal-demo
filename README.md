@@ -385,3 +385,7 @@ which only works because every task runs on its own stack.
   enable bit for the machine software interrupt; with MSIE clear a
   pended CLINT msip stays pending with no trap, with MSIE set it
   delivers exactly one M-mode trap.
+- **mstatus.MPRV readback** (see `src/mstatus-mprv-readback/`):
+  mstatus.MPRV (bit 17) reads back exactly as written; set via csrs
+  yields boot|MPRV, clear via csrc restores the boot value, with zero
+  traps.
