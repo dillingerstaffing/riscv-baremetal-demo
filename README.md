@@ -337,3 +337,10 @@ which only works because every task runs on its own stack.
   sip.STIP are legalized away on QEMU; the readback stays zero.
 - **sstatus.SUM gate** (see `src/sstatus-sum/`): sstatus.SUM gates S-mode
   access to U-pages; SUM=0 faults the load, SUM=1 reads the canary.
+- **menvcfg.STCE advertisement** (see `src/menvcfg-stce/`): menvcfg.STCE
+  writability probe matched against real Sstc presence; S-mode stimecmp
+  access works and an armed stimecmp delivers exactly one supervisor
+  timer interrupt.
+- **scounteren.TM gate** (see `src/scounteren-tm-gate/`): scounteren.TM
+  gates U-mode rdtime; a gated read traps as illegal instruction with
+  sepc at the rdtime site, an enabled read returns the advancing timer.
