@@ -1,0 +1,32 @@
+
+========================================
+scounteren.CY gates U-mode rdcycle
+CY clear must trap, CY set must read
+========================================
+
+boot: scounteren=0x0
+probe: csrw scounteren, 0x7; readback=0x7
+write: csrw scounteren, 0; readback=0x0
+write: mcounteren.CY=1 (unblock the M-level gate); readback=0x1
+medeleg readback=0x104
+setup complete; dropping to S-mode...
+in S-mode; scounteren-cy-gate experiment begins
+phase A payload: rdcycle site 0x80000250, ecall site 0x8000025c
+dropping to U-mode with scounteren.CY=0...
+
+--- back in S-mode: phase A complete ---
+trap history:
+  [0] gated rdcycle scause=0x2 stval=0xc00022f3 sepc=0x80000250 t0=0xdeadbeefdeadbeef a0=0x80001183
+  [1] SIG_A ecall  scause=0x8 stval=0x0 sepc=0x8000025c t0=0xdeadbeefdeadbeef a0=0x8a8a
+
+phase B: setting scounteren.CY in S-mode...
+  scounteren readback=0x1
+dropping to U-mode with scounteren.CY=1...
+
+--- back in S-mode: phase B complete ---
+  [2] SIG_B ecall  scause=0x8 stval=0x0 sepc=0x8000028c t0=0x2fa19f13f70 a0=0x8b8b
+  rdcycle sample 0 (t0) = 0x2fa19f13f70
+  rdcycle sample 1 (t1) = 0x2fa19f15cf8  (delta = 7560)
+
+checksum (FNV-1a over verdict values) = 0x9756843e0befd207
+RESULT: PASS

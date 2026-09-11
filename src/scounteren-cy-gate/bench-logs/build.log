@@ -1,0 +1,4 @@
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/scounteren-cy-gate/sccy_trap.S -o src/scounteren-cy-gate/sccy_trap.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/scounteren-cy-gate/sccy_main.c -o src/scounteren-cy-gate/sccy_main.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -T link.ld -o scounteren-cy-gate.elf src/boot.o src/uart.o src/scounteren-cy-gate/sccy_trap.o src/scounteren-cy-gate/sccy_main.o
+/usr/lib/gcc/riscv64-unknown-elf/13.2.0/../../../riscv64-unknown-elf/bin/ld: warning: scounteren-cy-gate.elf has a LOAD segment with RWX permissions
