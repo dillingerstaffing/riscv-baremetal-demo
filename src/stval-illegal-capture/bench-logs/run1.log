@@ -1,0 +1,14 @@
+stval-illegal-capture: setup
+boot: medeleg=0x0
+medeleg: write=0x0 readback=0x0
+medeleg: write=0x4 readback=0x4
+medeleg: write=0x4 readback=0x4
+mie: readback=0x0
+stval-illegal-capture: S-mode illegal-instruction stval capture test
+medeleg: write=0x0 readback=0x0
+medeleg: write=0x4 readback=0x4
+medeleg: write=0x4 readback=0x4
+ill: spins=0 s_traps=1 scause=0x2 sepc=0x8000030e expected=0x8000030e stval=0xffffffff word=0xffffffff m_traps=0
+quiet: s_traps=1 m_traps=0
+record checksum=0x3135d0ef80ebdf2f
+RESULT: PASS (checks=7)
