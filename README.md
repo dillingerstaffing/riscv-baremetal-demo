@@ -413,3 +413,6 @@ which only works because every task runs on its own stack.
 - **stval illegal-instruction capture** (see `src/stval-illegal-capture/`):
   on an S-mode illegal-instruction trap the hart records the faulting
   encoding in stval.
+- **PMP NAPOT encoding write/readback** (see `src/pmp-napot-encode/`):
+  NAPOT patterns for 4 KiB, 64 KiB, and 1 MiB regions read back exactly
+  from pmpaddr0, and the pmpcfg0 A field takes the NAPOT value.

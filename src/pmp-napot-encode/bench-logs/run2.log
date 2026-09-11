@@ -1,0 +1,14 @@
+pmp-napot-encode: PMP NAPOT write/readback test
+boot pmpaddr0: write=0x0 readback=0x0
+boot pmpaddr1: write=0x0 readback=0x0
+boot pmpcfg0: write=0x0 readback=0x0
+napot 4K: write=0x200009ff readback=0x200009ff
+napot 64K: write=0x20101fff readback=0x20101fff
+napot 1M: write=0x2201ffff readback=0x2201ffff
+pmpcfg0 entry0 A=NAPOT: write=0x18 readback=0x18
+pmpcfg0 entry0 NAPOT+RWX: write=0x1f readback=0x1f
+restore pmpaddr0: write=0x0 readback=0x0
+restore pmpaddr1: write=0x0 readback=0x0
+restore pmpcfg0: write=0x0 readback=0x0
+record checksum=0x7abdfe9a3880db7b
+RESULT: PASS (checks=9)
