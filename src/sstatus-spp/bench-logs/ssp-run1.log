@@ -1,0 +1,8 @@
+sstatus-spp: sstatus.SPP record on delegated S-mode ecall traps
+deleg: medeleg=0x200
+trap1: spp=1 scause=0x9 sepc=0x800002a8
+trap2: spp=1 scause=0x9 sepc=0x800002a8
+cksum=0x81dc6b1b81f94783
+m-traps=0
+RESULT: PASS
+done
