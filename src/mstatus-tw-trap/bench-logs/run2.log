@@ -1,0 +1,23 @@
+
+========================================
+mstatus.TW: S-mode wfi must trap
+TW=1: S-mode wfi raises illegal instruction
+========================================
+
+boot: mstatus=0xa00000000
+write: mstatus|TW; readback=0xa00200000
+medeleg readback=0x4
+setup complete; dropping to S-mode...
+in S-mode; mstatus.TW experiment begins
+
+S-mode wfi with mstatus.TW=1 (expect S-mode trap):
+  fault site (label 1)  = 0x8000026e
+  resume site (label 2) = 0x80000272
+  scause  = 0x2
+  stval   = 0x10500073
+  sepc    = 0x8000026e
+  sepc+4  = 0x80000272
+  traps   = 1
+
+checksum (FNV-1a over verdict values) = 0xc32b722c5100e880
+RESULT: PASS
