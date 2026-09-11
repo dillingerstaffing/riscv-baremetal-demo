@@ -330,3 +330,8 @@ which only works because every task runs on its own stack.
 - **mcounteren.IR gate** (see `src/mcounteren-ir-gate/`): mcounteren.IR gates
   S-mode `rdinstret`; a gated read traps illegal-instruction while an
   enabled read returns the retired-instruction count.
+- **scause WARL** (see `src/scause-warl/`): scause is WARL in S-mode;
+  all-ones and zero writes read back, and a trap overwrites it with
+  the real cause.
+- **sip.STIP write** (see `src/sip-stip-write/`): S-mode writes to
+  sip.STIP are legalized away on QEMU; the readback stays zero.
