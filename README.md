@@ -370,3 +370,6 @@ which only works because every task runs on its own stack.
   samples; 18 checks, 0 mismatches, FNV-1a 0x9756843e0befd207
   identical on 3 QEMU 8.2.2 runs, Verdict PASS.
 - mcountinhibit-cy-gate: M-mode module verifying mcountinhibit.CY freezes mcycle (zero advance over 1000 reads) and resumes it on clear.
+- **sie.STIE write/readback** (see `src/sie-stie-write/`): M-mode WARL
+  write/readback probe of the sie enable bits; with STIE delegated, an
+  all-ones write admits only STIE, and csrs/csrc round-trips bit 5.
