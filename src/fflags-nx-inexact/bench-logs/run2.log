@@ -1,0 +1,12 @@
+fflags-nx-inexact: inexact fdiv.d must set fflags.NX
+setup: mtvec=0x800001c8 mie=0x0
+setup: misa=0x80000000001411ad
+before: fcsr=0x0 fflags=0x0 frm=0
+after : fcsr=0x1 fflags=0x1 frm=0
+quotient bits=0x3fd5555555555555
+cleared: fcsr=0x0 fflags=0x0 frm=0
+traps: count=0 mcause=0x0 mepc=0x0 mtval=0x0
+triple fcsr: before=0x0 after=0x1 cleared=0x0
+checks=14 mismatches=0
+checksum=0xb3d407b627e1c2b2
+RESULT: PASS
