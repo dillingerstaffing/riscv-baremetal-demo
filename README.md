@@ -359,3 +359,13 @@ which only works because every task runs on its own stack.
 - **sip.SEIP read-only** (see `src/sip-seip-write/`): S-mode all-ones
   and zero writes to sip leave SEIP unchanged while SSIP sticks and
   clears, with a counting M-mode handler proving no trap was involved.
+- **mideleg SSIP routing** (see `src/mideleg-ssip-route/`): mideleg
+  bit 1 routes the supervisor software interrupt to S-mode; a pended
+  SSIP traps exactly once with scause 0x8000000000000001 and 0 M-mode
+  traps, while a pending CLINT msip takes no trap of either kind;
+  17 checks, 0 mismatches, 3 QEMU 8.2.2 runs byte-identical PASS.
+- **scounteren.IR gate** (see `src/scounteren-ir-gate/`): scounteren.IR
+  gates U-mode rdinstret; IR clear traps with scause 0x2 and sepc
+  exactly at the rdinstret site, IR set returns strictly increasing
+  samples; 18 checks, 0 mismatches, FNV-1a 0x9756843e0befd207
+  identical on 3 QEMU 8.2.2 runs, Verdict PASS.
