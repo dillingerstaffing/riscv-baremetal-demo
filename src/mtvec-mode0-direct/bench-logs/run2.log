@@ -1,0 +1,12 @@
+mtvec-mode0-direct: direct-mode single-entry trap test
+mtvec: written=0x800001c8 readback=0x800001c8
+control: traps-before-ecall=0 (expect 0)
+ecall: count=1 mcause=0xb landing=0x800001c8 (expect 0x800001c8) mepc=0x80000476 (expect 0x80000476)
+timer: armed-after-retries=1
+timer: waiting...
+timer: count=1 mcause=0x8000000000000007 landing=0x800001c8 (expect 0x800001c8)
+timer: mtimecmp-after-handler=0xffffffffffffffff (expect 0xffffffffffffffff)
+timer: count-after-quiet=1 (expect 1)
+checksum: fnv1a64=0x7b32d6aae4e318ef
+RESULT: PASS (M-mode ecall->BASE mcause=11, timer->BASE mcause=0x8000000000000007, 0 traps elsewhere)
+done
