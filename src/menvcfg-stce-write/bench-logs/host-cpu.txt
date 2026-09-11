@@ -1,0 +1,1 @@
+: AMD EPYC 9D25 126-Core Processor
