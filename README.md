@@ -381,3 +381,7 @@ which only works because every task runs on its own stack.
   M-mode probe of the menvcfg.STCE control bit; the bit reads back
   exactly as written, and an all-ones WARL probe reports the
   legalized readback.
+- **mie.MSIE gate** (see `src/mie-msie-gate/`): mie.MSIE is the M-mode
+  enable bit for the machine software interrupt; with MSIE clear a
+  pended CLINT msip stays pending with no trap, with MSIE set it
+  delivers exactly one M-mode trap.
