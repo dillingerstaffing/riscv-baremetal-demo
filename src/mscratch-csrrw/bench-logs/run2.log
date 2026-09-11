@@ -1,0 +1,11 @@
+mscratch-csrrw: mscratch csrrw atomic-swap round-trip test
+boot:   mscratch=0x0 (read before any write; boot.S does not touch mscratch)
+swap:   csrrw rd,mscratch,SENTINEL  rd(old)=0x0 mscratch(readback)=0xa5a55a5a5a5a5a5
+restore: csrrw rd,mscratch,boot  rd(old)=0xa5a55a5a5a5a5a5 mscratch(readback)=0x0
+traps:  0 (handler parks the hart, so a trap would end the run here)
+checksum=0xd2dc5b584cb8669 (FNV-1a over boot, swap rd, swap readback, restore rd,
+  restore readback, traps)
+checks=5 fails=0
+RESULT: PASS (swap both sides, restore exact, 0 traps)
+done
+qemu-system-riscv64: terminating on signal 15 from pid 9809 (timeout)

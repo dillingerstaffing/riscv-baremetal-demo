@@ -1,0 +1,4 @@
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/mscratch-csrrw/msc_trap.S -o src/mscratch-csrrw/msc_trap.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/mscratch-csrrw/mscratch_main.c -o src/mscratch-csrrw/mscratch_main.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -T link.ld -o mscratch-csrrw.elf src/boot.o src/uart.o src/mscratch-csrrw/msc_trap.o src/mscratch-csrrw/mscratch_main.o
+/usr/lib/gcc/riscv64-unknown-elf/13.2.0/../../../riscv64-unknown-elf/bin/ld: warning: mscratch-csrrw.elf has a LOAD segment with RWX permissions
