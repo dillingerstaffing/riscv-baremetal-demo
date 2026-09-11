@@ -439,3 +439,4 @@ which only works because every task runs on its own stack.
 - **src/stval-ecall-capture/**: drops from M-mode to U-mode with medeleg bit 8 set, issues one ecall, and verifies the S-mode handler records scause 0x8 with stval 0. [src/stval-ecall-capture/](src/stval-ecall-capture/)
 - **src/fflags-nx-inexact/**: clears fflags, executes fdiv.d 1.0/3.0, and verifies the NX (inexact) bit sets while no other accrued flag moves. [src/fflags-nx-inexact/](src/fflags-nx-inexact/)
 - **src/frm-rounding-write/**: writes each fcsr.frm rounding mode (RNE, RTZ, RDN, RUP, RMM) and verifies it reads back, including an RDN vs RUP quotient anchor proving the mode steers rounding. [src/frm-rounding-write/](src/frm-rounding-write/)
+- **src/frm-dynamic-vs-static/**: executes fdiv.d with a static RNE encoding under frm=RDN and frm=RUP, and verifies both quotients are the RNE result with frm untouched. [src/frm-dynamic-vs-static/](src/frm-dynamic-vs-static/)
