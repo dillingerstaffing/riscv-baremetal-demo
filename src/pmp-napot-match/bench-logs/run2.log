@@ -1,0 +1,25 @@
+pmp-napot-match: PMP NAPOT match-behavior test
+boot: pmpaddr0=0x0 pmpaddr1=0x0 pmpcfg0=0x0 mstatus=0xa00000000
+layout: pnm_save=0x800012d0 sp=0x80005280
+control: probe addresses are good RAM: ok
+config: pmpaddr0=0x200009ff (expect 0x200009ff)
+config: pmpaddr1=0x200007ff (expect 0x200007ff)
+config: pmpcfg0=0x1f18 (expect 0x1f18)
+t1a load in-lo : seen=1 mcause=0x5 mepc=0x8000030c mtval=0x80002000 resume-4=0x8000030c val=0xdeadbeefdeadbeef
+t1b load in-hi : seen=1 mcause=0x5 mepc=0x8000030c mtval=0x80002ffc resume-4=0x8000030c val=0xdeadbeefdeadbeef
+t2a load below : seen=0 mcause=0x5 mepc=0x8000030c mtval=0x80002ffc resume-4=0x8000030c val=0x6c0de0ca
+t2b load above : seen=0 mcause=0x5 mepc=0x8000030c mtval=0x80002ffc resume-4=0x8000030c val=0x6c0deafe
+t3a store in-lo: seen=1 mcause=0x7 mepc=0x800004c0 mtval=0x80002000 resume-4=0x800004c0
+t3b store below: seen=0 mcause=0x7 mepc=0x800004c0 mtval=0x80002000 resume-4=0x800004c0
+  roundtrip=0x5a5a5a5a
+t3c store above: seen=0 mcause=0x7 mepc=0x800004c0 mtval=0x80002000 resume-4=0x800004c0
+  roundtrip=0x5a5a5a5a
+quiet: traps before=3 after=3
+restore: pmpaddr0=0x0
+restore: pmpaddr1=0x0
+restore: pmpcfg0=0x0
+Checks: 39
+Mismatches: 0
+Checksum: 0x1cf84d380d3383e1
+Environment: QEMU 8.2.2
+Verdict: PASS
