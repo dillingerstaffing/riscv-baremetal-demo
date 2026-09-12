@@ -1,0 +1,14 @@
+mstatus-mprv-load: MPRV makes M-mode loads honor MPP
+boot: mstatus=0xa00000000 pmpcfg0=0x0
+test page=0x80002000
+pmp: pmpaddr0=0x20000800 pmpaddr1=0x20000c00 pmpcfg0=0x8
+sites: load-u=0x800005ee load-m=0x800006fc
+phaseA: value=0xc0ffee1234567890 traps=0
+phaseB: value=0xbadc0de0badc0de0 new-traps=1 cause=0x5 mepc=0x800005ee mtval=0x80002000
+phaseC: value=0xc0ffee1234567890 new-traps=0
+phaseD: value=0xc0ffee1234567890
+Checks: 20
+Mismatches: 0
+Checksum: 0xcaa47691de34383c
+Environment: QEMU 8.2.2
+Verdict: PASS
