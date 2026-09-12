@@ -1,0 +1,7 @@
+sstatus-spp-u-trap: sstatus.SPP record on delegated U-mode ecall trap
+deleg: boot_medeleg=0x0 medeleg=0x100
+trap: spp=0 scause=0x8 sepc=0x80000288
+cksum=0x904390c30350859
+m-traps=0
+RESULT: PASS
+done
