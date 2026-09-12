@@ -1,0 +1,13 @@
+fcsr-frm-roundup: frm selects the rounding direction of inexact FP results
+setup: mtvec=0x800001c8 mie=0x0
+setup: misa=0x80000000001411ad
+add RNE: result=0x3ff0000000000000 fcsr=0x1 fflags=0x1 frm=0
+add RNZ: result=0x3ff0000000000000 fcsr=0x21 fflags=0x1 frm=1
+add RUP: result=0x3ff0000000000001 fcsr=0x61 fflags=0x1 frm=3
+div RNE: result=0x3fd5555555555555 fcsr=0x1 fflags=0x1 frm=0
+div RUP: result=0x3fd5555555555556 fcsr=0x61 fflags=0x1 frm=3
+end: mstatus=0x8000000a00006000 FS=3
+traps: count=0 mcause=0x0 mepc=0x0 mtval=0x0
+checks=24 mismatches=0
+checksum=0x6585221d7c3874c3
+RESULT: PASS
