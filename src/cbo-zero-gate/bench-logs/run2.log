@@ -1,0 +1,13 @@
+
+========================================
+cbo-zero-gate: menvcfg.CBZE gates S-mode cbo.zero
+========================================
+
+boot: menvcfg=0x2000000000000000
+phase0: M-mode cbo.zero: traps=1 zeromism=64
+phase0: Zicboz NOT available: mcause=0x2 mepc=0x800009ea
+
+note: cbo.zero unavailable on this hart; gate test not run
+checksum (FNV-1a over the probe values) = 0x300b72994b2592ed
+checks: 1  mismatches: 0
+RESULT: PASS (probe only)
