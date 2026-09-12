@@ -1,0 +1,10 @@
+sret-to-umode-fault: sret in U-mode traps illegal-instruction
+deleg: medeleg=0x0
+phase1: control_ok=1 control_after=1 ecall_cause=0x9 ecall_epc=0x80000304 ecall_site=0x80000304
+phase2: count=2 mcause=0x2 mepc=0x80000344 mtval=0x10200073 mpp=0 expected=0x80000344
+phase2: s_traps=0 cksum=0x802872738f9db42a
+Checks: 18
+Mismatches: 0
+Checksum: 0x802872738f9db42a
+Environment: QEMU 8.2.2
+Verdict: PASS
