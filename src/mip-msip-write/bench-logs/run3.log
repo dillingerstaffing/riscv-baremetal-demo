@@ -1,0 +1,10 @@
+mip-msip-write: mip.MSIP software-write probe
+boot: mip=0x80 mie=0x0 mstatus=0xa00000000
+mip: after csrsi set bit 1 readback=0x82 (expect 0x82)
+mip: after csrci clear bit 1 readback=0x80 (expect 0x80)
+mip: after csrsi set bit 3 readback=0x80 (expect 0x80, write ignored)
+mip: after spin window readback=0x80 traps=0 (expect 0x80 / 0)
+mip: after csrci clear bit 3 readback=0x80 (expect 0x80, write ignored)
+VERDICT mip_boot=0x80 mie_boot=0x0 mip_ssip_set=0x82 mip_ssip_clear=0x80 mip_set=0x80 mip_hold=0x80 mip_clear=0x80 mie_final=0x0 traps=0 checksum=0x283c26a67ca35455
+checks=17 fails=0
+RESULT: PASS

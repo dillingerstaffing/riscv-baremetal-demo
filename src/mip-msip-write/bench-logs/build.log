@@ -1,0 +1,3 @@
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/mip-msip-write/mmsw_main.c -o src/mip-msip-write/mmsw_main.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -T link.ld -o mip-msip-write.elf src/boot.o src/uart.o src/mip-msip-write/mmsw_trap.o src/mip-msip-write/mmsw_main.o
+/home/hatch/workspace/toolchains/ubuntu-rv64/usr/bin/../lib/gcc/riscv64-unknown-elf/13.2.0/../../../riscv64-unknown-elf/bin/ld: warning: mip-msip-write.elf has a LOAD segment with RWX permissions
