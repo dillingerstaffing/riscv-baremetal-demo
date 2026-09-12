@@ -458,3 +458,4 @@ which only works because every task runs on its own stack.
 - **src/fcsr-frm-rounddn/**: proves frm=RDN steers rounding of an inexact fsub.d toward negative infinity, picking the lower neighbor while RNE picks the upper. [src/fcsr-frm-rounddn/](src/fcsr-frm-rounddn/)
 - **src/sret-to-umode-fault/**: proves sret executed in U-mode raises illegal-instruction trap to M-mode. [src/sret-to-umode-fault/](src/sret-to-umode-fault/)
 - **src/mstatus-tvm-trap/**: proves mstatus.TVM traps S-mode satp writes and sfence.vma into M-mode. [src/mstatus-tvm-trap/](src/mstatus-tvm-trap/)
+- **src/mstatus-mprv-load/**: proves mstatus.MPRV makes M-mode loads honor mstatus.MPP, faulting as U-mode against a deny-all PMP region with MPP=U and succeeding with MPP=M. [src/mstatus-mprv-load/](src/mstatus-mprv-load/)
