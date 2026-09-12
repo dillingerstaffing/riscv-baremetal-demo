@@ -441,7 +441,7 @@ mcounteren.elf: $(MCE_OBJS) link.ld
 run-mcounteren: mcounteren.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcounteren.elf
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf mstatus-sie-toggle.elf sstatus-mxr.elf amo-add-atomicity.elf sip-seip-write.elf scounteren-ir-gate.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf medeleg-ecall-u-route.elf mideleg-mtip-route.elf mie-msie-gate.elf mie-mtie-gate.elf mideleg-seip-route.elf sip-stip-mideleg-reconcile.elf medeleg-illegal-inst-route.elf medeleg-breakpoint.elf stval-illegal-capture.elf stval-ecall-capture.elf pmp-napot-encode.elf sstatus-fs-dirty.elf satp-mode-warl.elf sstatus-spp-sret-u.elf sie-ssip-clear-suppresses.elf stvec-vectored-mode.elf fflags-nx-inexact.elf frm-rounding-write.elf fflags-uf-underflow.elf fflags-of-overflow.elf fflags-dz-divide-by-zero.elf mtimecmp-delta-tracks-mtime.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf mstatus-sie-toggle.elf sstatus-mxr.elf amo-add-atomicity.elf sip-seip-write.elf scounteren-ir-gate.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf medeleg-ecall-u-route.elf mideleg-mtip-route.elf mie-msie-gate.elf mie-mtie-gate.elf mideleg-seip-route.elf sip-stip-mideleg-reconcile.elf medeleg-illegal-inst-route.elf medeleg-breakpoint.elf stval-illegal-capture.elf stval-ecall-capture.elf pmp-napot-encode.elf sstatus-fs-dirty.elf satp-mode-warl.elf sstatus-spp-sret-u.elf sie-ssip-clear-suppresses.elf stvec-vectored-mode.elf fflags-nx-inexact.elf frm-rounding-write.elf fflags-uf-underflow.elf fflags-of-overflow.elf fflags-dz-divide-by-zero.elf mtimecmp-delta-tracks-mtime.elf mtimecmp-rw.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -1984,6 +1984,33 @@ mtimecmp-delta-tracks-mtime.elf: $(MDT_OBJS) link.ld
 # Run the mtime advance/delta module under QEMU.
 run-mtimecmp-delta-tracks-mtime: mtimecmp-delta-tracks-mtime.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mtimecmp-delta-tracks-mtime.elf
+
+# mtimecmp-rw module (backlog riscv mtimecmp-rw):
+# its own binary sharing only boot.S and the UART driver with the
+# other demos. Runs on hart 0 (QEMU boots the ELF straight into
+# M-mode with -bios none): writes three patterns (0x0,
+# 0x123456789ABCDEF0, all-ones) to the CLINT mtimecmp register at
+# 0x02004000 with two 32-bit stores each and requires each
+# readback to match exactly, sampling mip.MTIP after each write.
+# All mie bits stay clear the whole run so no machine timer
+# interrupt can be delivered even when MTIP pends; a minimal trap
+# handler records and parks on any trap, so a printed PASS implies
+# zero traps. On PASS the machine shuts down via the virt
+# test-device finisher so the QEMU process exit code (0) reflects
+# the verdict; on FAIL it parks the hart instead.
+# NOTE: src/boot.S must stay first in MRW_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+MRW_SRCS := src/boot.S src/uart.c \
+            src/mtimecmp-rw/rw_trap.S src/mtimecmp-rw/rw_main.c
+MRW_OBJS := $(MRW_SRCS:.c=.o)
+MRW_OBJS := $(MRW_OBJS:.S=.o)
+
+mtimecmp-rw.elf: $(MRW_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MRW_OBJS)
+
+# Run the mtimecmp read/write probe under QEMU.
+run-mtimecmp-rw: mtimecmp-rw.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mtimecmp-rw.elf
 
 # stval-illegal-capture module (backlog riscv stval-illegal-capture):
 # its own binary sharing only boot.S and the UART driver with the

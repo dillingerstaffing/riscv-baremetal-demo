@@ -1,0 +1,21 @@
+
+========================================
+mtimecmp-rw
+CLINT mtimecmp read/write register probe
+========================================
+
+mie: all bits clear (MTIE=0), so no machine interrupt can be delivered
+mtimecmp address: 0x02004000 (hart 0, virt CLINT)
+
+write/readback trials (each requires exact readback):
+  trial 0: wrote=0x0000000000000000 read=0x0000000000000000 equal=yes mip.MTIP=1 (pending)
+  trial 1: wrote=0x123456789abcdef0 read=0x123456789abcdef0 equal=yes mip.MTIP=0 (clear)
+  trial 2: wrote=0xffffffffffffffff read=0xffffffffffffffff equal=yes mip.MTIP=0 (clear)
+
+final disarm: wrote=0xffffffffffffffff read=0xffffffffffffffff mip.MTIP=0 (clear)
+
+traps: count=0 mcause=0x0 mepc=0x0 mtval=0x0
+
+checks: 6, mismatches: 0
+checksum: 0xbe715111eb42d62b
+RESULT: PASS
