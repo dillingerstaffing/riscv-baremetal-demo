@@ -1,0 +1,40 @@
+
+========================================
+mtimecmp-delta-tracks-mtime
+CLINT mtime advance/delta measurement
+========================================
+
+readback addresses: lo=0x0200bff8 hi=0x0200bffc
+delay: spin until mtime advances 10000 ticks (12 delayed pairs, 8 back-to-back pairs)
+
+delayed pairs (delta must be > 0):
+  pair 0: t0=0xf8c0 t1=0x12219 delta=10585
+  pair 1: t0=0x147c5 t1=0x16ef0 delta=10027
+  pair 2: t0=0x18812 t1=0x1af36 delta=10020
+  pair 3: t0=0x1c8a3 t1=0x1efc7 delta=10020
+  pair 4: t0=0x20cb9 t1=0x233da delta=10017
+  pair 5: t0=0x24b21 t1=0x27249 delta=10024
+  pair 6: t0=0x28b6a t1=0x2e364 delta=22522
+  pair 7: t0=0x30147 t1=0x3286c delta=10021
+  pair 8: t0=0x342ea t1=0x36a12 delta=10024
+  pair 9: t0=0x39169 t1=0x44c93 delta=47914
+  pair 10: t0=0x4645f t1=0x4a3a5 delta=16198
+  pair 11: t0=0x4bbee t1=0x4e312 delta=10020
+  delayed delta min=10017 max=47914 mean=14782
+
+back-to-back pairs (t1 must be >= t0):
+  pair 0: t0=0x5cd37 t1=0x5d359 delta=1570
+  pair 1: t0=0x5f46b t1=0x5f47e delta=19
+  pair 2: t0=0x615ed t1=0x61600 delta=19
+  pair 3: t0=0x62dea t1=0x62df8 delta=14
+  pair 4: t0=0x652bc t1=0x652d0 delta=20
+  pair 5: t0=0x66933 t1=0x66942 delta=15
+  pair 6: t0=0x6813c t1=0x68149 delta=13
+  pair 7: t0=0x69875 t1=0x69883 delta=14
+  back-to-back delta min=13 max=1570 zero-deltas=0/8
+
+traps: count=0 mcause=0x0 mepc=0x0 mtval=0x0
+
+checks: 33, mismatches: 0
+checksum: 0x3499a18272e6aff0
+RESULT: PASS
