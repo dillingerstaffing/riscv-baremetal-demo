@@ -1,0 +1,13 @@
+mstatus-sd-summary: mstatus.SD tracks the FS Dirty state
+setup: mtvec=0x80000718
+boot: mstatus=0xa00000000 FS=0 SD=0 (expect FS=0 SD=0)
+fs-off: mstatus=0xa00000000 FS=0 SD=0 (expect FS=0 SD=0)
+fs-initial: mstatus=0xa00004000 FS=2 SD=0 (expect FS=2 SD=0)
+after-fadd: mstatus=0x8000000a00006000 FS=3 SD=1 f0bits=0x400e000000000000
+fs-clean: mstatus=0xa00002000 FS=1 SD=0 (expect FS=1 SD=0)
+sd-probe: mstatus=0xa00002000 SD=0 FS=1 (expect SD=0 FS=1)
+restore: mstatus=0xa00000000 (expect boot word)
+traps=0
+checks=15 mismatches=0
+checksum=0xcd8421132251ca67
+RESULT: PASS

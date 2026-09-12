@@ -2656,3 +2656,31 @@ pmp-napot-match.elf: $(PNM_OBJS) link.ld
 # Run the pmp-napot-match module under QEMU.
 run-pmp-napot-match: pmp-napot-match.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel pmp-napot-match.elf
+
+# mstatus.SD summary-bit module (backlog "riscv mstatus-sd-summary"): its
+# own binary sharing only boot.S and the UART driver with the other demos.
+# Proves in M-mode that mstatus.SD (bit 63) is the read-only summary bit
+# for the FS field: FS=Off reads SD=0, FS=Initial (enabled but not dirty)
+# still reads SD=0, a single fadd.d on 1.5 and 2.25 moves FS to Dirty
+# (field reads 3) and SD to 1 with f0 holding exactly 3.75
+# (0x400e000000000000), writing FS=Clean drops SD back to 0, and forcing
+# bit 63 to 1 by software leaves SD reading 0. All mstatus writes are
+# read-modify-write preserving the other bits, except the deliberate
+# bit-63 probe and the final explicit restore, which must match the boot
+# word bit-for-bit. A counting M-mode trap handler is installed as
+# hygiene; the run requires its counter to stay 0. On PASS it shuts the
+# machine down via the virt test-device finisher so the QEMU process exit
+# code (0) reflects the verdict; on FAIL it parks the hart instead.
+# NOTE: src/boot.S must stay first in SSD_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+SSD_SRCS := src/boot.S src/uart.c \
+            src/mstatus-sd-summary/ssd_trap.S src/mstatus-sd-summary/ssd_main.c
+SSD_OBJS := $(SSD_SRCS:.c=.o)
+SSD_OBJS := $(SSD_OBJS:.S=.o)
+
+mstatus-sd-summary.elf: $(SSD_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SSD_OBJS)
+
+# Run the mstatus.SD summary-bit module under QEMU.
+run-mstatus-sd-summary: mstatus-sd-summary.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mstatus-sd-summary.elf
