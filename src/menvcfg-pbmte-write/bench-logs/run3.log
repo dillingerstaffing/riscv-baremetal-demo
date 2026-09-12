@@ -1,0 +1,17 @@
+
+========================================
+menvcfg.PBMTE write/readback: set, clear, WARL legalize
+========================================
+
+boot: menvcfg=0x2000000000000000 PBMTE(bit62)=0
+set: write boot|PBMTE=0x6000000000000000 readback=0x2000000000000000 PBMTE(bit62)=0
+clear: write boot&~PBMTE=0x2000000000000000 readback=0x2000000000000000
+warl: write all-ones; legalized readback (1st)=0xa0000000000000f1
+warl: write all-ones; legalized readback (2nd)=0xa0000000000000f1
+  note: PBMTE not implemented on this hart (set probe did not stick); survival skipped
+restore: write boot=0x2000000000000000 readback=0x2000000000000000
+traps recorded by the handler: 0
+
+checksum (FNV-1a over the write/readback pairs) = 0xb162675eda645223
+checks: 6  mismatches: 0
+RESULT: PASS
