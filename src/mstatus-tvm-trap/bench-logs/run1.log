@@ -1,0 +1,12 @@
+mstatus-tvm-trap: M-mode virtual-memory trap switch mstatus.TVM
+boot: mstatus=0xa00000000
+pad: satp-site=0x800002cc satp-read-site=0x800002d0 fence-site=0x800002e0
+phase1: mstatus-after-set=0xa00100000
+phase1: traps=4 cause0=0x2 epc0=0x800002cc cause1=0x2 epc1=0x800002d0 cause2=0x2 epc2=0x800002e0 cause3=0x9 epc3=0x800002e4 satp-now=0x0
+phase2: mstatus-after-clear=0xa000000a0
+phase2: new-traps=1 ecall-cause=0x9 ecall-epc=0x800002e4 satp-rb=0x0
+Checks: 19
+Mismatches: 0
+Checksum: 0x580db705e095b710
+Environment: QEMU 8.2.2
+Verdict: PASS
