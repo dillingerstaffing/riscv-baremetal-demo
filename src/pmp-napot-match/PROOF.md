@@ -1,5 +1,7 @@
 <!-- PROOF-HEADER
+Checks: 39
 Mismatches: 0
+Checksum: 0x1cf84d380d3383e1
 Environment: QEMU 8.2.2
 Verdict: PASS
 -->

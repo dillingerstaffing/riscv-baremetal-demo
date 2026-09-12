@@ -459,3 +459,5 @@ which only works because every task runs on its own stack.
 - **src/sret-to-umode-fault/**: proves sret executed in U-mode raises illegal-instruction trap to M-mode. [src/sret-to-umode-fault/](src/sret-to-umode-fault/)
 - **src/mstatus-tvm-trap/**: proves mstatus.TVM traps S-mode satp writes and sfence.vma into M-mode. [src/mstatus-tvm-trap/](src/mstatus-tvm-trap/)
 - **src/mstatus-mprv-load/**: proves mstatus.MPRV makes M-mode loads honor mstatus.MPP, faulting as U-mode against a deny-all PMP region with MPP=U and succeeding with MPP=M. [src/mstatus-mprv-load/](src/mstatus-mprv-load/)
+- **src/frm-rounding-static/**: proves the static rm field in an fadd.d instruction word overrides fcsr.frm, with rm=010 (RDN) picking the lower neighbor while frm reads RNE and the DYN control following frm. [src/frm-rounding-static/](src/frm-rounding-static/)
+- **src/pmp-napot-match/**: proves a NAPOT PMP entry matches exactly its encoded region, with inside loads and stores trapping as access faults and accesses just outside the region completing cleanly. [src/pmp-napot-match/](src/pmp-napot-match/)
