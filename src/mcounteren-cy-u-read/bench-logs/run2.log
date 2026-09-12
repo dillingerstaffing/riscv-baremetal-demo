@@ -1,0 +1,41 @@
+
+========================================
+mcounteren.CY gates U-mode rdcycle
+CY set must read, CY clear must trap
+========================================
+
+boot: mcounteren=0x0
+probe: csrw mcounteren, 0x7; readback=0x7
+write: csrw mcounteren, 0x1 (CY); readback=0x1
+write: csrw scounteren, 0x1 (CY); readback=0x1
+medeleg readback=0x104
+setup complete; dropping to S-mode...
+in S-mode; mcounteren-cy-u-read experiment begins
+phase A payload: rdcycle site 0x80000254, ecall site 0x80000280
+dropping to U-mode with mcounteren.CY=1...
+
+--- back in S-mode: phase A complete ---
+trap history:
+  [0] SIG_A ecall  scause=0x8 stval=0x0 sepc=0x80000280 t0=0x255b78faea3 a0=0x9a9a
+  rdcycle sample 0 (t0) = 0x255b78faea3
+  rdcycle sample 1 (t1) = 0x255b78fcd75  (delta = 7890)
+
+phase A done; handing back to M-mode to clear mcounteren.CY...
+
+--- M-mode: phase-A handoff ecall ---
+  mcause=0x9 mepc=0x8000024c
+  scounteren still=0x1
+  mcounteren after clear=0x0
+phase B armed (mcounteren.CY=0); dropping to S-mode...
+
+in S-mode; mcounteren-cy-u-read phase B begins
+dropping to U-mode with mcounteren.CY=0...
+
+--- back in S-mode: phase B complete ---
+trap history:
+  [0] SIG_A ecall    scause=0x8 stval=0x0 sepc=0x80000280 t0=0x255b78faea3 a0=0x9a9a
+  [1] gated rdcycle  scause=0x2 stval=0xc00022f3 sepc=0x800002a4 t0=0xdeadbeefdeadbeef a0=0x80001493
+  [2] SIG_B ecall    scause=0x8 stval=0x0 sepc=0x800002b0 t0=0xdeadbeefdeadbeef a0=0x9b9b
+
+checksum (FNV-1a over verdict values) = 0x0f857e15c046194f
+RESULT: PASS

@@ -2684,3 +2684,33 @@ mstatus-sd-summary.elf: $(SSD_OBJS) link.ld
 # Run the mstatus.SD summary-bit module under QEMU.
 run-mstatus-sd-summary: mstatus-sd-summary.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mstatus-sd-summary.elf
+
+# mcounteren.CY U-mode rdcycle gate module (backlog mcounteren-cy-u-read):
+# its own binary sharing only boot.S and the UART driver with the
+# other demos. M-mode probes mcounteren writability, sets mcounteren.CY
+# and holds scounteren.CY set (so the S-level gate can never mask the
+# M-level gate under test), delegates the illegal-instruction trap and
+# the U-mode ecall to S-mode, and drops M -> S -> U twice: phase A
+# expects both U-mode rdcycle reads with CY set to succeed with
+# strictly increasing samples; between the phases an S-mode ecall
+# (cause 9, not delegated) hands back to M-mode, which verifies the
+# handoff, clears mcounteren.CY, and mrets into the phase-B driver;
+# phase B expects the U-mode rdcycle with CY clear to trap with
+# scause=2, sepc exactly at the rdcycle site, and the destination
+# register still holding its sentinel. Every expectation is an
+# in-program check; on PASS it shuts the machine down via the virt
+# test-device finisher so the QEMU process exit code (0) reflects the
+# verdict; on FAIL it parks the hart instead.
+# NOTE: src/boot.S must stay first in MCYU_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+MCYU_SRCS := src/boot.S src/uart.c \
+            src/mcounteren-cy-u-read/mcyu_trap.S src/mcounteren-cy-u-read/mcyu_main.c
+MCYU_OBJS := $(MCYU_SRCS:.c=.o)
+MCYU_OBJS := $(MCYU_OBJS:.S=.o)
+
+mcounteren-cy-u-read.elf: $(MCYU_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MCYU_OBJS)
+
+# Run the mcounteren.CY U-mode gate module under QEMU.
+run-mcounteren-cy-u-read: mcounteren-cy-u-read.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mcounteren-cy-u-read.elf
