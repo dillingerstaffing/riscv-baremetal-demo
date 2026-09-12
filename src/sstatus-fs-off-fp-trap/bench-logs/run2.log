@@ -1,0 +1,12 @@
+sstatus-fs-off-fp-trap: FP with mstatus.FS=Off must trap illegal-instruction
+setup: mtvec=0x800006b0 mie=0x0
+setup: misa=0x80000000001411ad
+boot: mstatus=0xa00000000 FS=0
+fs-off: mstatus=0xa00000000 FS=0 (expect 0)
+fault: site=0x800003a6 traps=1 mcause=0x2 mepc=0x800003a6 mtval=0x2007053
+after trap: FS=0 (expect 0)
+control: traps=1 (expect still 1) f0bits=0x400e000000000000 (expect 0x400e000000000000) FS=3 (expect 3)
+restore: mstatus=0xa00000000 (expect boot word)
+checks=15 mismatches=0
+checksum=0x9b52bcfd1c7d14c3
+RESULT: PASS
