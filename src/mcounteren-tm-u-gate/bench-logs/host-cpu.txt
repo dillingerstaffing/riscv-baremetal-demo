@@ -1,0 +1,3 @@
+Host CPU for the three QEMU runs (module runs on the emulated virt board, not the host):
+model name	: AMD EPYC 9D25 126-Core Processor
+x86_64

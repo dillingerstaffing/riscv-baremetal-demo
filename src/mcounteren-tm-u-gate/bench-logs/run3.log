@@ -1,0 +1,70 @@
+
+========================================
+mcounteren.TM gates U-mode rdtime
+TM set must read, TM clear must trap
+========================================
+
+boot: mcounteren=0x0 scounteren=0x0
+probe: csrw mcounteren, 0x7; readback=0x7
+write: csrw mcounteren, 0x2 (TM); readback=0x2
+write: csrw scounteren, 0x2 (TM); readback=0x2
+boot: medeleg=0x0
+medeleg readback=0x104
+setup complete; dropping to S-mode...
+in S-mode; mcounteren-tm-u-gate experiment begins
+phase A payload: rdtime site 0x80000260, ecall site 0x8000028c
+dropping to U-mode with mcounteren.TM=1...
+
+--- back in S-mode: phase A complete ---
+trap history:
+  [0] SIG_A ecall  scause=0x8 stval=0x0 sepc=0x8000028c t0=0x2957c a0=0xa1a1
+  rdtime sample 0 (t0) = 0x2957c
+  rdtime sample 1 (t1) = 0x295b7  (delta = 59)
+
+phase A done; handing back to M-mode to clear mcounteren.TM...
+
+--- M-mode: S-mode handoff ecall ---
+  mcause=0x9 mepc=0x80000258 M-mode trap count=1 phase=0
+  scounteren still=0x2
+  mcounteren after clear=0x0
+phase B armed (mcounteren.TM=0); dropping to S-mode...
+
+in S-mode; mcounteren-tm-u-gate phase B begins
+dropping to U-mode with mcounteren.TM=0...
+
+--- back in S-mode: phase B complete ---
+trap history:
+  [0] SIG_A ecall    scause=0x8 stval=0x0 sepc=0x8000028c t0=0x2957c a0=0xa1a1
+  [1] gated rdtime   scause=0x2 stval=0xc01022f3 sepc=0x800002b0 t0=0xdeadbeefdeadbeef a0=0x80000290
+  [2] SIG_B ecall    scause=0x8 stval=0x0 sepc=0x800002bc t0=0xdeadbeefdeadbeef a0=0xa2a2
+
+phase B done; handing back to M-mode to set mcounteren.TM...
+
+--- M-mode: S-mode handoff ecall ---
+  mcause=0x9 mepc=0x80000258 M-mode trap count=2 phase=1
+  scounteren still=0x2
+  mcounteren after set=0x2
+phase C armed (mcounteren.TM=1); dropping to S-mode...
+
+in S-mode; mcounteren-tm-u-gate phase C begins
+dropping to U-mode with mcounteren.TM=1...
+
+--- back in S-mode: phase C complete ---
+trap history:
+  [0] SIG_A ecall    scause=0x8 stval=0x0 sepc=0x8000028c t0=0x2957c a0=0xa1a1
+  [1] gated rdtime   scause=0x2 stval=0xc01022f3 sepc=0x800002b0 t0=0xdeadbeefdeadbeef a0=0x80000290
+  [2] SIG_B ecall    scause=0x8 stval=0x0 sepc=0x800002bc t0=0xdeadbeefdeadbeef a0=0xa2a2
+  [3] SIG_C ecall    scause=0x8 stval=0x0 sepc=0x800002ec t0=0x5745a a0=0xa3a3
+  rdtime sample 0 (t0) = 0x5745a
+  rdtime sample 1 (t1) = 0x57493  (delta = 57)
+
+phase C done; handing back to M-mode to restore CSRs and exit...
+
+--- M-mode: S-mode handoff ecall ---
+  mcause=0x9 mepc=0x80000258 M-mode trap count=3 phase=2
+  mcounteren restore readback=0x0
+  scounteren restore readback=0x0
+  medeleg restore readback=0x0
+
+checksum (FNV-1a over verdict values) = 0x96e2802b2ebd9505
+RESULT: PASS
