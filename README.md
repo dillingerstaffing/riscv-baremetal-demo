@@ -474,6 +474,7 @@ which only works because every task runs on its own stack.
 - **src/pmp-napot-match/**: proves a NAPOT PMP entry matches exactly its encoded region, with inside loads and stores trapping as access faults and accesses just outside the region completing cleanly. [src/pmp-napot-match/](src/pmp-napot-match/)
 - **src/mstatus-sd-summary/**: proves mstatus.SD is the read-only summary bit for the FS field, set exactly when FS reads Dirty and never settable by software. [src/mstatus-sd-summary/](src/mstatus-sd-summary/)
 - **src/mcounteren-cy-u-read/**: proves mcounteren.CY gates U-mode rdcycle, succeeding with the bit set and raising illegal-instruction with the bit clear. [src/mcounteren-cy-u-read/](src/mcounteren-cy-u-read/)
+- **src/mcounteren-tm-u-gate/**: proves mcounteren.TM gates U-mode rdtime, succeeding with the bit set, trapping as illegal instruction with the bit clear, and succeeding again once the bit is restored; mcounteren, scounteren, and medeleg restored to their boot values before exit. [src/mcounteren-tm-u-gate/](src/mcounteren-tm-u-gate/)
 
 
 ## Hire the author
