@@ -1,0 +1,39 @@
+
+========================================
+stval: WARL write probe in S-mode
+all-ones / zero legalized readbacks, plus the
+trap-time stval capture on an illegal CSR read
+========================================
+
+boot: stval=0x0
+medeleg readback=0x4
+setup complete; dropping to S-mode...
+in S-mode; stval WARL probe begins
+
+phase 1: boot stval readback = 0x0
+phase 2: csrw stval, 0xffffffffffffffff; readback = 0xffffffffffffffff
+phase 3: csrw stval, 0x0; readback = 0x0
+
+phase 4: illegal CSR read at labeled site (expect S-mode trap):
+  fault site (label 1)  = 0x80000486
+  resume site (label 2) = 0x8000048a
+  faulting instruction word = 0x7ff022f3
+  scause  = 0x2
+  stval   = 0x7ff022f3
+  sepc    = 0x80000486
+  sepc+4  = 0x8000048a
+  traps   = 1
+  t0 after trap = 0xdeadbeefdeadbeef (sentinel = 0xdeadbeefdeadbeef)
+
+phase 5: csrw stval, boot value; readback = 0x0
+
+phase 6: ecall to M-mode for the verdict...
+
+M-mode: ecall received from S-mode:
+  ecall site (label 1) = 0x80000648
+  mcause  = 0x9
+  mepc    = 0x80000648
+  M-mode traps = 1
+
+checksum (FNV-1a over verdict values) = 0x0edf2feb40411329
+RESULT: PASS
