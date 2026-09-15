@@ -428,6 +428,9 @@ which only works because every task runs on its own stack.
   (mcause 0xc, mepc and mtval at the faulting fetch); 32 checks,
   0 mismatches, FNV-1a 0xe4760397517dbcf6 identical on 3 QEMU 8.2.2
   runs, Verdict PASS.
+- **medeleg load-page-fault route** (see `src/medeleg-load-pagefault/`):
+  medeleg bit 13 selects the trap destination for S-mode load page
+  faults raised against a hand-built Sv39 table's unmapped page.
 - **stval illegal-instruction capture** (see `src/stval-illegal-capture/`):
   on an S-mode illegal-instruction trap the hart records the faulting
   encoding in stval.
