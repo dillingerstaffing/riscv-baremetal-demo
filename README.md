@@ -433,7 +433,13 @@ which only works because every task runs on its own stack.
   faults raised against a hand-built Sv39 table's unmapped page.
 - **medeleg store-page-fault route** (see `src/medeleg-store-pagefault/`):
   medeleg bit 15 selects the trap destination for S-mode store page
-  faults raised against a hand-built Sv39 table's unmapped page.
+  faults; with the bit set an S-mode store to a hand-built Sv39
+  table's unmapped page lands in S-mode (scause 0xf,
+  sepc=0x80000300 at the faulting store while stval=0x80080000 is
+  the faulting data address), with the bit clear it lands in M-mode
+  (mcause 0xf, mepc=0x80000394, mtval=0x80080000); 34 checks,
+  0 mismatches, FNV-1a 0x5f72e2349de7d1fa identical on 3 QEMU 8.2.2
+  runs, Verdict PASS.
 - **stval illegal-instruction capture** (see `src/stval-illegal-capture/`):
   on an S-mode illegal-instruction trap the hart records the faulting
   encoding in stval.
