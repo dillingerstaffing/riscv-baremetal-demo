@@ -431,6 +431,9 @@ which only works because every task runs on its own stack.
 - **medeleg load-page-fault route** (see `src/medeleg-load-pagefault/`):
   medeleg bit 13 selects the trap destination for S-mode load page
   faults raised against a hand-built Sv39 table's unmapped page.
+- **medeleg store-page-fault route** (see `src/medeleg-store-pagefault/`):
+  medeleg bit 15 selects the trap destination for S-mode store page
+  faults raised against a hand-built Sv39 table's unmapped page.
 - **stval illegal-instruction capture** (see `src/stval-illegal-capture/`):
   on an S-mode illegal-instruction trap the hart records the faulting
   encoding in stval.

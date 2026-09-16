@@ -1,0 +1,16 @@
+medeleg-store-pagefault: medeleg bit-15 store-page-fault trap destination switch
+m-mode: pmpcfg0=0x1f (entry0: NAPOT all R|W|X)
+m-mode: satp=0x8000000000080005 (MODE=8 ASID=0)
+m-mode: phase-A medeleg write=0x8000 readback=0x8000
+m-mode: entering S-mode (phase A, bit 15 set)
+medeleg-store-pagefault: store-page-fault trap destination switch test
+boot: medeleg=0x0
+table: root[2]->l1[0]->l0 identity [0x80000000,0x80080000) R|W|X, l0[128]=0 (fault page 0x80080000)
+phaseA: medeleg bit15 set readback=0x8000
+phaseB: medeleg bit15 clear readback=0x0
+pA: s_traps=1 scause=0xf sepc=0x80000300 expected=0x80000300 stval=0x80080000 sstatus_spp=1
+pA: m_traps=1 mcause=0x9 mepc=0x80000304
+pB: m_traps=2 mcause=0xf mepc=0x80000394 expected=0x80000394 mtval=0x80080000 mstatus_mpp=1 s_traps=1
+quiet: m_traps=2 s_traps=1
+checksum=0x5f72e2349de7d1fa
+RESULT: PASS (checks=34)
