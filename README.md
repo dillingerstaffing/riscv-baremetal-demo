@@ -440,6 +440,9 @@ which only works because every task runs on its own stack.
   (mcause 0xf, mepc=0x80000394, mtval=0x80080000); 34 checks,
   0 mismatches, FNV-1a 0x5f72e2349de7d1fa identical on 3 QEMU 8.2.2
   runs, Verdict PASS.
+- **medeleg store-access-fault route** (see `src/medeleg-store-access-fault/`):
+  medeleg bit 7 selects the trap destination for S-mode store access
+  faults raised by a locked PMP TOR deny entry over a mapped page.
 - **stval illegal-instruction capture** (see `src/stval-illegal-capture/`):
   on an S-mode illegal-instruction trap the hart records the faulting
   encoding in stval.
