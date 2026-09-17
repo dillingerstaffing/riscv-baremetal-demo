@@ -1,0 +1,17 @@
+medeleg-store-access-fault: medeleg bit-7 store-access-fault trap destination switch
+m-mode: pmpcfg0=0xf880f pmpaddr0=0x20020000 pmpaddr1=0x20020400 pmpaddr2=0x40000000
+m-mode: satp=0x8000000000080005 (MODE=8 ASID=0)
+m-mode: phase-A medeleg write=0x80 readback=0x80
+m-mode: entering S-mode (phase A, bit 7 set)
+medeleg-store-access-fault: store-access-fault trap destination switch test
+boot: medeleg=0x0 restored readback=0x0
+table: root[2]->l1[0]->l0 identity [0x80000000,0x80080000) R|W|X, l0[128] valid R|W (PMP-denied store page 0x80080000)
+pmp: cfg0=0xf880f addr0=0x20020000 addr1=0x20020400 addr2=0x40000000
+phaseA: medeleg bit7 set readback=0x80
+phaseB: medeleg bit7 clear readback=0x0
+pA: s_traps=1 scause=0x7 sepc=0x80000312 expected=0x80000312 stval=0x80080000 sstatus_spp=1
+pA: m_traps=1 mcause=0x9 mepc=0x80000316
+pB: m_traps=2 mcause=0x7 mepc=0x800003b6 expected=0x800003b6 mtval=0x80080000 mstatus_mpp=1 s_traps=1
+quiet: m_traps=2 s_traps=1
+checksum=0x943ff096d0326162
+RESULT: PASS (checks=41)
