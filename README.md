@@ -443,6 +443,11 @@ which only works because every task runs on its own stack.
 - **medeleg store-access-fault route** (see `src/medeleg-store-access-fault/`):
   medeleg bit 7 selects the trap destination for S-mode store access
   faults raised by a locked PMP TOR deny entry over a mapped page.
+- **pmp entry priority** (see `src/pmp-priority/`):
+  two unlocked NAPOT entries over the same page with conflicting
+  permissions, swapped between phases: the S-mode load completes when
+  entry 0 allows and traps with mcause 0x5 when entry 0 denies, so the
+  lowest-numbered matching entry wins.
 - **stval illegal-instruction capture** (see `src/stval-illegal-capture/`):
   on an S-mode illegal-instruction trap the hart records the faulting
   encoding in stval.
