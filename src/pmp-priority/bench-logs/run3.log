@@ -1,0 +1,19 @@
+pmp-priority: PMP entry-priority first-match test
+m-mode: boot medeleg=0x0 pmpcfg0=0x0 pmpaddr0=0x0 pmpaddr1=0x0 pmpaddr2=0x0
+m-mode: phase-A pmpcfg0=0x1f181b pmpaddr0=0x20000dff pmpaddr1=0x20000dff pmpaddr2=0x2fffffff
+m-mode: satp=0x0 (Bare)
+m-mode: entering S-mode (phase A, entry 0 allows)
+m-mode: phase-B pmpcfg0=0x1f1b18 pmpaddr0=0x20000dff pmpaddr1=0x20000dff pmpaddr2=0x2fffffff
+pmp-priority: PMP entry-priority first-match test
+boot: medeleg=0x0 restored readback=0x0
+boot: pmpcfg0=0x0 pmpaddr0=0x0 pmpaddr1=0x0 pmpaddr2=0x0
+restore: pmpcfg0 readback=0x0 pmpaddr0=0x0 pmpaddr1=0x0 pmpaddr2=0x0
+scratch: pa=0x80003000 napot=0x20000dff control=0x80001a8b
+pmpA: cfg0=0x1f181b addr0=0x20000dff addr1=0x20000dff addr2=0x2fffffff
+pmpB: cfg0=0x1f1b18 addr0=0x20000dff addr1=0x20000dff addr2=0x2fffffff
+pA: s_traps=0 canary=0xa5 control=0x5a
+pA: m_traps=1 mcause=0x9 mepc=0x80000320 mstatus_mpp=1
+pB: m_traps=2 mcause=0x5 mepc=0x80000362 expected=0x80000362 mtval=0x80003000 mstatus_mpp=1 control=0x5a s_traps=0
+quiet: m_traps=2 s_traps=0
+checksum=0xfb7bd8f9f90b987b
+RESULT: PASS (checks=33)
