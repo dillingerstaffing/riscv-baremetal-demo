@@ -1,0 +1,17 @@
+pmp-na4-match: PMP locked-NA4 match-behavior test
+boot: pmpaddr0=0x0 pmpcfg0=0x0 mstatus=0xa00000000
+layout: na4_save=0x80000ee8 sp=0x80004eb0
+control: scratch words are good RAM: ok
+config: pmpaddr0=0x20000800 (expect 0x20000800)
+config: pmpcfg0=0x90 (expect 0x90)
+t1 lbu canary   : seen=1 mcause=0x5 mepc=0x80000524 mtval=0x80002000 resume-4=0x80000524 val=0xdeadbeefdeadbeef
+t1 neighbor     : word=0x9f8e7d6c
+t2 lbu canary+4 : seen=0 mcause=0x5 mepc=0x80000524 mtval=0x80002000 resume-4=0x80000696 val=0x6c
+quiet: traps before=1 after=1
+lock: pmpaddr0 after restore attempt=0x20000800
+lock: pmpcfg0 after restore attempt=0x90
+Checks: 21
+Mismatches: 0
+Checksum: 0xb3bbd7eb5f7a5e74
+Environment: QEMU 8.2.2
+Verdict: PASS
