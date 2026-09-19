@@ -496,6 +496,7 @@ which only works because every task runs on its own stack.
 - **src/mcounteren-cy-u-read/**: proves mcounteren.CY gates U-mode rdcycle, succeeding with the bit set and raising illegal-instruction with the bit clear. [src/mcounteren-cy-u-read/](src/mcounteren-cy-u-read/)
 - **src/mcounteren-tm-u-gate/**: proves mcounteren.TM gates U-mode rdtime, succeeding with the bit set, trapping as illegal instruction with the bit clear, and succeeding again once the bit is restored; mcounteren, scounteren, and medeleg restored to their boot values before exit. [src/mcounteren-tm-u-gate/](src/mcounteren-tm-u-gate/)
 - **src/stval-warl-probe/**: S-mode stval WARL write probe: publishes the legalized readbacks of all-ones and zero writes, restores the boot value, and on a deliberate illegal CSR read verifies the S-mode trap records scause 0x2 with stval equal to the faulting instruction word. [src/stval-warl-probe/](src/stval-warl-probe/)
+- **src/pmp-na4-match/**: proves a locked NA4 PMP entry matches exactly its 4-byte word: an lbu inside the word traps as a load access fault (mcause 0x5, mtval at the word), while an lbu one byte past it matches no entry and completes under M-mode default-allow; the lock makes the programmed values persist through restore attempts. [src/pmp-na4-match/](src/pmp-na4-match/)
 
 
 ## Hire the author
