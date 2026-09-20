@@ -1,0 +1,21 @@
+pmp-tor-top: PMP TOR exclusive-top-bound test
+boot: pmpaddr0=0x0 pmpaddr1=0x0 pmpcfg0=0x0 mstatus=0xa00000000
+layout: start=0x80003000 end=0x80004000 tor_top_save=0x80002000 sp=0x80007f90
+control: 4 KiB region readable/writable before PMP: ok
+control: sentinel 0xa5 at the top bound: ok
+config: pmpaddr0=0x20000c00 (expect start>>2)
+config: pmpaddr1=0x20001000 (expect end>>2)
+config: pmpcfg0=0x880f (expect 0x880f)
+config: pmpcfg0 after clear attempt=0x8800 (entry1 byte 0x88 locked, entry0 byte cleared)
+t1 lbu end-1    : seen=1 mcause=0x5 mepc=0x800006e2 mtval=0x80003fff resume-4=0x800006e2 val=0xdeadbeefdeadbeef
+t1 neighbor     : sentinel=0xa5
+t2 lbu end      : seen=0 mcause=0x5 mepc=0x800006e2 mtval=0x80003fff resume-4=0x80000868 val=0xa5
+quiet: traps before=1 after=1
+lock: pmpaddr0 after restore attempt=0x20000c00
+lock: pmpaddr1 after restore attempt=0x20001000
+lock: pmpcfg0 after restore attempt=0x8800
+Checks: 4123
+Mismatches: 0
+Checksum: 0x7ebc94761e0d7274
+Environment: QEMU 8.2.2
+Verdict: PASS

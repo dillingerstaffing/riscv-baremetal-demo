@@ -2958,3 +2958,44 @@ mcounteren-cy-u-read.elf: $(MCYU_OBJS) link.ld
 # Run the mcounteren.CY U-mode gate module under QEMU.
 run-mcounteren-cy-u-read: mcounteren-cy-u-read.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcounteren-cy-u-read.elf
+
+# PMP TOR exclusive-top-bound module (backlog item "riscv
+# pmp-tor-exclusive-top"): its own binary sharing only boot.S and the
+# UART driver with the other demos. A TOR PMP entry matches the
+# half-open range [pmpaddr[i-1], pmpaddr[i]), so an access exactly at
+# the top bound matches nothing. Entry 0 is TOR over [0, base) with
+# full permissions, unlocked; entry 1 is TOR over [base, base+4KiB)
+# with no permissions and the lock bit set (pmpcfg0 = 0x880F). A
+# locked TOR deny cannot be entry 0: entry 0's TOR bottom is fixed at
+# address 0, so a locked deny there would deny the program's own
+# code, the UART, and the test finisher. The top bound under test
+# belongs to entry 1, the locked entry. Entry 0's unlocked byte is
+# cleared right after programming (verifying the per-entry lock rule
+# and leaving only the locked entry programmed), so the top-bound
+# probe's clean completion directly measures M-mode default-allow.
+# An lbu at base+4KiB-1 must trap exactly once with mcause=0x5, mepc
+# at the faulting lbu (resume-4), mtval the faulting address, and the
+# destination keeping its poison value; an lbu at exactly base+4KiB
+# must complete with 0 traps and return the sentinel byte stamped
+# there before programming. A minimal M-mode trap entry records
+# mcause/mepc/mtval and counts every entry; a quiet window of
+# ordinary M-mode work with the entry still programmed must show
+# 0 new traps. The lock makes pmpaddr1, pmpcfg0's entry-1 byte, and
+# (TOR bottom) pmpaddr0 read-only until reset: restore writes are
+# attempted and the locked readbacks asserted bit-for-bit. On PASS
+# the machine shuts down via the virt test-device finisher so the
+# QEMU process exit code (0) reflects the verdict; on FAIL the hart
+# parks without touching the finisher.
+# NOTE: src/boot.S must stay first in TOPT_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+TOPT_SRCS := src/boot.S src/uart.c \
+            src/pmp-tor-top/tor_top_trap.S src/pmp-tor-top/tor_top_main.c
+TOPT_OBJS := $(TOPT_SRCS:.c=.o)
+TOPT_OBJS := $(TOPT_OBJS:.S=.o)
+
+pmp-tor-top.elf: $(TOPT_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TOPT_OBJS)
+
+# Run the pmp-tor-top module under QEMU.
+run-pmp-tor-top: pmp-tor-top.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel pmp-tor-top.elf
