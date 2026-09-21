@@ -1,0 +1,21 @@
+pmp-tor-bottom: PMP TOR inclusive-bottom-bound test
+boot: pmpaddr0=0x0 pmpaddr1=0x0 pmpcfg0=0x0 mstatus=0xa00000000
+layout: start=0x80003000 end=0x80004000 tor_bot_save=0x80002000 sp=0x80007f70
+control: 4 KiB region readable/writable before PMP: ok
+control: sentinel 0x5a one byte below the bottom bound: ok
+config: pmpaddr0=0x20000c00 (expect start>>2 = 0x20000c00)
+config: pmpaddr1=0x20001000 (expect end>>2)
+config: pmpcfg0=0x880f (expect 0x880f)
+config: pmpcfg0 after clear attempt=0x8800 (entry1 byte 0x88 locked, entry0 byte cleared)
+t1 lbu base     : seen=1 mcause=0x5 mepc=0x80000726 mtval=0x80003000 resume-4=0x80000726 val=0xdeadbeefdeadbeef
+t1 neighbor     : sentinel=0x5a
+t2 lbu base-1   : seen=0 mcause=0x5 mepc=0x80000726 mtval=0x80003000 resume-4=0x800008a6 val=0x5a
+quiet: traps before=1 after=1
+lock: pmpaddr0 after restore attempt=0x20000c00
+lock: pmpaddr1 after restore attempt=0x20001000
+lock: pmpcfg0 after restore attempt=0x8800
+Checks: 4125
+Mismatches: 0
+Checksum: 0xda9c5efc875beabd
+Environment: QEMU 8.2.2
+Verdict: PASS

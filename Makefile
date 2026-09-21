@@ -2999,3 +2999,45 @@ pmp-tor-top.elf: $(TOPT_OBJS) link.ld
 # Run the pmp-tor-top module under QEMU.
 run-pmp-tor-top: pmp-tor-top.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel pmp-tor-top.elf
+
+# PMP TOR inclusive-bottom-bound module (backlog item "riscv
+# pmp-tor-bottom-inclusive"): its own binary sharing only boot.S and
+# the UART driver with the other demos. A TOR PMP entry matches the
+# half-open range [pmpaddr[i-1], pmpaddr[i]), so an access exactly at
+# the bottom bound still matches the entry. Entry 0 is TOR over
+# [0, base) with full permissions, unlocked; entry 1 is TOR over
+# [base, base+4KiB) with no permissions and the lock bit set
+# (pmpcfg0 = 0x880F). A locked TOR deny cannot be entry 0: entry 0's
+# TOR bottom is fixed at address 0, so a locked deny there would deny
+# the program's own code, the UART, and the test finisher. The bottom
+# bound under test is pmpaddr0 (0x20000c00, base 0x80003000), entry
+# 1's bottom bound, hence entry 1 is the locked entry. Entry 0's
+# unlocked byte is cleared right after programming (verifying the
+# per-entry lock rule and leaving only the locked entry programmed),
+# so the below-bound probe's clean completion directly measures
+# M-mode default-allow. An lbu exactly at base must trap exactly
+# once with mcause=0x5, mepc at the faulting lbu (resume-4), mtval
+# the bottom bound, and the destination keeping its poison value; an
+# lbu at base-1 matches no entry and must complete with 0 traps,
+# returning the sentinel byte stamped there before programming. A
+# minimal M-mode trap entry records mcause/mepc/mtval and counts every
+# entry; a quiet window of ordinary M-mode work with the entry still
+# programmed must show 0 new traps. The lock makes pmpaddr1,
+# pmpcfg0's entry-1 byte, and (TOR bottom) pmpaddr0 read-only until
+# reset: restore writes are attempted and the locked readbacks
+# asserted bit-for-bit. On PASS the machine shuts down via the virt
+# test-device finisher so the QEMU process exit code (0) reflects the
+# verdict; on FAIL the hart parks without touching the finisher.
+# NOTE: src/boot.S must stay first in PBOT_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+PBOT_SRCS := src/boot.S src/uart.c \
+            src/pmp-tor-bottom/tor_bot_trap.S src/pmp-tor-bottom/tor_bot_main.c
+PBOT_OBJS := $(PBOT_SRCS:.c=.o)
+PBOT_OBJS := $(PBOT_OBJS:.S=.o)
+
+pmp-tor-bottom.elf: $(PBOT_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(PBOT_OBJS)
+
+# Run the pmp-tor-bottom module under QEMU.
+run-pmp-tor-bottom: pmp-tor-bottom.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel pmp-tor-bottom.elf
