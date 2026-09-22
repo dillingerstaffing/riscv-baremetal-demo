@@ -299,6 +299,34 @@ sip-write-probe.elf: $(SIPW_OBJS) link.ld
 run-sip-write-probe: sip-write-probe.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel sip-write-probe.elf
 
+# mie WARL write/readback probe module: its own binary sharing only
+# boot.S and the UART driver with the other demos. Records the boot
+# mie/mstatus/mideleg baselines, writes all-ones to mie and publishes
+# the readback (which interrupt-enable bits the implementation
+# provides), writes zero and confirms the readback is 0, then probes
+# bits 0..11 individually (each must read back exactly the written
+# bit or 0, with no stray bits), writes all-ones again and confirms
+# the readback matches the phase-1 readback and the OR of the
+# per-bit results, then restores mie to the exact boot value.
+# mstatus.MIE stays clear for the whole run, so no interrupt can be
+# taken; a trap handler recording mcause/mepc/mtval is installed but
+# must never fire (trap count 0). Prints a checks/mismatches summary
+# and an FNV-1a digest of the verdict-relevant values for
+# run-to-run comparison. On PASS it shuts the machine down via the
+# virt test-device finisher so the QEMU process exit code (0)
+# reflects the verdict; on FAIL it parks the hart instead.
+MWR_SRCS := src/boot.S src/uart.c \
+            src/mie-write-readback/mwr_trap.S src/mie-write-readback/mwr_main.c
+MWR_OBJS := $(MWR_SRCS:.c=.o)
+MWR_OBJS := $(MWR_OBJS:.S=.o)
+
+mie-write-readback.elf: $(MWR_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MWR_OBJS)
+
+# Run the mie WARL write/readback probe module under QEMU.
+run-mie-write-readback: mie-write-readback.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mie-write-readback.elf
+
 # M-mode to U-mode trap transition module: its own binary sharing only
 # boot.S and the UART driver with the other demos. Drops to U-mode with
 # mret (mstatus.MPP = 0) into a one-instruction ecall payload; the
@@ -442,7 +470,7 @@ run-mcounteren: mcounteren.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcounteren.elf
 
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf mip-msip-write.elf mstatus-sie-toggle.elf sstatus-mxr.elf amo-add-atomicity.elf sip-seip-write.elf scounteren-ir-gate.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf medeleg-ecall-u-route.elf mideleg-mtip-route.elf mie-msie-gate.elf mie-mtie-gate.elf mideleg-seip-route.elf sip-stip-mideleg-reconcile.elf medeleg-illegal-inst-route.elf medeleg-breakpoint.elf stval-illegal-capture.elf stval-ecall-capture.elf pmp-napot-encode.elf sstatus-fs-dirty.elf satp-mode-warl.elf sstatus-spp-sret-u.elf sie-ssip-clear-suppresses.elf stvec-vectored-mode.elf fflags-nx-inexact.elf fflags-nx-only.elf frm-rounding-write.elf fflags-uf-underflow.elf fflags-of-overflow.elf fflags-dz-divide-by-zero.elf fflags-nv-invalid.elf mtimecmp-delta-tracks-mtime.elf mtimecmp-rw.elf fcsr-field-independence.elf fcsr-frm-roundup.elf fcsr-frm-rounddn.elf mstatus-tvm-trap.elf sret-to-umode-fault.elf mstatus-mprv-load.elf frm-rounding-static.elf pmp-napot-match.elf sstatus-spp-u-trap.elf mstatus-tsr-trap.elf medeleg-instr-pagefault.elf medeleg-load-pagefault.elf medeleg-store-pagefault.elf medeleg-store-access-fault.elf pmp-priority.elf
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf mip-msip-write.elf mstatus-sie-toggle.elf sstatus-mxr.elf amo-add-atomicity.elf sip-seip-write.elf scounteren-ir-gate.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf medeleg-ecall-u-route.elf mideleg-mtip-route.elf mie-msie-gate.elf mie-mtie-gate.elf mideleg-seip-route.elf sip-stip-mideleg-reconcile.elf mie-write-readback.elf medeleg-illegal-inst-route.elf medeleg-breakpoint.elf stval-illegal-capture.elf stval-ecall-capture.elf pmp-napot-encode.elf sstatus-fs-dirty.elf satp-mode-warl.elf sstatus-spp-sret-u.elf sie-ssip-clear-suppresses.elf stvec-vectored-mode.elf fflags-nx-inexact.elf fflags-nx-only.elf frm-rounding-write.elf fflags-uf-underflow.elf fflags-of-overflow.elf fflags-dz-divide-by-zero.elf fflags-nv-invalid.elf mtimecmp-delta-tracks-mtime.elf mtimecmp-rw.elf fcsr-field-independence.elf fcsr-frm-roundup.elf fcsr-frm-rounddn.elf mstatus-tvm-trap.elf sret-to-umode-fault.elf mstatus-mprv-load.elf frm-rounding-static.elf pmp-napot-match.elf sstatus-spp-u-trap.elf mstatus-tsr-trap.elf medeleg-instr-pagefault.elf medeleg-load-pagefault.elf medeleg-store-pagefault.elf medeleg-store-access-fault.elf pmp-priority.elf
 
 
 demo.elf: $(OBJS) link.ld

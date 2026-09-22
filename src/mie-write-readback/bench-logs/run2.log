@@ -1,0 +1,24 @@
+mie-write-readback: mie all-ones WARL write/readback probe
+trap: mtvec=0x800001c8
+boot: mie=0x0 mstatus=0xa00000000 mideleg=0x1444
+phase1 ones: mie=0xfffffffffffffeee
+phase1 zero: mie=0x0
+  bit 0: mie=0x0
+  bit 1: mie=0x2
+  bit 2: mie=0x4
+  bit 3: mie=0x8
+  bit 4: mie=0x0
+  bit 5: mie=0x20
+  bit 6: mie=0x40
+  bit 7: mie=0x80
+  bit 8: mie=0x0
+  bit 9: mie=0x200
+  bit 10: mie=0x400
+  bit 11: mie=0x800
+phase2 sticky-union: mie=0xeee
+phase3 ones: mie=0xfffffffffffffeee
+restored: mie=0x0 mstatus=0xa00000000
+traps: count=0
+checks: 10 mismatches: 0
+digest: 0xf75a313eb8844187
+RESULT: PASS
