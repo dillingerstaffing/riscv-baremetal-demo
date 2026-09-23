@@ -1,0 +1,27 @@
+mideleg-seip-clear: mideleg bit-9 clear moves a pended SEI from S-mode to M-mode
+boot: mstatus=0xa00000000
+trap: mtvec=0x800001e4
+boot: mideleg=0x1444
+mideleg: write=0x0 readback=0x1444
+mideleg: write=0x200 readback=0x1644
+mideleg: write=0x1644 readback=0x1644
+medeleg: write=0x0 readback=0x0
+trap: stvec=0x80000268
+pend: mip-after-csrs=0x200
+phaseA: sie=0x200
+phaseA-control: s_traps=0 m_traps=0
+phaseA-sei: spins=0 s_traps=1 scause=0x8000000000000009 sepc=0x80000434 expected=0x80000434 sip-at-entry=0x200
+phaseB-mideleg-clear: write=0x1444 readback=0x1444
+phaseB-pend: mip-after-csrs=0x200
+phaseB-control1: s_traps=1 m_traps=0
+phaseB-control2: s_traps=1 m_traps=0
+phaseB-trap: spins=0 m_traps=1 mcause=0x8000000000000009 mepc=0x800006fe expected=0x800006fe s_traps=1
+phaseB-mideleg-reset: write=0x1644 readback=0x1644
+phaseC: sie=0x200
+phaseC-sei: spins=0 s_traps=2 scause=0x8000000000000009 sepc=0x80000c52 expected=0x80000c52 sip-at-entry=0x200 m_traps=1
+phaseD-pend: mip-after-csrs=0x200
+quiet: s_traps=2 m_traps=1 ecalls=2
+restore: mideleg=0x1444
+restore: mstatus=0xa00000000 boot=0xa00000000
+record checksum=0xbd94fd8e55fa89f0
+RESULT: PASS (checks=50)
