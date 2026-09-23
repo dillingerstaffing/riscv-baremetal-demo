@@ -1,3 +1,11 @@
+<!-- PROOF-HEADER
+Checks: 50
+Mismatches: 0
+Checksum: 0xbd94fd8e55fa89f0
+Environment: QEMU 8.2.2
+Verdict: PASS
+-->
+
 # PROOF: mideleg-seip-clear
 
 Checks: 50
