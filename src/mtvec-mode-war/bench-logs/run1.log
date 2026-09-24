@@ -1,0 +1,12 @@
+mtvec-mode-war: mtvec MODE WARL write/readback probe
+boot: mtvec=0x0 mstatus=0xa00000000
+trap: mtvec=0x800001c8
+phase1 ones: mtvec=0x800001c8
+phase1 ones-base: mtvec=0xfffffffffffffffc
+phase2 vectored: written=0x800001c9 readback=0x800001c9
+phase2 direct: written=0x800001c8 readback=0x800001c8
+restored: mtvec=0x0 mstatus=0xa00000000
+traps: count=0
+checks: 10 mismatches: 0
+digest: 0x6e1dc83f46d9431
+RESULT: PASS

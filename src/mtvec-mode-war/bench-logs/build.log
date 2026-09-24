@@ -1,0 +1,4 @@
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/mtvec-mode-war/mmw_main.c -o src/mtvec-mode-war/mmw_main.o
+riscv64-unknown-elf-gcc -Wall -Wextra -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -T link.ld -o mtvec-mode-war.elf src/boot.o src/uart.o src/mtvec-mode-war/mmw_trap.o src/mtvec-mode-war/mmw_main.o
+/home/hatch/workspace/toolchains/ubuntu-rv64/usr/bin/../lib/gcc/riscv64-unknown-elf/13.2.0/../../../riscv64-unknown-elf/bin/ld: warning: mtvec-mode-war.elf has a LOAD segment with RWX permissions
+exit=0

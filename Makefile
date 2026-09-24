@@ -470,8 +470,7 @@ run-mcounteren: mcounteren.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mcounteren.elf
 
 
-all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf mip-msip-write.elf mstatus-sie-toggle.elf sstatus-mxr.elf amo-add-atomicity.elf sip-seip-write.elf scounteren-ir-gate.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf medeleg-ecall-u-route.elf mideleg-mtip-route.elf mie-msie-gate.elf mie-mtie-gate.elf mideleg-seip-route.elf sip-stip-mideleg-reconcile.elf mie-write-readback.elf medeleg-illegal-inst-route.elf medeleg-breakpoint.elf stval-illegal-capture.elf stval-ecall-capture.elf pmp-napot-encode.elf sstatus-fs-dirty.elf satp-mode-warl.elf sstatus-spp-sret-u.elf sie-ssip-clear-suppresses.elf stvec-vectored-mode.elf fflags-nx-inexact.elf fflags-nx-only.elf frm-rounding-write.elf fflags-uf-underflow.elf fflags-of-overflow.elf fflags-dz-divide-by-zero.elf fflags-nv-invalid.elf mtimecmp-delta-tracks-mtime.elf mtimecmp-rw.elf fcsr-field-independence.elf fcsr-frm-roundup.elf fcsr-frm-rounddn.elf mstatus-tvm-trap.elf sret-to-umode-fault.elf mstatus-mprv-load.elf frm-rounding-static.elf pmp-napot-match.elf sstatus-spp-u-trap.elf mstatus-tsr-trap.elf medeleg-instr-pagefault.elf medeleg-load-pagefault.elf medeleg-store-pagefault.elf medeleg-store-access-fault.elf pmp-priority.elf mideleg-seip-clear.elf
-
+all: demo.elf preempt.elf virtio-blk.elf smp.elf shell.elf uart-baud.elf smode.elf smode-mbase.elf pmp.elf wfi-latency.elf mal.elf plic.elf mtimecmp.elf sv39.elf csr.elf ecall.elf counter-alias.elf amo.elf umode.elf msip.elf mtvec-vectored.elf cycmon.elf fs-check.elf medeleg-mask.elf wfi-resume-pc.elf lrsc-histogram.elf pmp-tor.elf mpp-encoding.elf mcycle-write.elf mip-msip.elf mie-global.elf sip-ssip.elf sc-fail.elf mret-no-restore.elf stvec-direct.elf mepc-resume-skip.elf sepc-resume-skip.elf pmp-napot-size.elf satp-asid.elf satp-bare.elf mtval-fault-address.elf mcounteren.elf cycle-read-latency.elf mtimecmp-oneshot.elf stimecmp-one-shot.elf mie-stie.elf mcause-warl.elf mideleg-route.elf sepc-warl.elf scause-bit.elf mideleg-warl.elf mtvec-mode0-direct.elf pmp-lock-bit.elf mie-toggle.elf mscratch-csrrw.elf sstatus-spp.elf sip-write-probe.elf mip-pending-no-trap.elf sstatus-sie-gate.elf sip-stip-write.elf mcause-interrupt-bit.elf scause-warl.elf sstatus-sum.elf sie-stie-gate.elf sie-stie-write.elf mip-msip-write.elf mstatus-sie-toggle.elf sstatus-mxr.elf amo-add-atomicity.elf sip-seip-write.elf scounteren-ir-gate.elf mideleg-ssip-route.elf medeleg-ecall-destination.elf medeleg-ecall-u-route.elf mideleg-mtip-route.elf mie-msie-gate.elf mie-mtie-gate.elf mideleg-seip-route.elf sip-stip-mideleg-reconcile.elf mie-write-readback.elf medeleg-illegal-inst-route.elf medeleg-breakpoint.elf stval-illegal-capture.elf stval-ecall-capture.elf pmp-napot-encode.elf sstatus-fs-dirty.elf satp-mode-warl.elf sstatus-spp-sret-u.elf sie-ssip-clear-suppresses.elf stvec-vectored-mode.elf fflags-nx-inexact.elf fflags-nx-only.elf frm-rounding-write.elf fflags-uf-underflow.elf fflags-of-overflow.elf fflags-dz-divide-by-zero.elf fflags-nv-invalid.elf mtimecmp-delta-tracks-mtime.elf mtimecmp-rw.elf fcsr-field-independence.elf fcsr-frm-roundup.elf fcsr-frm-rounddn.elf mstatus-tvm-trap.elf sret-to-umode-fault.elf mstatus-mprv-load.elf frm-rounding-static.elf pmp-napot-match.elf sstatus-spp-u-trap.elf mstatus-tsr-trap.elf medeleg-instr-pagefault.elf medeleg-load-pagefault.elf medeleg-store-pagefault.elf medeleg-store-access-fault.elf pmp-priority.elf mideleg-seip-clear.elf mtvec-mode-war.elf
 
 demo.elf: $(OBJS) link.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
@@ -2209,6 +2208,35 @@ mideleg-seip-clear.elf: $(SEIPCLR_OBJS) link.ld
 # Run the mideleg SEIP clear-and-restore module under QEMU.
 run-mideleg-seip-clear: mideleg-seip-clear.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel mideleg-seip-clear.elf
+
+# mtvec MODE WARL write/readback probe module: its own binary sharing
+# only boot.S and the UART driver with the other demos. Records the
+# boot mtvec readback, writes all-ones and publishes the legalized
+# readback (MODE restricted to implemented values, BASE kept
+# aligned), writes MODE=1 (vectored) and MODE=0 (direct) values and
+# publishes each readback to pin down the implemented modes by
+# measurement, writes the boot value back and verifies the readback
+# equals the boot value bit-for-bit, and verifies mstatus is
+# unchanged bit-for-bit. mstatus.MIE stays clear for the whole run,
+# so no interrupt can be taken; a trap handler is installed but must
+# never fire (trap count 0). Prints a checks/mismatches summary and
+# an FNV-1a digest of the verdict-relevant values for run-to-run
+# comparison. On PASS it shuts the machine down via the virt
+# test-device finisher so the QEMU process exit code (0) reflects the
+# verdict; on FAIL it parks the hart instead.
+# NOTE: src/boot.S must stay first in MMW_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+MMW_SRCS := src/boot.S src/uart.c \
+            src/mtvec-mode-war/mmw_trap.S src/mtvec-mode-war/mmw_main.c
+MMW_OBJS := $(MMW_SRCS:.c=.o)
+MMW_OBJS := $(MMW_OBJS:.S=.o)
+
+mtvec-mode-war.elf: $(MMW_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MMW_OBJS)
+
+# Run the mtvec MODE WARL write/readback probe module under QEMU.
+run-mtvec-mode-war: mtvec-mode-war.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel mtvec-mode-war.elf
 
 # medeleg bit-9 S-mode ecall destination switch module (backlog item
 # "riscv medeleg-ecall-destination"): its own binary sharing only
