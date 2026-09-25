@@ -1,0 +1,18 @@
+
+========================================
+menvcfg.CBIE (bits 5:4) write/readback WARL probe
+========================================
+
+boot: menvcfg=0x2000000000000000 CBIE(bits5:4)=0
+cbie=1: write=0x2000000000000010 readback=0x2000000000000010
+cbie=2: write=0x2000000000000020 readback=0x2000000000000020
+cbie=3: write=0x2000000000000030 readback=0x2000000000000030
+cbie=0: write=0x2000000000000000 readback=0x2000000000000000
+warl: write all-ones; legalized readback (1st)=0xa0000000000000f1
+warl: write all-ones; legalized readback (2nd)=0xa0000000000000f1
+restore: write boot=0x2000000000000000 readback=0x2000000000000000
+traps recorded by the handler: 0
+
+checksum (FNV-1a over the write/readback pairs) = 0x695a0fc4812f73e3
+checks: 9  mismatches: 0
+RESULT: PASS
