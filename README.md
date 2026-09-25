@@ -486,6 +486,7 @@ which only works because every task runs on its own stack.
 - **src/fcsr-field-independence/**: proves fcsr's fflags and frm fields are independent by writing each via csrs/csrc and verifying the other field stays untouched. [src/fcsr-field-independence/](src/fcsr-field-independence/)
 - **src/fcsr-frm-roundup/**: proves frm in fcsr controls floating-point rounding by computing the same sum under RNE and RUP and verifying the last bit differs. [src/fcsr-frm-roundup/](src/fcsr-frm-roundup/)
 - **src/menvcfg-cbze-write/**: M-mode WARL probe of the menvcfg.CBZE field (bits 7:6); every value 0-3 reads back exactly as written and the boot value restores exactly. [src/menvcfg-cbze-write/](src/menvcfg-cbze-write/)
+- **src/menvcfg-cbie-write/**: M-mode WARL probe of the menvcfg.CBIE field (bits 5:4); every value 0-3 reads back exactly as written and the boot value restores exactly. [src/menvcfg-cbie-write/](src/menvcfg-cbie-write/)
 - **src/fcsr-frm-rounddn/**: proves frm=RDN steers rounding of an inexact fsub.d toward negative infinity, picking the lower neighbor while RNE picks the upper. [src/fcsr-frm-rounddn/](src/fcsr-frm-rounddn/)
 - **src/sret-to-umode-fault/**: proves sret executed in U-mode raises illegal-instruction trap to M-mode. [src/sret-to-umode-fault/](src/sret-to-umode-fault/)
 - **src/mstatus-tvm-trap/**: proves mstatus.TVM traps S-mode satp writes and sfence.vma into M-mode. [src/mstatus-tvm-trap/](src/mstatus-tvm-trap/)
