@@ -1,0 +1,6 @@
+riscv64-unknown-elf-gcc -Wall -Wextra -Werror -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/boot.S -o src/boot.o
+riscv64-unknown-elf-gcc -Wall -Wextra -Werror -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/uart.c -o src/uart.o
+riscv64-unknown-elf-gcc -Wall -Wextra -Werror -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/pmp-na4-low-edge/low_trap.S -o src/pmp-na4-low-edge/low_trap.o
+riscv64-unknown-elf-gcc -Wall -Wextra -Werror -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -c src/pmp-na4-low-edge/low_main.c -o src/pmp-na4-low-edge/low_main.o
+riscv64-unknown-elf-gcc -Wall -Wextra -Werror -O2 -ffreestanding -nostdlib -nostartfiles -no-pie -fno-pie -fno-pic -march=rv64imac_zicsr -mabi=lp64 -mcmodel=medany -T link.ld -o pmp-na4-low-edge.elf src/boot.o src/uart.o src/pmp-na4-low-edge/low_trap.o src/pmp-na4-low-edge/low_main.o
+/home/hatch/workspace/toolchains/ubuntu-rv64/usr/bin/../lib/gcc/riscv64-unknown-elf/13.2.0/../../../riscv64-unknown-elf/bin/ld: warning: pmp-na4-low-edge.elf has a LOAD segment with RWX permissions
