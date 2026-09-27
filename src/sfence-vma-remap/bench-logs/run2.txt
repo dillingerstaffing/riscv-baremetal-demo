@@ -1,0 +1,19 @@
+sfence-vma-remap: sfence.vma remap visibility test
+m-mode: pmpcfg0=0x1f (entry0: NAPOT all R|W|X)
+m-mode: satp=0x8000000000080009 (MODE=8 ASID=0)
+m-mode: initial leaf PTE=0x200010c7 (maps TEST_VA to PA1)
+m-mode: entering S-mode (phase A, PTE -> PA1)
+sfence-vma-remap: PTE remap visibility without/with sfence.vma
+boot: satp=0x0 medeleg=0x0
+table: root[2]->l1[0]->l0 identity [0x80000000,0x80080000) R|W|X; root[1]->l1[0]->l0[0] leaf maps 0x40000000
+satp=0x8000000000080009 (MODE=8 ASID=0)
+pte_before=0x200010c7 (PA1 leaf)
+pte_after=0x20000cc7 (PA2 leaf, no fence)
+phaseA: readback=0xaaaaaaaaaaaaaaaa expected=0xaaaaaaaaaaaaaaaa mcause=0x9 mepc=0x800002c0 expected=0x800002c0
+phaseB: readback=0xaaaaaaaaaaaaaaaa (stale A expected, no fence issued) mcause=0x9 mepc=0x800002f6 expected=0x800002f6
+phaseC: readback=0xbbbbbbbbbbbbbbbb (fresh B expected, after sfence.vma) mcause=0x9 mepc=0x8000032c expected=0x8000032c
+canaries: scratch1[0]=0xaaaaaaaaaaaaaaaa scratch2[0]=0xbbbbbbbbbbbbbbbb
+traps: m_traps=3 s_traps=0
+quiet: m_traps=3 s_traps=0
+checksum=0x421dacf7967027dc
+RESULT: PASS (checks=39)

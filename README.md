@@ -504,6 +504,7 @@ which only works because every task runs on its own stack.
 - **src/pmp-tor-bottom/**: proves a locked TOR PMP entry matches the half-open range [pmpaddr0, pmpaddr1) with the bottom bound inclusive: the load exactly at the bottom bound traps as a load access fault (mcause 0x5, mtval at the bottom bound, the destination keeping its poison value), while the load one byte below it matches no entry and completes with no trap under M-mode default-allow. [src/pmp-tor-bottom/](src/pmp-tor-bottom/)
 - **src/mideleg-seip-clear/**: proves clearing mideleg bit 9 moves a pended SEI from S-mode to M-mode and re-setting it moves delivery back to S-mode. [src/mideleg-seip-clear/](src/mideleg-seip-clear/)
 - **src/mtvec-mode-war/**: M-mode WARL write/readback probe of the mtvec MODE field: a reserved-MODE write is dropped entirely, an all-ones BASE sticks, MODE=0 and MODE=1 both stick, and the boot value restores bit-for-bit. [src/mtvec-mode-war/](src/mtvec-mode-war/)
+- **src/sfence-vma-remap/**: proves a PTE remap is invisible to the hart until sfence.vma: a remap with no fence reads the stale mapping, and the same read after sfence.vma returns the fresh page. [src/sfence-vma-remap/](src/sfence-vma-remap/)
 
 
 ## Hire the author

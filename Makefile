@@ -1882,6 +1882,32 @@ medeleg-store-pagefault.elf: $(MSPF_OBJS) link.ld
 run-medeleg-store-pagefault: medeleg-store-pagefault.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel medeleg-store-pagefault.elf
 
+# sfence.vma remap visibility module (backlog item
+# "riscv sfence-vma-remap"): its own binary sharing only boot.S and
+# the UART driver with the other demos. A single Sv39 leaf maps
+# TEST_VA (0x40000000) to a page holding canary A; phase A reads it
+# back in S-mode (expect A). M-mode then rewrites the leaf to a page
+# holding canary B with NO fence: phase B must read stale canary A.
+# M-mode issues sfence.vma: phase C must read fresh canary B.
+# Readbacks, PTE values before/after, per-mode trap counts, causes,
+# ecall-site PCs, and an FNV-1a checksum over the verdict values are
+# printed; all interrupt enables stay clear. PASS writes 0x5555 to
+# the virt test-device finisher so the QEMU exit code (0) reflects
+# the verdict; on FAIL it parks the hart.
+# NOTE: src/boot.S must stay first in SVR_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+SVR_SRCS := src/boot.S src/uart.c \
+            src/sfence-vma-remap/svr_trap.S src/sfence-vma-remap/svr_main.c
+SVR_OBJS := $(SVR_SRCS:.c=.o)
+SVR_OBJS := $(SVR_OBJS:.S=.o)
+
+sfence-vma-remap.elf: $(SVR_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SVR_OBJS)
+
+# Run the sfence.vma remap visibility module under QEMU.
+run-sfence-vma-remap: sfence-vma-remap.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel sfence-vma-remap.elf
+
 # medeleg bit-7 store-access-fault trap destination switch module
 # (backlog item "riscv medeleg-store-access-fault"): its own binary
 # sharing only boot.S and the UART driver with the other demos.
