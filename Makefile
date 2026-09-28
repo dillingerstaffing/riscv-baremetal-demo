@@ -1908,6 +1908,36 @@ sfence-vma-remap.elf: $(SVR_OBJS) link.ld
 run-sfence-vma-remap: sfence-vma-remap.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel sfence-vma-remap.elf
 
+# sfence.vma rs1-scoped invalidation module
+# (backlog item "riscv sfence-vma-rs1-scoped"): its own binary
+# sharing only boot.S and the UART driver with the other demos.
+# Remaps two virtual addresses (VA1=0x40000000, VA2=0xc0000000)
+# between two pairs of physical pages holding distinct canaries,
+# fences only VA1 with sfence.vma rs1=VA1, and reads both words
+# back in S-mode phases: phase A must read canaries A and C
+# (populating both translations); phase B records what the
+# rs1-scoped fence actually invalidated on QEMU 8.2.2 (measured:
+# it does not scope, both addresses read fresh); phase C, after
+# a global sfence.vma, must read B at VA1 and fresh canary D at
+# VA2. Readbacks, PTE values before/after, per-mode trap counts, causes, ecall-site
+# PCs, and an FNV-1a checksum over the verdict values are
+# printed; all interrupt enables stay clear. PASS writes 0x5555 to
+# the virt test-device finisher so the QEMU exit code (0) reflects
+# the verdict; on FAIL it parks the hart.
+# NOTE: src/boot.S must stay first in SRS_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+SRS_SRCS := src/boot.S src/uart.c \
+            src/sfence-vma-rs1-scoped/srs_trap.S src/sfence-vma-rs1-scoped/srs_main.c
+SRS_OBJS := $(SRS_SRCS:.c=.o)
+SRS_OBJS := $(SRS_OBJS:.S=.o)
+
+sfence-vma-rs1-scoped.elf: $(SRS_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SRS_OBJS)
+
+# Run the sfence.vma rs1-scoped invalidation module under QEMU.
+run-sfence-vma-rs1-scoped: sfence-vma-rs1-scoped.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel sfence-vma-rs1-scoped.elf
+
 # medeleg bit-7 store-access-fault trap destination switch module
 # (backlog item "riscv medeleg-store-access-fault"): its own binary
 # sharing only boot.S and the UART driver with the other demos.

@@ -1,0 +1,19 @@
+sfence-vma-rs1-scoped: sfence.vma rs1-scoped invalidation test
+m-mode: pmpcfg0=0x1f (entry0: NAPOT all R|W|X)
+m-mode: satp=0x800000000008000d (MODE=8 ASID=0)
+m-mode: initial leaf PTEs: VA1=0x200018c7 VA2=0x200010c7
+m-mode: entering S-mode (phase A, VA1->PA1, VA2->PA3)
+sfence-vma-rs1-scoped: sfence.vma rs1-scoped invalidation
+boot: satp=0x0 medeleg=0x0
+table: root[2]->l1[0]->l0 identity [0x80000000,0x80080000) R|W|X; root[1]->l1[0]->l0[0] leaf maps 0x40000000; root[3]->l1[0]->l0[0] leaf maps 0xc0000000
+satp=0x800000000008000d (MODE=8 ASID=0)
+pte1_before=0x200018c7 (VA1 -> PA1) pte2_before=0x200010c7 (VA2 -> PA3)
+pte1_after=0x200014c7 (VA1 -> PA2) pte2_after=0x20000cc7 (VA2 -> PA4, no global fence before phase B)
+phaseA: va1=0xaaaaaaaaaaaaaaaa (A) va2=0xcccccccccccccccc (C) mcause=0x9 mepc=0x800002d6 expected=0x800002d6
+phaseB: va1=0xbbbbbbbbbbbbbbbb (fresh B expected) va2=0xdddddddddddddddd (fresh D observed: scoped fence did not scope) mcause=0x9 mepc=0x80000322 expected=0x80000322
+phaseC: va1=0xbbbbbbbbbbbbbbbb (B) va2=0xdddddddddddddddd (fresh D expected, after global fence) mcause=0x9 mepc=0x8000036e expected=0x8000036e
+canaries: s1=0xaaaaaaaaaaaaaaaa s2=0xbbbbbbbbbbbbbbbb s3=0xcccccccccccccccc s4=0xdddddddddddddddd
+traps: m_traps=3 s_traps=0
+quiet: m_traps=3 s_traps=0
+checksum=0x69d07a40571b29d3
+RESULT: PASS (checks=60)
