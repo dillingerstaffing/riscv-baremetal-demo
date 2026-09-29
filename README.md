@@ -506,6 +506,7 @@ which only works because every task runs on its own stack.
 - **src/mtvec-mode-war/**: M-mode WARL write/readback probe of the mtvec MODE field: a reserved-MODE write is dropped entirely, an all-ones BASE sticks, MODE=0 and MODE=1 both stick, and the boot value restores bit-for-bit. [src/mtvec-mode-war/](src/mtvec-mode-war/)
 - **src/sfence-vma-remap/**: proves a PTE remap is invisible to the hart until sfence.vma: a remap with no fence reads the stale mapping, and the same read after sfence.vma returns the fresh page. [src/sfence-vma-remap/](src/sfence-vma-remap/)
 - **src/sfence-vma-rs1-scoped/**: checks whether sfence.vma with rs1 set scopes the invalidation to the named address. [src/sfence-vma-rs1-scoped/](src/sfence-vma-rs1-scoped/)
+- **src/sfence-vma-rs2-scoped/**: checks whether sfence.vma with rs1=x0 and rs2 holding an ASID scopes the invalidation to that ASID. [src/sfence-vma-rs2-scoped/](src/sfence-vma-rs2-scoped/)
 
 
 ## Hire the author
