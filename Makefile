@@ -3185,3 +3185,37 @@ pmp-tor-bottom.elf: $(PBOT_OBJS) link.ld
 # Run the pmp-tor-bottom module under QEMU.
 run-pmp-tor-bottom: pmp-tor-bottom.elf
 	$(QEMU) -machine virt -nographic -bios none -kernel pmp-tor-bottom.elf
+
+# sfence.vma rs2-scoped (ASID-scoped) invalidation module
+# (backlog item "riscv sfence-vma-rs2-asid-scoped"): its own binary
+# sharing only boot.S and the UART driver with the other demos.
+# Builds two Sv39 roots: root1 (ASID 1) maps one VA to the
+# canary-A page, root2 (ASID 2) maps the SAME VA to the canary-B
+# page. Reads VA under each ASID (phase A must read A, phase B
+# must read B, populating both (ASID, VA) cache entries), rewrites
+# both leaf PTEs with NO fence and no satp write (root1 leaf to
+# the canary-C page, root2 leaf to the canary-D page), then reads
+# VA under ASID 2 with satp untouched: phase C must read stale B
+# (the cached-stale baseline). M-mode then issues sfence.vma with
+# rs1 = x0 and rs2 = 1 (ASID 1 only); phase D, still under ASID 2,
+# records the scoping verdict (stale B = correctly scoped, fresh
+# D = over-invalidation; measured on QEMU 8.2.2: fresh D). M-mode
+# reinstalls root1/ASID1 with a full fence; phase E must read
+# fresh C. Readbacks, PTE values before/after, per-mode trap
+# counts, causes, ecall-site PCs, and an FNV-1a checksum over the
+# verdict values are printed; all interrupt enables stay clear.
+# PASS writes 0x5555 to the virt test-device finisher so the QEMU
+# exit code (0) reflects the verdict; on FAIL it parks the hart.
+# NOTE: src/boot.S must stay first in SRS2_SRCS so _start lands at
+# 0x80000000, the address QEMU's -kernel loader starts at.
+SRS2_SRCS := src/boot.S src/uart.c \
+            src/sfence-vma-rs2-scoped/srs2_trap.S src/sfence-vma-rs2-scoped/srs2_main.c
+SRS2_OBJS := $(SRS2_SRCS:.c=.o)
+SRS2_OBJS := $(SRS2_OBJS:.S=.o)
+
+sfence-vma-rs2-scoped.elf: $(SRS2_OBJS) link.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SRS2_OBJS)
+
+# Run the sfence.vma rs2-scoped invalidation module under QEMU.
+run-sfence-vma-rs2-scoped: sfence-vma-rs2-scoped.elf
+	$(QEMU) -machine virt -nographic -bios none -kernel sfence-vma-rs2-scoped.elf

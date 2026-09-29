@@ -1,0 +1,21 @@
+sfence-vma-rs2-scoped: sfence.vma rs2-scoped (ASID) invalidation test
+m-mode: pmpcfg0=0x1f (entry0: NAPOT all R|W|X)
+m-mode: satp=0x800010000008000f (MODE=8 ASID=1)
+m-mode: initial leaf PTEs: ASID1=0x20001cc7 ASID2=0x200018c7
+m-mode: entering S-mode (phase A, ASID1: VA->PA1)
+sfence-vma-rs2-scoped: sfence.vma rs2-scoped (ASID) invalidation
+boot: satp=0x0 medeleg=0x0
+table: root1[1]->l1[0]->l0[0] leaf maps 0x40000000 (ASID 1); root2[1]->l1[0]->l0[0] leaf maps 0x40000000 (ASID 2); root[2]->l1[0]->l0[] identity [0x80000000,0x80080000) R|W|X
+satpA=0x800010000008000f (MODE=8 ASID=1) satpB=0x800020000008000c (MODE=8 ASID=2) satpE=0x800010000008000f (MODE=8 ASID=1)
+pte1_before=0x20001cc7 (ASID1 leaf -> PA1) pte2_before=0x200018c7 (ASID2 leaf -> PA2)
+pte1_after=0x200014c7 (ASID1 leaf -> PA3) pte2_after=0x200010c7 (ASID2 leaf -> PA4, no fence, no satp write)
+phaseA: va=0xaaaaaaaaaaaaaaaa (A expected) mcause=0x9 mepc=0x800002c0 expected=0x800002c0
+phaseB: va=0xbbbbbbbbbbbbbbbb (B expected) mcause=0x9 mepc=0x800002f6 expected=0x800002f6
+phaseC: va=0xbbbbbbbbbbbbbbbb (stale B expected: no fence yet) mcause=0x9 mepc=0x8000032c expected=0x8000032c
+phaseD: va=0xdddddddddddddddd (after sfence.vma rs1=x0,rs2=1) mcause=0x9 mepc=0x80000362 expected=0x80000362
+phaseE: va=0xcccccccccccccccc (fresh C expected, ASID1 reinstalled+fenced) mcause=0x9 mepc=0x80000398 expected=0x80000398
+canaries: s1=0xaaaaaaaaaaaaaaaa s2=0xbbbbbbbbbbbbbbbb s3=0xcccccccccccccccc s4=0xdddddddddddddddd sentinels: s1e=0x0 s2e=0x0 s3e=0x0 s4e=0x0
+traps: m_traps=5 s_traps=0
+quiet: m_traps=5 s_traps=0
+checksum=0x30523dc5b14164bb
+RESULT: PASS (checks=82)
