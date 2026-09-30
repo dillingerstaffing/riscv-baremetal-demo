@@ -507,6 +507,7 @@ which only works because every task runs on its own stack.
 - **src/sfence-vma-remap/**: proves a PTE remap is invisible to the hart until sfence.vma: a remap with no fence reads the stale mapping, and the same read after sfence.vma returns the fresh page. [src/sfence-vma-remap/](src/sfence-vma-remap/)
 - **src/sfence-vma-rs1-scoped/**: checks whether sfence.vma with rs1 set scopes the invalidation to the named address. [src/sfence-vma-rs1-scoped/](src/sfence-vma-rs1-scoped/)
 - **src/sfence-vma-rs2-scoped/**: checks whether sfence.vma with rs1=x0 and rs2 holding an ASID scopes the invalidation to that ASID. [src/sfence-vma-rs2-scoped/](src/sfence-vma-rs2-scoped/)
+- **src/mhartid-readonly/**: verifies mhartid is a read-only CSR: both csrw attempts trap as illegal instructions and the hart ID reads back unchanged. [src/mhartid-readonly/](src/mhartid-readonly/)
 
 
 ## Hire the author
