@@ -1,0 +1,10 @@
+mhartid-readonly: mhartid read-only invariant check
+boot: mhartid=0x0
+write: value=0xffffffffffffffff readback=0x0
+write: value=0x0 readback=0x0
+traps: count=2
+trap[0]: mcause=0x2 mepc=0x80000316 mtval=0xf1479073
+trap[1]: mcause=0x2 mepc=0x80000352 mtval=0xf1479073
+checksum=0x29c5e4e7cf447a7d (FNV-1a over readbacks and trap records)
+summary: checks=7 mismatches=0
+RESULT: PASS
