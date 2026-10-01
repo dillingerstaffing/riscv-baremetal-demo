@@ -508,6 +508,7 @@ which only works because every task runs on its own stack.
 - **src/sfence-vma-rs1-scoped/**: checks whether sfence.vma with rs1 set scopes the invalidation to the named address. [src/sfence-vma-rs1-scoped/](src/sfence-vma-rs1-scoped/)
 - **src/sfence-vma-rs2-scoped/**: checks whether sfence.vma with rs1=x0 and rs2 holding an ASID scopes the invalidation to that ASID. [src/sfence-vma-rs2-scoped/](src/sfence-vma-rs2-scoped/)
 - **src/mhartid-readonly/**: verifies mhartid is a read-only CSR: both csrw attempts trap as illegal instructions and the hart ID reads back unchanged. [src/mhartid-readonly/](src/mhartid-readonly/)
+- **src/mhartid-s-mode-read/**: verifies the privilege gate on mhartid: an S-mode read traps as an illegal instruction instead of returning the hart ID. [src/mhartid-s-mode-read/](src/mhartid-s-mode-read/)
 
 
 ## Hire the author

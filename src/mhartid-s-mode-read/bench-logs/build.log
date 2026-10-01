@@ -1,0 +1,3 @@
+/home/hatch/workspace/toolchains/ubuntu-rv64/usr/bin/../lib/gcc/riscv64-unknown-elf/13.2.0/../../../riscv64-unknown-elf/bin/ld: warning: mhartid-s-mode-read.elf has a LOAD segment with RWX permissions
+built mhartid-s-mode-read.elf
+exit=0

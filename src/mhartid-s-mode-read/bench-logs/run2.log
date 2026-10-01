@@ -1,0 +1,24 @@
+
+mhartid-s-mode-read: S-mode read of the M-mode hart ID register
+boot: mhartid=0x0 second=0x0
+medeleg readback=0x4
+setup complete; dropping to S-mode...
+in S-mode; mhartid read experiment begins
+
+phase A: csrr mhartid in S-mode (expect S-mode trap):
+  fault site (label 1)  = 0x800002ec
+  resume site (label 2) = 0x800002f0
+  scause  = 0x2
+  stval   = 0xf14024f3
+  sepc    = 0x800002ec
+  sepc+4  = 0x800002f0
+  traps   = 1
+  csrr dest register = 0xdeadbeefdeadbeef (sentinel = 0xdeadbeefdeadbeef)
+
+phase B: csrr sstatus in S-mode (expect success):
+  sstatus readback = 0x200000020
+  S-mode traps after phase B = 1
+
+checksum (FNV-1a over verdict values) = 0xc3067c713d5fdc59
+summary: checks=11 mismatches=0
+RESULT: PASS
