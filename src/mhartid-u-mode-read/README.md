@@ -1,0 +1,3 @@
+# mhartid-u-mode-read
+
+Verifies the privilege gate on the `mhartid` CSR on the QEMU `virt` board: M-mode reads the hart ID as `0x0`, then the hart drops to U-mode and reads the same register, which raises an illegal-instruction trap (scause `0x2`) delivered to S-mode through medeleg bit 2, with the destination register never overwritten. A control read of `sstatus` in U-mode traps identically, proving the gate is charged to the privilege level rather than to the CSR itself. The ending U-mode ecall returns to M-mode, which restores `medeleg` and `pmpcfg0` to their boot values before the test-device finisher shuts the machine down. See [PROOF.md](PROOF.md) for the measured results.

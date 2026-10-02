@@ -1,0 +1,31 @@
+
+mhartid-u-mode-read: U-mode read of the M-mode hart ID register
+boot: medeleg=0x0 pmpcfg0=0x0
+boot: mhartid=0x0 second=0x0
+medeleg readback=0x4
+setup complete; dropping to U-mode...
+in U-mode; mhartid read experiment begins
+
+phase A: csrr mhartid in U-mode (expect S-mode trap):
+  fault site (label 1)  = 0x8000033c
+  resume site (label 2) = 0x80000340
+  scause  = 0x2
+  stval   = 0xf1402973
+  sepc    = 0x8000033c
+  sepc+4  = 0x80000340
+  traps   = 1
+  csrr dest register = 0xdeadbeefdeadbeef (sentinel = 0xdeadbeefdeadbeef)
+
+phase B: csrr sstatus in U-mode (expect S-mode trap):
+  fault site (label 1)  = 0x800004b0
+  resume site (label 2) = 0x800004b4
+  scause  = 0x2
+  stval   = 0x10002973
+  sepc    = 0x800004b0
+  sepc+4  = 0x800004b4
+  traps   = 2
+  csrr dest register = 0xdeadbeefdeadbeef (sentinel = 0xdeadbeefdeadbeef)
+
+checksum (FNV-1a over verdict values) = 0x4504320e66bc7b23
+summary: checks=14 mismatches=0
+RESULT: PASS
