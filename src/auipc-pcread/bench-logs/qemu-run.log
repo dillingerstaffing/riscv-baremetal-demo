@@ -1,0 +1,5 @@
+auipc rd,0      -> 0x800001d2  (expect the auipc's own address from objdump)
+auipc rd,0x12345 -> 0x923451f4  (expect pc + 0x12345000)
+pc-relative ld  -> 0x123456789abcdef0  (expect 0x123456789abcdef0)
+done
+qemu-system-riscv64: terminating on signal 15 from pid 4062 (timeout)
