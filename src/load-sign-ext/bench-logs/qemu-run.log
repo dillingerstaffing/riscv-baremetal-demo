@@ -1,0 +1,6 @@
+pattern: 0x80000001
+lw  -> 0xffffffff80000001
+lwu -> 0x80000001
+mismatches: 0
+PASS
+qemu-system-riscv64: terminating on signal 15 from pid 9514 (timeout)
