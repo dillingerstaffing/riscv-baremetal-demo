@@ -1,0 +1,12 @@
+hi = 0x8000000000000000
+lo = 0x1000
+kern = 0xfffffffffffff000
+blt (hi, lo) : got 1, want 1  ok
+blt (lo, hi) : got 0, want 0  ok
+bltu(hi, lo) : got 0, want 0  ok
+bltu(lo, hi) : got 1, want 1  ok
+blt (kern, lo): got 1, want 1  ok
+bltu(kern, lo): got 0, want 0  ok
+mismatches: 0
+PASS
+qemu-system-riscv64: terminating on signal 15 from pid 10215 (timeout)
