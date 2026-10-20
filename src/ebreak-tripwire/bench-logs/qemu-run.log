@@ -1,0 +1,9 @@
+qemu-system-riscv64 -machine virt -nographic -bios none -kernel ebreak-tripwire.elf
+ebreak-tripwire: two planted tripwires, two named traps
+setup: mtvec=0x800001c8 mie=0x0
+phase A: tripwire=0x800002fe post=0x80000302 delta=4
+phase A trap: mcause=0x3 mepc=0x800002fe insn=0x100073
+phase B: tripwire=0x80000320 post=0x80000322 delta=2
+phase B trap: mcause=0x3 mepc=0x80000320 insn=0x9002
+resume: stored_a=0x80000302 stored_b=0x80000322 marker_a=0xebbe4a marker_b=0xebbe4b traps=2
+RESULT: PASS (traps=2)

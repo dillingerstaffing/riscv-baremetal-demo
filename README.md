@@ -510,6 +510,7 @@ which only works because every task runs on its own stack.
 - **src/mhartid-readonly/**: verifies mhartid is a read-only CSR: both csrw attempts trap as illegal instructions and the hart ID reads back unchanged. [src/mhartid-readonly/](src/mhartid-readonly/)
 - **src/mhartid-s-mode-read/**: verifies the privilege gate on mhartid: an S-mode read traps as an illegal instruction instead of returning the hart ID. [src/mhartid-s-mode-read/](src/mhartid-s-mode-read/)
 - **src/mhartid-u-mode-read/**: verifies the privilege gate on mhartid from user mode: a U-mode read traps as an illegal instruction, and a U-mode read of a supervisor register traps too, charging the gate to the privilege level. [src/mhartid-u-mode-read/](src/mhartid-u-mode-read/)
+- **src/ebreak-tripwire/**: verifies the planted-breakpoint contract in both encodings: a 4-byte `ebreak` (0x00100073) and the 2-byte compressed `c.ebreak` (0x9002, the form `__builtin_trap()` emits at -O2) each trap with mcause 3 and mepc naming the exact tripwire address, with the resume landing 4 and 2 bytes past respectively. [src/ebreak-tripwire/](src/ebreak-tripwire/)
 
 
 ## Hire the author

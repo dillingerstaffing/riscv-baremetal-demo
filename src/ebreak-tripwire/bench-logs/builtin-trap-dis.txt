@@ -1,0 +1,8 @@
+
+/tmp/builtin_trap_check.o:     file format elf64-littleriscv
+
+
+Disassembly of section .text.unlikely:
+
+0000000000000000 <tripwire>:
+   0:	9002                	ebreak

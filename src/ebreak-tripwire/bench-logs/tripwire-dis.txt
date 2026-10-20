@@ -1,0 +1,17 @@
+    800002f6:	010a0a13          	addi	s4,s4,16 # 80000302 <main+0xaa>
+    800002fa:	01443823          	sd	s4,16(s0)
+    800002fe:	00100073          	ebreak
+    80000302:	00ebc7b7          	lui	a5,0xebc
+    80000306:	e4a7879b          	addiw	a5,a5,-438 # ebbe4a <_start-0x7f1441b6>
+--
+    80000318:	00e98993          	addi	s3,s3,14 # 80000322 <main+0xca>
+    8000031c:	03343423          	sd	s3,40(s0)
+    80000320:	9002                	ebreak
+    80000322:	00ebc737          	lui	a4,0xebc
+    80000326:	e4b7071b          	addiw	a4,a4,-437 # ebbe4b <_start-0x7f1441b5>
+--
+    800004f2:	1af49163          	bne	s1,a5,80000694 <main+0x43c>
+    800004f6:	67a5                	lui	a5,0x9
+    800004f8:	0789                	addi	a5,a5,2 # 9002 <_start-0x7fff6ffe>
+    800004fa:	18f41663          	bne	s0,a5,80000686 <main+0x42e>
+    800004fe:	4791                	li	a5,4
