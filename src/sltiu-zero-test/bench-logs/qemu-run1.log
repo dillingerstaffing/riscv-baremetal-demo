@@ -1,0 +1,6 @@
+sltiu(v, 1) v=0x0 -> 1
+sltiu(v, 1) v=0x1 -> 0
+sltiu(v, 1) v=0x2 -> 0
+sltiu(v, 1) v=0x5 -> 0
+sltiu(v, 1) v=0xffffffffffffffff -> 0
+done
