@@ -1,0 +1,6 @@
+sextw in=0x80000001 addiw=0xffffffff80000001 addi=0x80000001
+sextw in=0x7fffffff addiw=0x7fffffff addi=0x7fffffff
+sextw in=0x180000001 addiw=0xffffffff80000001 addi=0x180000001
+sextw in=0xffffffff80000001 addiw=0xffffffff80000001 addi=0xffffffff80000001
+sextw in=0xffffffff addiw=0xffffffffffffffff addi=0xffffffff
+done
