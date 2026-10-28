@@ -1,0 +1,3 @@
+/tmp/andi-test/reject.s: Assembler messages:
+/tmp/andi-test/reject.s:4: Error: illegal operands `andi t0,s0,0xfff'
+/tmp/andi-test/reject.s:5: Error: illegal operands `andi t1,s0,0x800'
